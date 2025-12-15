@@ -1,10 +1,358 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * This is a manifest file that'll be compiled into application.css
  */
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1e40af;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-background: #f9fafb;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-text: #1f2937;
+  --color-text-light: #6b7280;
+  --spacing-unit: 1rem;
+  --border-radius: 8px;
+  --max-width: 1200px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+/* Layout */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-unit);
+}
+
+header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-unit) 0;
+  margin-bottom: calc(var(--spacing-unit) * 2);
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+header h1 a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+main {
+  min-height: calc(100vh - 200px);
+  padding-bottom: calc(var(--spacing-unit) * 2);
+}
+
+footer {
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: calc(var(--spacing-unit) * 1.5) 0;
+  margin-top: calc(var(--spacing-unit) * 3);
+  text-align: center;
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+}
+
+/* Notifications */
+.notice,
+.alert {
+  padding: calc(var(--spacing-unit) * 0.75) var(--spacing-unit);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-unit);
+}
+
+.notice {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.alert {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* Dashboard */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing-unit) * 2);
+}
+
+.progress-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-unit);
+}
+
+.stat-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: calc(var(--spacing-unit) * 1.5);
+  text-align: center;
+}
+
+.stat-card h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: calc(var(--spacing-unit) * 0.5);
+}
+
+.stat-card p {
+  font-size: 1.125rem;
+  color: var(--color-text);
+  margin-bottom: calc(var(--spacing-unit) * 0.25);
+}
+
+.stat-card small {
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+}
+
+.stat-card small.complete {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+/* In-progress drive */
+.in-progress-drive {
+  background-color: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: var(--border-radius);
+  padding: calc(var(--spacing-unit) * 1.5);
+}
+
+.in-progress-drive h3 {
+  margin-bottom: var(--spacing-unit);
+  color: #92400e;
+}
+
+.in-progress-drive p {
+  margin-bottom: calc(var(--spacing-unit) * 0.5);
+}
+
+.in-progress-drive .button-primary {
+  margin-top: var(--spacing-unit);
+  margin-right: calc(var(--spacing-unit) * 0.5);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: var(--spacing-unit);
+  flex-wrap: wrap;
+}
+
+/* Drive history */
+.drive-history {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: calc(var(--spacing-unit) * 1.5);
+}
+
+.drive-history h3 {
+  margin-bottom: var(--spacing-unit);
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-unit);
+}
+
+table th {
+  text-align: left;
+  padding: calc(var(--spacing-unit) * 0.75);
+  background-color: var(--color-background);
+  border-bottom: 2px solid var(--color-border);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+table td {
+  padding: calc(var(--spacing-unit) * 0.75);
+  border-bottom: 1px solid var(--color-border);
+}
+
+table tr:hover {
+  background-color: var(--color-background);
+}
+
+table td.actions {
+  text-align: right;
+}
+
+table td.actions a,
+table td.actions button {
+  margin-left: calc(var(--spacing-unit) * 0.5);
+  font-size: 0.875rem;
+}
+
+/* Forms */
+.drive-form {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: calc(var(--spacing-unit) * 2);
+  max-width: 600px;
+}
+
+.field {
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.field label {
+  display: block;
+  margin-bottom: calc(var(--spacing-unit) * 0.5);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.field input[type="text"],
+.field input[type="datetime-local"],
+.field textarea {
+  width: 100%;
+  padding: calc(var(--spacing-unit) * 0.625);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+/* Error messages */
+.error-messages {
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-unit);
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.error-messages h3 {
+  color: #991b1b;
+  font-size: 0.875rem;
+  margin-bottom: calc(var(--spacing-unit) * 0.5);
+}
+
+.error-messages ul {
+  margin-left: calc(var(--spacing-unit) * 1.25);
+  color: #991b1b;
+  font-size: 0.875rem;
+}
+
+/* Buttons */
+.button,
+.button-primary,
+.button-large,
+button[type="submit"],
+input[type="submit"] {
+  display: inline-block;
+  padding: calc(var(--spacing-unit) * 0.625) calc(var(--spacing-unit) * 1.25);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button:hover {
+  background-color: var(--color-background);
+  border-color: var(--color-text-light);
+}
+
+.button-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.button-primary:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.button-large {
+  padding: calc(var(--spacing-unit) * 0.875) calc(var(--spacing-unit) * 2);
+  font-size: 1.125rem;
+}
+
+.link-danger {
+  color: var(--color-danger);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-danger:hover {
+  color: #991b1b;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: calc(var(--spacing-unit) * 3) var(--spacing-unit);
+  color: var(--color-text-light);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .progress-summary {
+    grid-template-columns: 1fr;
+  }
+
+  table {
+    font-size: 0.875rem;
+  }
+
+  table th,
+  table td {
+    padding: calc(var(--spacing-unit) * 0.5);
+  }
+
+  .button-large {
+    width: 100%;
+  }
+}

@@ -1,0 +1,46 @@
+<%= form_with model: drive_session, class: "drive-form" do |f| %>
+  <% if drive_session.errors.any? %>
+    <div class="error-messages">
+      <h3><%= pluralize(drive_session.errors.count, "error") %> prevented this drive from being saved:</h3>
+      <ul>
+        <% drive_session.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :driver_name, "Driver Name" %>
+    <%= f.text_field :driver_name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= f.label :supervisor_name, "Supervisor Name (optional)" %>
+    <%= f.text_field :supervisor_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :started_at, "Start Time" %>
+    <%= f.datetime_local_field :started_at, required: true %>
+  </div>
+
+  <% if drive_session.persisted? %>
+    <div class="field">
+      <%= f.label :ended_at, "End Time (optional)" %>
+      <%= f.datetime_local_field :ended_at %>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :notes, "Notes (optional)" %>
+    <%= f.text_area :notes, rows: 3,
+                    placeholder: "Road types, conditions, skills practiced..." %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit class: "button-primary" %>
+    <%= link_to "Cancel", drive_sessions_path, class: "button" %>
+  </div>
+<% end %>
+

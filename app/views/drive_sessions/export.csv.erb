@@ -1,0 +1,15 @@
+<%- headers = ["Date", "Start Time", "End Time", "Duration (hours)", "Night Drive", "Driver", "Supervisor", "Notes"] -%>
+<%= CSV.generate_line(headers) -%>
+<%- @sessions.each do |session| -%>
+<%= CSV.generate_line([
+  session.started_at.strftime("%m/%d/%Y"),
+  session.started_at.strftime("%I:%M %p"),
+  session.ended_at&.strftime("%I:%M %p"),
+  session.duration_hours,
+  session.is_night_drive ? "Yes" : "No",
+  session.driver_name,
+  session.supervisor_name,
+  session.notes
+]) -%>
+<%- end -%>
+
