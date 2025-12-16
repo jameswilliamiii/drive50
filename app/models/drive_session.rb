@@ -1,4 +1,6 @@
 class DriveSession < ApplicationRecord
+  belongs_to :user
+
   # Validations
   validates :driver_name, presence: true
   validates :started_at, presence: true

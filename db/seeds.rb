@@ -1,8 +1,14 @@
 # Clear existing data
 DriveSession.destroy_all
+User.destroy_all
 
-# Create sample driver
-driver_name = "Sarah Mitchell"
+# Create sample user
+user = User.create!(
+  name: "Sarah Mitchell",
+  email_address: "jameswilliamiii@gmail.com",
+  password: "password",
+  password_confirmation: "password"
+)
 
 # Create some completed drives
 20.times do |i|
@@ -11,9 +17,8 @@ driver_name = "Sarah Mitchell"
   duration = [ 30, 45, 60, 90, 120 ].sample
   end_time = start_time + duration.minutes
 
-  DriveSession.create!(
-    driver_name: driver_name,
-    supervisor_name: [ "Mom", "Dad", "Uncle Tom", "Aunt Jane" ].sample,
+  user.drive_sessions.create!(
+    driver_name: user.name, # Automatically set to user's name
     started_at: start_time,
     ended_at: end_time,
     notes: [
@@ -26,6 +31,9 @@ driver_name = "Sarah Mitchell"
   )
 end
 
+puts "Created user: #{user.name} (#{user.email_address})"
 puts "Created #{DriveSession.count} drive sessions"
-puts "Total hours: #{DriveSession.total_hours.round(1)}"
-puts "Night hours: #{DriveSession.night_hours.round(1)}"
+total_hours = user.drive_sessions.completed.sum(:duration_minutes) / 60.0
+night_hours = user.drive_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
+puts "Total hours: #{total_hours.round(1)}"
+puts "Night hours: #{night_hours.round(1)}"

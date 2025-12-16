@@ -1,0 +1,75 @@
+<div class="dashboard">
+  <div class="progress-summary">
+    <div class="stat-card">
+      <h2><%= @total_hours.round(1) %> / 50</h2>
+      <p>
+        Total Hours
+        <span class="tooltip-trigger" data-tooltip="Illinois requires 50 hours total of supervised driving practice">
+          <%= icon_info(size: 14, class: "info-icon") %>
+        </span>
+      </p>
+      <% if @hours_needed > 0 %>
+        <small><%= @hours_needed.round(1) %> hours remaining</small>
+      <% else %>
+        <small class="complete"><%= icon_check(size: 16, class: "check-icon") %> Complete!</small>
+      <% end %>
+    </div>
+
+    <div class="stat-card">
+      <h2><%= @night_hours.round(1) %> / 10</h2>
+      <p>
+        Night Hours
+        <span class="tooltip-trigger" data-tooltip="Illinois requires 10 hours of night driving (between sunset and sunrise)">
+          <%= icon_info(size: 14, class: "info-icon") %>
+        </span>
+      </p>
+      <% if @night_hours_needed > 0 %>
+        <small><%= @night_hours_needed.round(1) %> hours remaining</small>
+      <% else %>
+        <small class="complete"><%= icon_check(size: 16, class: "check-icon") %> Complete!</small>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="drive-history">
+    <h3>All Drive Sessions</h3>
+
+    <% if @sessions.any? %>
+      <div id="sessions-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Driver</th>
+              <th>Duration</th>
+              <th>Night</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="sessions-tbody">
+            <%= render partial: "session_row", collection: @sessions, as: :session %>
+          </tbody>
+        </table>
+      </div>
+
+      <turbo-frame id="sessions-pagination" data-controller="infinite-scroll">
+        <div id="pagination-container" class="pagination-wrapper">
+          <% if @pagy.next %>
+            <%= link_to "Load More", @pagy.page_url(:next),
+                        class: "button button-primary",
+                        data: {
+                          turbo_frame: "sessions-pagination",
+                          infinite_scroll_target: "link"
+                        } %>
+          <% end %>
+          <div class="pagination-info">
+            <%== @pagy.info_tag %>
+          </div>
+        </div>
+      </turbo-frame>
+    <% else %>
+      <p class="empty-state">No drives recorded yet. Start your first drive!</p>
+    <% end %>
+  </div>
+</div>
+

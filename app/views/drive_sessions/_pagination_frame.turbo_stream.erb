@@ -1,0 +1,20 @@
+<%= turbo_stream.append "sessions-tbody" do %>
+  <%= render partial: "session_row", collection: @sessions, as: :session %>
+<% end %>
+
+<%= turbo_stream.update "sessions-pagination" do %>
+  <div id="pagination-container" class="pagination-wrapper">
+    <% if @pagy.next %>
+      <%= link_to "Load More", @pagy.page_url(:next),
+                  class: "button button-primary",
+                  data: {
+                    turbo_frame: "sessions-pagination",
+                    infinite_scroll_target: "link"
+                  } %>
+    <% end %>
+    <div class="pagination-info">
+      <%== @pagy.info_tag %>
+    </div>
+  </div>
+<% end %>
+

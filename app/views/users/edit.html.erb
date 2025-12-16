@@ -1,0 +1,42 @@
+<div class="dashboard">
+  <h2>Edit Profile</h2>
+
+  <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
+    <% if @user.errors.any? %>
+      <div class="error-messages">
+        <h3><%= pluralize(@user.errors.count, "error") %> prevented this profile from being saved:</h3>
+        <ul>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :name, "Name" %>
+      <%= f.text_field :name, required: true %>
+    </div>
+
+    <div class="field">
+      <%= f.label :email_address, "Email" %>
+      <%= f.email_field :email_address, required: true %>
+    </div>
+
+    <div class="field">
+      <%= f.label :password, "New Password (leave blank to keep current)" %>
+      <%= f.password_field :password %>
+      <small>Leave blank if you don't want to change it</small>
+    </div>
+
+    <div class="field">
+      <%= f.label :password_confirmation, "Confirm New Password" %>
+      <%= f.password_field :password_confirmation %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Update Profile", class: "button-primary" %>
+      <%= link_to "Cancel", root_path, class: "button" %>
+    </div>
+  <% end %>
+</div>

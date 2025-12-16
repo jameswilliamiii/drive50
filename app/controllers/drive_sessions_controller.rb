@@ -2,23 +2,52 @@ class DriveSessionsController < ApplicationController
   before_action :set_drive_session, only: [ :edit, :update, :destroy, :complete ]
 
   def index
-    @in_progress = DriveSession.in_progress.first
-    @sessions = DriveSession.completed.ordered.limit(50)
-    @total_hours = DriveSession.total_hours
-    @night_hours = DriveSession.night_hours
-    @hours_needed = DriveSession.hours_needed
-    @night_hours_needed = DriveSession.night_hours_needed
+    user_sessions = Current.user.drive_sessions
+    @in_progress = user_sessions.in_progress.first
+
+    # Show only recent 3 drives for summary view
+    @recent_sessions = user_sessions.completed.ordered.limit(3)
+
+    @total_hours = user_sessions.completed.sum(:duration_minutes) / 60.0
+    @night_hours = user_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
+    @hours_needed = [ 50 - @total_hours, 0 ].max
+    @night_hours_needed = [ 10 - @night_hours, 0 ].max
+  end
+
+  def all
+    user_sessions = Current.user.drive_sessions
+
+    # Use pagy for pagination (v43 API: pagy(:offset, collection))
+    @pagy, @sessions = pagy(:offset, user_sessions.completed.ordered, limit: 20)
+
+    @total_hours = user_sessions.completed.sum(:duration_minutes) / 60.0
+    @night_hours = user_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
+    @hours_needed = [ 50 - @total_hours, 0 ].max
+    @night_hours_needed = [ 10 - @night_hours, 0 ].max
+
+    # Handle turbo frame requests for infinite scroll
+    if turbo_frame_request?
+      respond_to do |format|
+        format.turbo_stream { render partial: "pagination_frame" }
+      end
+    end
   end
 
   def new
-    @drive_session = DriveSession.new(
-      started_at: Time.current,
-      driver_name: params[:driver_name]
+    @drive_session = Current.user.drive_sessions.build(
+      started_at: Time.current
     )
   end
 
   def create
-    @drive_session = DriveSession.new(drive_session_params)
+    @drive_session = Current.user.drive_sessions.build(
+      started_at: params[:drive_session]&.dig(:started_at) || Time.current,
+      driver_name: Current.user.name
+    )
+
+    if params[:drive_session].present?
+      @drive_session.assign_attributes(drive_session_params)
+    end
 
     if @drive_session.save
       redirect_to drive_sessions_path, notice: "Drive started!"
@@ -31,7 +60,10 @@ class DriveSessionsController < ApplicationController
   end
 
   def update
-    if @drive_session.update(drive_session_params)
+    @drive_session.assign_attributes(drive_session_params)
+    @drive_session.driver_name = Current.user.name
+
+    if @drive_session.save
       redirect_to drive_sessions_path, notice: "Drive updated."
     else
       render :edit, status: :unprocessable_entity
@@ -45,11 +77,27 @@ class DriveSessionsController < ApplicationController
 
   def destroy
     @drive_session.destroy
-    redirect_to drive_sessions_path, notice: "Drive deleted."
+
+    # Clear association cache and reload user
+    Current.user.association(:drive_sessions).reset
+    Current.user.reload
+
+    # Get updated recent sessions for the table (always show up to 3)
+    # Query directly to bypass any caching issues
+    @recent_sessions = DriveSession.where(user_id: Current.user.id)
+                                   .completed
+                                   .ordered
+                                   .limit(3)
+                                   .to_a
+
+    respond_to do |format|
+      format.html { redirect_to drive_sessions_path }
+      format.turbo_stream
+    end
   end
 
   def export
-    @sessions = DriveSession.completed.ordered
+    @sessions = Current.user.drive_sessions.completed.ordered
 
     respond_to do |format|
       format.csv do
@@ -62,13 +110,11 @@ class DriveSessionsController < ApplicationController
   private
 
   def set_drive_session
-    @drive_session = DriveSession.find(params[:id])
+    @drive_session = Current.user.drive_sessions.find(params[:id])
   end
 
   def drive_session_params
     params.require(:drive_session).permit(
-      :driver_name,
-      :supervisor_name,
       :started_at,
       :ended_at,
       :notes

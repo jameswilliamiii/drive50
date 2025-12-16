@@ -1,0 +1,20 @@
+<tr id="<%= dom_id(session) %>" class="drive-session-row" data-controller="drive-session">
+  <td data-label="Date"><%= local_time(session.started_at, format: "%B %d, %Y") %></td>
+  <td data-label="Driver"><%= session.driver_name %></td>
+  <td data-label="Duration"><%= session.duration_hours %> hrs</td>
+  <td data-label="Night" class="night-indicator">
+    <%= session.is_night_drive ? icon_moon(size: 20, class: "night-icon") : icon_sun(size: 20, class: "day-icon") %>
+  </td>
+  <td class="actions">
+    <%= link_to "Edit", edit_drive_session_path(session), class: "button button-small" %>
+    <%= button_to "Delete", drive_session_path(session),
+                  method: :delete,
+                  data: { turbo_confirm: "Are you sure?" },
+                  class: "action-link-danger",
+                  form: {
+                    style: "display: inline;",
+                    data: { action: "submit->drive-session#handleDelete" }
+                  } %>
+  </td>
+</tr>
+

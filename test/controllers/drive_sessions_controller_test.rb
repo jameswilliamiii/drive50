@@ -1,6 +1,11 @@
 require "test_helper"
 
 class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @user = users(:one)
+    sign_in_as @user
+  end
+
   test "should get index" do
     get drive_sessions_url
     assert_response :success

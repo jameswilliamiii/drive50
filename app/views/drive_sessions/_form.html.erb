@@ -11,24 +11,25 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :driver_name, "Driver Name" %>
-    <%= f.text_field :driver_name, required: true %>
-  </div>
-
-  <div class="field">
-    <%= f.label :supervisor_name, "Supervisor Name (optional)" %>
-    <%= f.text_field :supervisor_name %>
-  </div>
-
-  <div class="field">
     <%= f.label :started_at, "Start Time" %>
-    <%= f.datetime_local_field :started_at, required: true %>
+    <% if drive_session.started_at.present? %>
+      <%= f.datetime_local_field :started_at,
+                                  value: drive_session.started_at&.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M"),
+                                  required: true %>
+    <% else %>
+      <%= f.datetime_local_field :started_at, required: true %>
+    <% end %>
   </div>
 
   <% if drive_session.persisted? %>
     <div class="field">
       <%= f.label :ended_at, "End Time (optional)" %>
-      <%= f.datetime_local_field :ended_at %>
+      <% if drive_session.ended_at.present? %>
+        <%= f.datetime_local_field :ended_at,
+                                    value: drive_session.ended_at&.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M") %>
+      <% else %>
+        <%= f.datetime_local_field :ended_at %>
+      <% end %>
     </div>
   <% end %>
 

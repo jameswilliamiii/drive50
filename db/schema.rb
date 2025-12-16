@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_15_231347) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_16_144745) do
   create_table "drive_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "driver_name", null: false
@@ -19,9 +19,31 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_15_231347) do
     t.boolean "is_night_drive", default: false, null: false
     t.text "notes"
     t.datetime "started_at", null: false
-    t.string "supervisor_name"
     t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
     t.index ["ended_at"], name: "index_drive_sessions_on_ended_at"
     t.index ["started_at"], name: "index_drive_sessions_on_started_at"
+    t.index ["user_id"], name: "index_drive_sessions_on_user_id"
   end
+
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.string "name"
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
+  add_foreign_key "drive_sessions", "users"
+  add_foreign_key "sessions", "users"
 end
