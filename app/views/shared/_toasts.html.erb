@@ -1,0 +1,10 @@
+<div class="toast-container" id="toast-container">
+  <% [
+    { type: "success", content: notice, duration: 5000 },
+    { type: "error", content: alert, duration: 6000 }
+  ].each do |toast| %>
+    <% if toast[:content].present? %>
+      <%= render "shared/toast", type: toast[:type], content: toast[:content], duration: toast[:duration] %>
+    <% end %>
+  <% end %>
+</div>

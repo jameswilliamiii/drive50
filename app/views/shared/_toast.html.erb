@@ -1,0 +1,8 @@
+<div class="toast toast-<%= type %>"
+     data-controller="toast"
+     data-toast-type-value="<%= type %>"
+     data-toast-duration-value="<%= duration %>">
+  <div class="toast-content"><%= content %></div>
+  <button type="button" class="toast-close" data-action="click->toast#close" aria-label="Close"></button>
+</div>
+

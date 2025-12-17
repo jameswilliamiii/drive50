@@ -57,6 +57,8 @@
 .bottom-nav-form button.bottom-nav-item {
   width: 100%;
   box-shadow: none;
+  background-color: transparent;
+  border: none;
 }
 
 .bottom-nav-icon {

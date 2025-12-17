@@ -1,0 +1,40 @@
+<header>
+  <div class="container">
+    <div class="header-content">
+      <h1><%= link_to "Drive50", root_path %></h1>
+      <% if authenticated? %>
+        <div class="header-nav">
+          <button type="button" class="menu-button" data-drawer-target="button" data-action="click->drawer#toggle" aria-label="Toggle menu" aria-expanded="false">
+            <%= icon_menu(size: 24, class: "menu-icon") %>
+          </button>
+          <!-- Drawer for desktop dropdown -->
+          <div class="drawer-backdrop drawer-backdrop-desktop" data-drawer-target="backdrop" data-action="click->drawer#handleBackdropClick"></div>
+          <nav class="drawer drawer-desktop" data-drawer-target="drawer">
+            <div class="drawer-content" data-action="click->drawer#handleMenuItemClick">
+              <%= button_to "Start New Drive", drive_sessions_path,
+                            method: :post,
+                            class: "drawer-item drawer-item-primary",
+                            form: { style: "display: inline;" } %>
+              <%= link_to "All Drives", all_drive_sessions_path, class: "drawer-item" %>
+              <%= link_to "Export Log", export_drive_sessions_path(format: :csv), class: "drawer-item" %>
+              <%= link_to "Edit Profile", edit_user_path, class: "drawer-item" %>
+              <hr class="drawer-divider">
+              <%= link_to "Sign Out", session_path, data: { turbo_method: :delete }, class: "drawer-item drawer-item-danger" %>
+            </div>
+          </nav>
+        </div>
+      <% else %>
+        <div class="header-nav" data-controller="menu" data-action="click@window->menu#handleClickOutside">
+          <button type="button" class="menu-button" data-menu-target="button" data-action="click->menu#toggle" aria-label="Toggle menu" aria-expanded="false">
+            <%= icon_menu(size: 24, class: "menu-icon") %>
+          </button>
+          <nav class="menu" data-menu-target="menu">
+            <%= link_to "Sign In", new_session_path, class: "menu-item" %>
+            <%= link_to "Sign Up", new_registration_path, class: "menu-item menu-item-primary" %>
+          </nav>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</header>
+

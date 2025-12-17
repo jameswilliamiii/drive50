@@ -111,9 +111,10 @@
 }
 
 .view-all-link {
-  margin-top: var(--spacing-xl);
+  margin: var(--spacing-xl) auto 0;
   text-align: center;
   padding-top: var(--spacing-lg);
+  max-width: 350px;
 }
 
 .view-all-link .button {

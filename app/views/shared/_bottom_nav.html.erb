@@ -1,0 +1,16 @@
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav">
+  <%= link_to root_path, class: "bottom-nav-item #{'active' if request.path == root_path}" do %>
+    <%= icon_home(size: 24, class: "bottom-nav-icon") %>
+    <span class="bottom-nav-label">Home</span>
+  <% end %>
+  <%= button_to drive_sessions_path, method: :post, class: "bottom-nav-item", form: { class: "bottom-nav-form" } do %>
+    <%= icon_plus(size: 24, class: "bottom-nav-icon") %>
+    <span class="bottom-nav-label">New Drive</span>
+  <% end %>
+  <button type="button" class="bottom-nav-item" data-drawer-target="button" data-action="click->drawer#toggle" aria-label="Toggle menu" aria-expanded="false">
+    <%= icon_menu(size: 24, class: "bottom-nav-icon") %>
+    <span class="bottom-nav-label">Menu</span>
+  </button>
+</nav>
+

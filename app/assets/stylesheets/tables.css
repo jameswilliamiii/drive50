@@ -217,6 +217,7 @@ table td.night-indicator {
   }
 
   .drive-history table td::before {
+    content: none;
     font-size: 0.625rem;
   }
 }

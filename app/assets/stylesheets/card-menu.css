@@ -21,6 +21,12 @@
     width: 100%;
   }
 
+  .card-header.mobile-only span {
+    flex-grow: 1;
+    text-align: center;
+    font-weight: 600;
+  }
+
   .card-menu-button {
     display: flex;
     background: none;
@@ -171,7 +177,7 @@
   }
 
   .card-stats-row {
-    display: flex;
+    display: flex !important;
     gap: var(--spacing-lg);
     width: 100%;
     padding: 0;
