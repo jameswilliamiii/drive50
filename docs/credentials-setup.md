@@ -19,8 +19,8 @@ resend:
 
 # Mail configuration
 mail:
-  from: noreply@yourdomain.com
-  host: yourdomain.com
+  from: noreply@drive50.app
+  host: drive50.app
 ```
 
 ### Example credentials.yml.enc structure:

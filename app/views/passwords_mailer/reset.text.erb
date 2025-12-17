@@ -1,4 +1,14 @@
-You can reset your password on
+Reset Your Password
+
+Hello<%= " #{@user.name}" if @user.name.present? %>!
+
+We received a request to reset your password. Use the link below to create a new password:
+
 <%= edit_password_url(@user.password_reset_token) %>
 
-This link will expire in <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>.
+This link will expire in 1 hour.
+
+If you didn't request a password reset, you can safely ignore this email.
+
+---
+This is an automated message, please do not reply.

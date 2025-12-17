@@ -1,8 +1,6 @@
 <h2>Update your password</h2>
 
 <%= form_with url: password_path(params[:token]), method: :put, class: "drive-form" do |form| %>
-  <%= render "shared/flash_messages" %>
-
   <div class="field">
     <%= form.label :password, "New Password" %>
     <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter new password", maxlength: 72 %>

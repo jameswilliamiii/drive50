@@ -1,6 +1,46 @@
-<p>
-  You can reset your password on
-  <%= link_to "this password reset page", edit_password_url(@user.password_reset_token) %>.
+<!-- Header -->
+<tr>
+  <td class="email-header">
+    <h1>Reset Your Password</h1>
+  </td>
+</tr>
 
-  This link will expire in 1 hour.
-</p>
+<!-- Body -->
+<tr>
+  <td class="email-body">
+    <h2>Hello<%= " #{@user.name}" if @user.name.present? %>!</h2>
+
+    <p>We received a request to reset your password. Click the button below to create a new password:</p>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="button-container">
+      <tr>
+        <td align="center" style="padding: 0;">
+          <a href="<%= edit_password_url(@user.password_reset_token) %>" class="button">Reset Password</a>
+        </td>
+      </tr>
+    </table>
+
+    <p class="text-muted" style="margin-top: 30px;">
+      This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
+    </p>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 30px 0;">
+      <tr>
+        <td style="height: 1px; background-color: #e2e8f0; border: none;"></td>
+      </tr>
+    </table>
+
+    <p class="text-muted">
+      If the button doesn't work, copy and paste this link into your browser:<br>
+      <a href="<%= edit_password_url(@user.password_reset_token) %>" style="color: #0ea5e9; word-break: break-all;"><%= edit_password_url(@user.password_reset_token) %></a>
+    </p>
+  </td>
+</tr>
+
+<!-- Footer -->
+<tr>
+  <td class="email-footer">
+    <p>If you didn't request this password reset, please ignore this email.</p>
+    <p class="text-small">This is an automated message, please do not reply.</p>
+  </td>
+</tr>

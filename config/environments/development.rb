@@ -40,22 +40,8 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
-  # Use Resend SMTP in development if credentials are set, otherwise use test delivery
-  if Rails.application.credentials.dig(:resend, :api_key).present?
-    config.action_mailer.delivery_method = :smtp
-    config.action_mailer.smtp_settings = {
-      address: "smtp.resend.com",
-      port: 465,
-      user_name: "resend",
-      password: Rails.application.credentials.dig(:resend, :api_key),
-      authentication: :plain,
-      enable_starttls_auto: true,
-      tls: true
-    }
-    config.action_mailer.raise_delivery_errors = true
-  else
-    config.action_mailer.delivery_method = :test
-  end
+  # Use test delivery method in development (emails won't actually be sent)
+  config.action_mailer.delivery_method = :test
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
