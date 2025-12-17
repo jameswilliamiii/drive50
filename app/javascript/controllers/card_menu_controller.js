@@ -4,6 +4,27 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["menu", "button", "backdrop"]
 
+  connect() {
+    // Close this menu when page is loaded or restored from cache
+    this.close()
+
+    // Listen for Turbo navigation events to close all menus
+    this.boundCloseAllMenus = this.closeAllMenus.bind(this)
+    document.addEventListener("turbo:before-visit", this.boundCloseAllMenus)
+    document.addEventListener("turbo:load", this.boundCloseAllMenus)
+    document.addEventListener("turbo:restore", this.boundCloseAllMenus)
+  }
+
+  disconnect() {
+    // Remove event listeners
+    document.removeEventListener("turbo:before-visit", this.boundCloseAllMenus)
+    document.removeEventListener("turbo:load", this.boundCloseAllMenus)
+    document.removeEventListener("turbo:restore", this.boundCloseAllMenus)
+
+    // Ensure scroll is restored if controller is disconnected
+    this.close()
+  }
+
   toggle(event) {
     event.stopPropagation()
     const isOpen = this.menuTarget.classList.contains("card-menu-open")
@@ -35,10 +56,31 @@ export default class extends Controller {
   }
 
   close() {
+    // Only close if this menu is actually open
+    if (this.hasMenuTarget && this.menuTarget.classList.contains("card-menu-open")) {
+      document.body.style.overflow = ""
+      if (this.hasBackdropTarget) {
+        this.backdropTarget.classList.remove("card-menu-backdrop-visible")
+      }
+      this.menuTarget.classList.remove("card-menu-open")
+      if (this.hasButtonTarget) {
+        this.buttonTarget.setAttribute("aria-expanded", "false")
+      }
+    }
+  }
+
+  // Close all card menus on the page
+  closeAllMenus() {
+    document.querySelectorAll(".card-menu-open").forEach(menu => {
+      menu.classList.remove("card-menu-open")
+    })
+    document.querySelectorAll(".card-menu-backdrop-visible").forEach(backdrop => {
+      backdrop.classList.remove("card-menu-backdrop-visible")
+    })
+    document.querySelectorAll("[data-card-menu-target='button'][aria-expanded='true']").forEach(button => {
+      button.setAttribute("aria-expanded", "false")
+    })
     document.body.style.overflow = ""
-    this.backdropTarget.classList.remove("card-menu-backdrop-visible")
-    this.menuTarget.classList.remove("card-menu-open")
-    this.buttonTarget.setAttribute("aria-expanded", "false")
   }
 
   // Handle backdrop click
@@ -60,12 +102,6 @@ export default class extends Controller {
   handleFormSubmit(event) {
     // Close the menu when form is submitted (including delete)
     this.close()
-  }
-
-  // Cleanup when element is removed from DOM
-  disconnect() {
-    // Ensure scroll is restored if controller is disconnected
-    document.body.style.overflow = ""
   }
 }
 

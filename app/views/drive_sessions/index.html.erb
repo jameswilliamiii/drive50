@@ -7,9 +7,7 @@
         </div>
         <p>Drive in Progress</p>
         <div class="drive-actions">
-          <%= button_to "Complete Drive", complete_drive_session_path(@in_progress),
-                        class: "button-primary" %>
-          <%= link_to "Edit", edit_drive_session_path(@in_progress), class: "button" %>
+          <%= button_to "Complete Drive", complete_drive_session_path(@in_progress), class: "button-primary" %>
         </div>
       </div>
     <% end %>

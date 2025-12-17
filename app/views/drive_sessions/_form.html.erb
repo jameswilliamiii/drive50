@@ -11,9 +11,6 @@
   <% end %>
 
   <div class="form-section">
-    <div class="form-section-header">
-      <h3 class="form-section-title">Time</h3>
-    </div>
     <div class="form-section-content">
       <div class="field-group">
         <div class="field">
@@ -31,7 +28,6 @@
         <% if drive_session.persisted? %>
           <div class="field">
             <%= f.label :ended_at, "End Time" %>
-            <span class="field-optional">(optional)</span>
             <% if drive_session.ended_at.present? %>
               <%= f.datetime_local_field :ended_at,
                                           value: drive_session.ended_at&.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M"),
@@ -46,14 +42,10 @@
   </div>
 
   <div class="form-section">
-    <div class="form-section-header">
-      <h3 class="form-section-title">Notes</h3>
-      <span class="field-optional">(optional)</span>
-    </div>
     <div class="form-section-content">
       <div class="field">
-        <%= f.label :notes, "Add notes about this drive", class: "sr-only" %>
-        <%= f.text_area :notes, rows: 4,
+        <%= f.label :notes, "Notes", aria: { label: "Add notes about this drive" } %>
+        <%= f.text_area :notes, rows: 2,
                         placeholder: "Road types, conditions, skills practiced...",
                         class: "form-input form-textarea" %>
       </div>
@@ -62,7 +54,7 @@
 
   <div class="form-actions">
     <%= f.submit class: "button-primary button-large" %>
-    <%= link_to "Cancel", drive_sessions_path, class: "button button-large" %>
+    <%= link_to "Cancel", drive_sessions_path, class: "button button-large cancel-button" %>
   </div>
 <% end %>
 

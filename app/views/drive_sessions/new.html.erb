@@ -1,4 +1,10 @@
-<h2>Start New Drive</h2>
+<div class="page-header">
+  <%= link_to drive_sessions_path, class: "page-header-back" do %>
+    <%= icon_arrow_left(size: 24, class: "page-header-icon") %>
+  <% end %>
+  <h1 class="page-header-title">Start New Drive</h1>
+  <div class="page-header-spacer"></div>
+</div>
 
 <%= render "form", drive_session: @drive_session %>
 

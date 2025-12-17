@@ -108,4 +108,14 @@ module ApplicationHelper
       <path d="M12 5v14M5 12h14" stroke="#{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>))
   end
+
+  def icon_arrow_left(options = {})
+    size = options[:size] || 24
+    color = options[:color] || "currentColor"
+    classes = options[:class] || ""
+
+    raw(%(<svg class="icon icon-arrow-left #{classes}" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 12H5M12 19l-7-7 7-7" stroke="#{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>))
+  end
 end

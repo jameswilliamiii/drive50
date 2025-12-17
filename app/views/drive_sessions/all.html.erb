@@ -1,39 +1,9 @@
 <div class="dashboard">
-  <div class="progress-summary">
-    <div class="stat-card">
-      <h2><%= @total_hours.round(1) %> / 50</h2>
-      <p>
-        Total Hours
-        <span class="tooltip-trigger" data-tooltip="Illinois requires 50 hours total of supervised driving practice">
-          <%= icon_info(size: 14, class: "info-icon") %>
-        </span>
-      </p>
-      <% if @hours_needed > 0 %>
-        <small><%= @hours_needed.round(1) %> hours remaining</small>
-      <% else %>
-        <small class="complete"><%= icon_check(size: 16, class: "check-icon") %> Complete!</small>
-      <% end %>
-    </div>
-
-    <div class="stat-card">
-      <h2><%= @night_hours.round(1) %> / 10</h2>
-      <p>
-        Night Hours
-        <span class="tooltip-trigger" data-tooltip="Illinois requires 10 hours of night driving (between sunset and sunrise)">
-          <%= icon_info(size: 14, class: "info-icon") %>
-        </span>
-      </p>
-      <% if @night_hours_needed > 0 %>
-        <small><%= @night_hours_needed.round(1) %> hours remaining</small>
-      <% else %>
-        <small class="complete"><%= icon_check(size: 16, class: "check-icon") %> Complete!</small>
-      <% end %>
-    </div>
+  <div class="page-header">
+    <h1 class="page-header-title">All Drive Sessions</h1>
   </div>
 
   <div class="drive-history">
-    <h3>All Drive Sessions</h3>
-
     <% if @sessions.any? %>
       <div id="sessions-table">
         <table>
