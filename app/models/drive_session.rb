@@ -1,4 +1,7 @@
 class DriveSession < ApplicationRecord
+  HOURS_NEEDED = 50
+  NIGHT_HOURS_NEEDED = 10
+
   belongs_to :user
 
   # Validations
@@ -29,11 +32,11 @@ class DriveSession < ApplicationRecord
   end
 
   def self.hours_needed
-    [ 50 - total_hours, 0 ].max
+    [ HOURS_NEEDED - total_hours, 0 ].max
   end
 
   def self.night_hours_needed
-    [ 10 - night_hours, 0 ].max
+    [ NIGHT_HOURS_NEEDED - night_hours, 0 ].max
   end
 
   # Instance methods
