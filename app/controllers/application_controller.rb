@@ -7,4 +7,24 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  # Set user's timezone for the request so Rails parses datetimes correctly
+  before_action :set_time_zone
+
+  private
+
+  def set_time_zone
+    # Get timezone from params (form submission or AJAX) or session or user
+    timezone = params[:timezone] || session[:timezone] || (Current.user&.timezone if authenticated?)
+
+    if timezone.present?
+      Time.zone = timezone
+      session[:timezone] = timezone
+
+      # Save timezone to user if authenticated and timezone changed
+      if authenticated? && Current.user.timezone != timezone
+        Current.user.update_column(:timezone, timezone)
+      end
+    end
+  end
 end

@@ -35,3 +35,13 @@ if (document.readyState === 'loading') {
   // DOM already loaded, run immediately
   runLocalTime()
 }
+document.addEventListener("turbo:frame-load", runLocalTime)
+document.addEventListener("turbo:morph", runLocalTime)
+
+// Also run on DOMContentLoaded as fallback
+if (document.readyState === 'loading') {
+  document.addEventListener("DOMContentLoaded", runLocalTime)
+} else {
+  // DOM already loaded, run immediately
+  runLocalTime()
+}

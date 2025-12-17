@@ -84,10 +84,27 @@ class DriveSession < ApplicationRecord
   def determine_night_drive
     return unless started_at
 
-    # Simple heuristic: 8pm - 6am is night
+    # Simple heuristic: 8pm - 6am is night (in user's timezone)
     # For production, could use sunrise/sunset API
-    hour = started_at.hour
-    self.is_night_drive = hour >= 20 || hour < 6
+    # Convert UTC time to user's timezone to check the hour
+    user_timezone = user.timezone || "UTC"
+    local_start = started_at.in_time_zone(user_timezone)
+    start_hour = local_start.hour
+
+    # Check if started during night hours (8pm - 6am)
+    started_at_night = start_hour >= 20 || start_hour < 6
+
+    # If drive is completed, also check if it ended during night hours
+    # A drive is considered a night drive if it starts OR ends during night hours
+    if ended_at.present?
+      local_end = ended_at.in_time_zone(user_timezone)
+      end_hour = local_end.hour
+      ended_at_night = end_hour >= 20 || end_hour < 6
+      self.is_night_drive = started_at_night || ended_at_night
+    else
+      # In-progress drives: only check start time
+      self.is_night_drive = started_at_night
+    end
   end
 
   def broadcast_create

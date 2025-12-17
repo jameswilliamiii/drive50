@@ -1,5 +1,8 @@
-<%= form_with model: drive_session, class: "drive-form" do |f| %>
+<%= form_with model: drive_session, class: "drive-form", data: { controller: "timezone" } do |f| %>
   <%= render "shared/error_messages", object: drive_session, object_name: "drive" %>
+
+  <!-- Hidden field to send timezone with form -->
+  <%= hidden_field_tag :timezone, "", data: { timezone_target: "timezone" } %>
 
   <div class="form-section">
     <div class="form-section-content">
@@ -8,7 +11,7 @@
           <%= f.label :started_at, "Start Time" %>
           <% if drive_session.started_at.present? %>
             <%= f.datetime_local_field :started_at,
-                                        value: drive_session.started_at&.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M"),
+                                        value: drive_session.started_at.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M"),
                                         required: true,
                                         class: "form-input" %>
           <% else %>
@@ -21,7 +24,7 @@
             <%= f.label :ended_at, "End Time" %>
             <% if drive_session.ended_at.present? %>
               <%= f.datetime_local_field :ended_at,
-                                          value: drive_session.ended_at&.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M"),
+                                          value: drive_session.ended_at.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M"),
                                           class: "form-input" %>
             <% else %>
               <%= f.datetime_local_field :ended_at, class: "form-input" %>
