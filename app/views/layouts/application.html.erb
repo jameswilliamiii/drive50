@@ -57,11 +57,6 @@
       <!-- Slide-out Drawer for Mobile -->
       <div class="drawer-backdrop drawer-backdrop-mobile" data-drawer-target="backdrop" data-action="click->drawer#handleBackdropClick"></div>
       <nav class="drawer drawer-mobile" data-drawer-target="drawer">
-        <div class="drawer-header">
-          <button type="button" class="drawer-close" data-action="click->drawer#close" aria-label="Close menu">
-            <%= icon_close(size: 24) %>
-          </button>
-        </div>
         <div class="drawer-content" data-action="click->drawer#handleMenuItemClick">
           <%= link_to "All Drives", all_drive_sessions_path, class: "drawer-item" %>
           <%= link_to "Export Log", export_drive_sessions_path(format: :csv), class: "drawer-item" %>

@@ -76,7 +76,7 @@ header {
   }
 
   .toast-container {
-    top: calc(var(--spacing-unit) * 1);
+    top: calc(var(--spacing-unit) * 0.5);
   }
 }
 
@@ -141,11 +141,13 @@ header h1 a:hover {
 
 .bottom-nav-item.menu-button-active {
   background-color: transparent;
-  color: var(--color-primary);
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 .bottom-nav-item.menu-button-active .bottom-nav-icon {
-  color: var(--color-primary);
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 .menu {
@@ -260,8 +262,8 @@ main {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--color-surface);
-  border-top: 1px solid var(--color-border);
+  background-color: var(--color-primary);
+  border-top: none;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -278,7 +280,7 @@ main {
   justify-content: center;
   gap: calc(var(--spacing-unit) * 0.25);
   padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
-  color: var(--color-text-secondary);
+  color: #ffffff;
   text-decoration: none;
   font-size: 0.75rem;
   font-weight: 500;
@@ -286,7 +288,7 @@ main {
   outline: none;
   background: none;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: opacity 0.2s ease;
   min-width: 60px;
   flex: 1;
   font-family: inherit;
@@ -344,7 +346,7 @@ main {
   justify-content: center;
   gap: calc(var(--spacing-unit) * 0.25);
   padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
-  color: var(--color-text-secondary);
+  color: #ffffff;
   text-decoration: none;
   font-size: 0.75rem;
   font-weight: 500;
@@ -352,7 +354,7 @@ main {
   outline: none;
   background: none;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: opacity 0.2s ease;
   min-width: 60px;
   width: 100%;
   font-family: inherit;
@@ -365,11 +367,13 @@ main {
   width: 24px;
   height: 24px;
   transition: transform 0.2s ease;
+  color: #ffffff;
 }
 
 .bottom-nav-label {
   font-size: 0.6875rem;
   line-height: 1.2;
+  color: #ffffff;
 }
 
 .bottom-nav-item:active .bottom-nav-icon,
@@ -381,30 +385,36 @@ main {
 
 .bottom-nav-item.active,
 .bottom-nav-item:hover {
-  color: var(--color-primary);
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 .bottom-nav-item.active .bottom-nav-icon,
 .bottom-nav-item:hover .bottom-nav-icon {
-  color: var(--color-primary);
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 .bottom-nav-item button:hover {
-  color: var(--color-primary);
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 .bottom-nav-item button:hover .bottom-nav-icon {
-  color: var(--color-primary);
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 .bottom-nav-item form button:hover,
 .bottom-nav-form button:hover {
-  color: var(--color-primary);
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 .bottom-nav-item form button:hover .bottom-nav-icon,
 .bottom-nav-form button:hover .bottom-nav-icon {
-  color: var(--color-primary);
+  color: #ffffff;
+  opacity: 0.8;
 }
 
 /* Add padding to main content when bottom nav is present */
@@ -473,14 +483,6 @@ body.has-bottom-nav main {
   display: none;
 }
 
-.drawer-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: calc(var(--spacing-unit) * 1.5);
-  border-bottom: 1px solid var(--color-border);
-}
-
 .drawer-header h2 {
   display: none;
 }
@@ -537,41 +539,21 @@ body.has-bottom-nav main {
 }
 
 .drawer-item-primary {
-  background-color: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-primary);
 }
 
 .drawer-item-primary:hover,
 .drawer-item-primary:active {
-  background-color: var(--color-primary-dark);
-  color: #ffffff;
+  background-color: var(--color-background);
+  color: var(--color-primary);
 }
 
 .drawer-item-primary form {
   display: inline;
   margin: 0;
   padding: 0;
-}
-
-.drawer-item-primary form button {
-  width: 100%;
-  text-align: left;
-  padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.5);
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 1rem;
-  font-weight: 500;
-  border-radius: var(--border-radius-sm);
-  transition: var(--transition);
   border: none;
   background: none;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.drawer-item-primary form button:hover {
-  background-color: var(--color-primary-dark);
-  color: #ffffff;
 }
 
 .drawer-item-danger {
@@ -775,7 +757,7 @@ h3 {
 /* Ensure toasts appear below sticky header on mobile */
 @media (max-width: 767px) {
   .toast-container {
-    top: calc(var(--spacing-unit) * 6);
+    top: calc(var(--spacing-unit) * 0.5);
   }
 }
 
@@ -1184,6 +1166,12 @@ h3 {
   margin-top: calc(var(--spacing-unit) * 1.5);
   text-align: center;
   padding-top: calc(var(--spacing-unit) * 1);
+}
+
+@media (max-width: 768px) {
+  .view-all-link {
+    display: none;
+  }
 }
 
 .view-all-link .button {
@@ -1678,6 +1666,58 @@ form button.button-primary {
   transform: scale(0.98);
 }
 
+/* Override general button styles for drawer-item-primary buttons */
+/* Target button.drawer-item-primary directly since the button has the class, not the form */
+.drawer-item-primary[type="submit"],
+button.drawer-item-primary,
+.drawer button.drawer-item-primary {
+  width: 100%;
+  text-align: left;
+  padding: calc(var(--spacing-unit) * 1) calc(var(--spacing-unit) * 1.5);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 0;
+  transition: var(--transition);
+  border: none;
+  outline: none;
+  background: none;
+  box-shadow: none;
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: auto;
+  display: block;
+  white-space: normal;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.drawer-item-primary[type="submit"]:hover,
+button.drawer-item-primary:hover,
+.drawer button.drawer-item-primary:hover {
+  background-color: var(--color-background);
+  color: var(--color-primary);
+  border: none;
+  transform: none;
+}
+
+.drawer-item-primary[type="submit"]:active,
+.drawer-item-primary[type="submit"]:focus,
+button.drawer-item-primary:active,
+button.drawer-item-primary:focus,
+.drawer button.drawer-item-primary:active,
+.drawer button.drawer-item-primary:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background-color: var(--color-background);
+  color: var(--color-primary);
+  transform: none;
+}
+
 .button-large {
   padding: calc(var(--spacing-unit) * 1.125) calc(var(--spacing-unit) * 2);
   font-size: 1.0625rem;
@@ -2141,15 +2181,16 @@ form button.button-primary {
     border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
     box-shadow: none;
     z-index: 1000;
-    transform: translateY(100%);
+    transform: translateY(calc(100% + 1px));
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 90vh;
+    max-height: calc(90vh - 80px - env(safe-area-inset-bottom));
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
 
   .card-menu.card-menu-open {
-    transform: translateY(0);
+    transform: translateY(calc(80px - env(safe-area-inset-bottom)));
   }
 
   .card-menu-options {
@@ -2209,25 +2250,20 @@ form button.button-primary {
     cursor: pointer;
   }
 
-  .card-menu-item-danger form button {
+  button.card-menu-item-danger {
     color: var(--color-danger) !important;
-  }
-
-  .card-menu-item-danger form button span {
-    color: var(--color-danger) !important;
-  }
-
-  .card-menu-item-danger span {
-    color: var(--color-danger) !important;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
   }
 
   .card-menu-cancel {
     display: block;
     width: 100%;
     padding: calc(var(--spacing-unit) * 1.125) calc(var(--spacing-unit) * 1.5);
-    margin-top: calc(var(--spacing-unit) * 0.5);
     border: none;
-    background-color: var(--color-background);
+    background-color: var(--white);
     color: var(--color-text);
     font-size: 1.0625rem;
     font-weight: 600;
@@ -2266,7 +2302,7 @@ form button.button-primary {
   }
 
   main .container {
-    padding: 0 calc(var(--spacing-unit) * 0.75);
+    padding: 0 calc(var(--spacing-unit) * 1.75);
   }
 
   .stat-card h2 {

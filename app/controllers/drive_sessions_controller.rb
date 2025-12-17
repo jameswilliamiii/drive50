@@ -34,12 +34,26 @@ class DriveSessionsController < ApplicationController
   end
 
   def new
+    # Check if there's already an active drive
+    existing_active = Current.user.drive_sessions.in_progress.first
+    if existing_active
+      redirect_to drive_sessions_path, alert: "You already have an active drive. Please complete it before starting a new one."
+      return
+    end
+
     @drive_session = Current.user.drive_sessions.build(
       started_at: Time.current
     )
   end
 
   def create
+    # Check if there's already an active drive
+    existing_active = Current.user.drive_sessions.in_progress.first
+    if existing_active
+      redirect_to drive_sessions_path, alert: "You already have an active drive. Please complete it before starting a new one."
+      return
+    end
+
     @drive_session = Current.user.drive_sessions.build(
       started_at: params[:drive_session]&.dig(:started_at) || Time.current,
       driver_name: Current.user.name
@@ -50,7 +64,7 @@ class DriveSessionsController < ApplicationController
     end
 
     if @drive_session.save
-      redirect_to drive_sessions_path, notice: "Drive started!"
+      redirect_to drive_sessions_path
     else
       render :new, status: :unprocessable_entity
     end
