@@ -1,0 +1,200 @@
+/* ============================================
+   Forms
+   ============================================ */
+.drive-form {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form-section {
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-section-content {
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-lg);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.field {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  display: block;
+  margin-bottom: calc(var(--spacing-unit) * 0.625);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="datetime-local"],
+.field textarea,
+.form-input {
+  width: 100%;
+  padding: var(--spacing-lg) calc(var(--spacing-unit) * 1.25);
+  min-height: 48px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  transition: var(--transition);
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.form-textarea {
+  min-height: 100px;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  line-height: 1.6;
+  resize: vertical;
+}
+
+@media (hover: hover) {
+  .field input:hover,
+  .field textarea:hover {
+    border-color: var(--color-primary-light);
+  }
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  background-color: var(--color-surface);
+}
+
+.field small {
+  display: block;
+  margin-top: var(--spacing-sm);
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.error-messages {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #fca5a5;
+  border-radius: var(--border-radius-sm);
+  padding: calc(var(--spacing-unit) * 1.25);
+  margin-bottom: var(--spacing-2xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.error-messages h3 {
+  color: #991b1b;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+.error-messages ul {
+  margin-left: var(--spacing-xl);
+  color: #991b1b;
+  font-size: 0.875rem;
+  list-style-type: disc;
+}
+
+.error-messages li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-footer {
+  margin-top: var(--spacing-xl);
+  text-align: center;
+}
+
+.form-footer a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: var(--spacing-sm);
+  display: inline-block;
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .form-footer a:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+  }
+}
+
+.form-footer a:active {
+  color: var(--color-primary-dark);
+  opacity: 0.8;
+}
+
+/* Mobile Form Styles */
+@media (max-width: 768px) {
+  .drive-form {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    gap: var(--spacing-lg);
+  }
+
+  .form-section {
+    border-radius: var(--border-radius);
+    box-shadow: none;
+  }
+
+  .form-section-content {
+    padding: var(--spacing-lg);
+  }
+
+  .form-actions {
+    margin-top: 0;
+    padding-top: calc(var(--spacing-unit) * 1.25);
+  }
+
+  .field label {
+    font-size: 0.8125rem;
+    margin-bottom: calc(var(--spacing-unit) * 0.625);
+  }
+
+  .field input,
+  .field textarea,
+  .form-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: var(--spacing-lg) var(--spacing-lg);
+    min-height: 44px;
+  }
+
+  .form-textarea {
+    min-height: 100px;
+  }
+}

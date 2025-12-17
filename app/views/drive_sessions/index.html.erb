@@ -11,14 +11,7 @@
     <h3>Recent Drives</h3>
     <% if Current.user.drive_sessions.completed.any? %>
       <table class="recent-drives-table-wrapper">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Time of Day</th>
-            <th>Duration</th>
-            <th></th>
-          </tr>
-        </thead>
+        <%= render "table_header" %>
         <tbody id="recent-drives-table">
           <%= render partial: "session_row", collection: @recent_sessions, as: :session %>
         </tbody>
@@ -33,4 +26,3 @@
     <% end %>
   </div>
 </div>
-

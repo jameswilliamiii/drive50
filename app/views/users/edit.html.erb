@@ -2,16 +2,7 @@
   <h2>Edit Profile</h2>
 
   <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
-    <% if @user.errors.any? %>
-      <div class="error-messages">
-        <h3><%= pluralize(@user.errors.count, "error") %> prevented this profile from being saved:</h3>
-        <ul>
-          <% @user.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+    <%= render "shared/error_messages", object: @user, object_name: "profile" %>
 
     <div class="field">
       <%= f.label :name, "Name" %>

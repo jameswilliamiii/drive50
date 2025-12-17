@@ -1,0 +1,222 @@
+/* ============================================
+   Tables
+   ============================================ */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: var(--spacing-lg);
+}
+
+table th {
+  text-align: left;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background-color: var(--color-background);
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+table th:first-child {
+  border-top-left-radius: var(--border-radius-sm);
+}
+
+table th:last-child {
+  border-top-right-radius: var(--border-radius-sm);
+}
+
+table th:nth-child(2) {
+  text-align: center;
+}
+
+table td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+table tbody tr {
+  transition: var(--transition);
+}
+
+table tbody tr:hover {
+  background-color: var(--color-background);
+}
+
+.drive-session-row {
+  animation: fadeIn 0.3s ease-in;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.drive-session-row.fade-out {
+  opacity: 0 !important;
+  transform: translateY(-10px) !important;
+  pointer-events: none;
+}
+
+table td.actions {
+  text-align: right;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+table td.actions form {
+  display: inline-block;
+  margin: 0;
+}
+
+table td.night-indicator {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.night-indicator .icon-moon {
+  color: #6366f1;
+}
+
+.night-indicator .icon-sun {
+  color: #f59e0b;
+}
+
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.pagination-wrapper {
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.pagination-info {
+  margin-top: var(--spacing-lg);
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+}
+
+/* Desktop Table Styles */
+@media (min-width: 768px) {
+  table th {
+    padding: calc(var(--spacing-unit) * 1.25) var(--spacing-xl);
+    background: linear-gradient(to bottom, var(--color-background), var(--color-border-light));
+    font-size: 0.8125rem;
+    letter-spacing: 0.1em;
+  }
+
+  .desktop-content {
+    display: inline;
+  }
+
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+/* Mobile Table Styles */
+@media (max-width: 768px) {
+  .drive-history table {
+    font-size: 0.875rem;
+    display: block;
+  }
+
+  .drive-history table thead,
+  .drive-history table tbody,
+  .drive-history table tr {
+    display: block;
+  }
+
+  .drive-history table thead {
+    display: none;
+  }
+
+  .drive-history table tbody tr {
+    display: block;
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-lg);
+    background-color: var(--color-surface);
+    position: relative;
+  }
+
+  .drive-history table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+    padding: calc(var(--spacing-unit) * 0.375) 0;
+    border-bottom: none;
+    font-size: 0.8125rem;
+  }
+
+  .drive-history table td:first-child {
+    padding-top: 0;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border-light);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .drive-history table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+    letter-spacing: 0.05em;
+    margin-right: var(--spacing-sm);
+    flex-shrink: 0;
+  }
+
+  .drive-history table td.actions {
+    display: none;
+  }
+
+  .drive-history table td.duration-cell {
+    display: none;
+  }
+
+  .desktop-content {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  .card-header.mobile-only {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .drive-history table tbody tr {
+    padding: var(--spacing-md);
+  }
+
+  .drive-history table td {
+    padding: var(--spacing-xs) 0;
+    font-size: 0.75rem;
+  }
+
+  .drive-history table td::before {
+    font-size: 0.625rem;
+  }
+}

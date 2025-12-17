@@ -1,0 +1,309 @@
+/* ============================================
+   Buttons & Actions
+   ============================================ */
+
+/* Base Button Styles */
+.button,
+button[type="submit"],
+input[type="submit"],
+form button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  min-height: 48px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  line-height: 1.5;
+  font-family: inherit;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Button Hover States */
+@media (hover: hover) {
+  .button:hover,
+  button[type="submit"]:hover,
+  input[type="submit"]:hover {
+    background-color: var(--color-background);
+    border-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+  }
+}
+
+.button:active,
+button[type="submit"]:active,
+input[type="submit"]:active {
+  background-color: var(--color-background);
+  transform: scale(0.98);
+}
+
+/* Primary Button */
+.button-primary,
+.button-primary[type="submit"],
+form button.button-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #ffffff !important;
+  border-color: transparent;
+  box-shadow: var(--shadow);
+}
+
+@media (hover: hover) {
+  .button-primary:hover,
+  .button-primary[type="submit"]:hover {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    color: #ffffff !important;
+  }
+}
+
+.button-primary:active,
+.button-primary[type="submit"]:active {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  color: #ffffff !important;
+  transform: scale(0.98);
+}
+
+/* Pagination button override */
+.button.button-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #ffffff !important;
+  border-color: transparent;
+}
+
+.button.button-primary:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  color: #ffffff !important;
+}
+
+/* Button Sizes */
+.button-large {
+  padding: calc(var(--spacing-unit) * 1.125) var(--spacing-2xl);
+  font-size: 1.0625rem;
+  min-height: 52px;
+}
+
+.button-small {
+  padding: calc(var(--spacing-unit) * 0.375) var(--spacing-md) !important;
+  font-size: 0.8125rem !important;
+  border-width: 1px !important;
+}
+
+/* Base Action Link Styles */
+.action-link-base {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-family: inherit;
+  box-shadow: none;
+  min-height: auto;
+  line-height: 1.5;
+}
+
+/* Action Links */
+.action-link {
+  color: var(--color-primary);
+  display: inline-block;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-family: inherit;
+  box-shadow: none;
+  min-height: auto;
+  line-height: 1.5;
+}
+
+.action-link:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.action-link:active {
+  color: var(--color-primary-dark);
+  opacity: 0.8;
+}
+
+.action-link-danger {
+  color: var(--color-danger);
+  display: inline-block;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-family: inherit;
+  box-shadow: none;
+  min-height: auto;
+  line-height: 1.5;
+}
+
+.action-link-danger:hover {
+  color: var(--color-danger);
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.action-link-danger:active {
+  color: var(--color-danger);
+  opacity: 0.7;
+}
+
+/* Action link in form buttons */
+table td.actions form button.action-link-danger {
+  display: inline-block;
+  color: var(--color-danger);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-family: inherit;
+  box-shadow: none;
+  min-height: auto;
+  line-height: 1.5;
+}
+
+table td.actions form button.action-link-danger:hover {
+  color: var(--color-danger);
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+table td.actions form button.action-link-danger:active {
+  color: var(--color-danger);
+  opacity: 0.7;
+}
+
+/* Danger Link */
+.link-danger {
+  color: var(--color-danger);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+.link-danger:hover {
+  color: #dc2626;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Button Containers */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.actions .button,
+.actions .button-primary {
+  width: 100%;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.form-actions .button,
+.form-actions .button-primary {
+  width: 100%;
+  min-height: 52px;
+  font-size: 1.0625rem;
+}
+
+.form-actions .cancel-button {
+  display: none;
+}
+
+/* Desktop Button Layouts */
+@media (min-width: 768px) {
+  .actions {
+    flex-direction: row;
+    width: auto;
+  }
+
+  .actions .button,
+  .actions .button-primary {
+    width: auto;
+  }
+
+  .form-actions {
+    flex-direction: row;
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .form-actions .button,
+  .form-actions .button-primary {
+    width: auto;
+    flex: 1;
+  }
+
+  .form-actions .cancel-button {
+    display: inline-block;
+  }
+}
+
+/* Mobile Button Styles */
+@media (max-width: 768px) {
+  .button,
+  button[type="submit"],
+  input[type="submit"],
+  form button {
+    width: 100%;
+    min-height: 48px;
+    font-size: 1rem;
+    padding: var(--spacing-lg) var(--spacing-xl);
+  }
+
+  .button-large {
+    width: 100%;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions .button,
+  .actions .button-primary {
+    width: 100%;
+  }
+}

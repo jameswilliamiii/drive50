@@ -1,0 +1,45 @@
+/* ============================================
+   Layout & Structure
+   ============================================ */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-xl);
+}
+
+main {
+  min-height: calc(100vh - 200px);
+  padding-bottom: var(--spacing-3xl);
+}
+
+/* Mobile padding when bottom nav is present */
+body.has-bottom-nav main {
+  padding-bottom: calc(var(--spacing-3xl) + 80px);
+}
+
+@media (max-width: 768px) {
+  main {
+    margin-top: 0;
+    padding-top: var(--spacing-xl);
+  }
+
+  main .container {
+    padding: 0 var(--spacing-lg);
+  }
+
+  body.has-bottom-nav main {
+    padding-bottom: calc(var(--spacing-3xl) + 80px);
+  }
+}
+
+@media (min-width: 769px) {
+  body.has-bottom-nav main {
+    padding-bottom: var(--spacing-3xl);
+  }
+}
+
+@media (max-width: 480px) {
+  main .container {
+    padding: 0 calc(var(--spacing-unit) * 1.75);
+  }
+}

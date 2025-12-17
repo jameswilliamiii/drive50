@@ -1,10 +1,3 @@
-<div class="page-header page-header-no-margin">
-  <%= link_to "javascript:history.back()", class: "page-header-back" do %>
-    <%= icon_arrow_left(size: 24, class: "page-header-icon") %>
-  <% end %>
-  <h1 class="page-header-title">Edit Drive</h1>
-  <div class="page-header-spacer"></div>
-</div>
+<%= render "shared/page_header", title: "Edit Drive", back_path: "javascript:history.back()", no_margin: true %>
 
 <%= render "form", drive_session: @drive_session %>
-

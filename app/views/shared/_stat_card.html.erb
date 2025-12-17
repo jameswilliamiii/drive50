@@ -1,0 +1,17 @@
+<div class="stat-card">
+  <h2><%= current_value.round(1) %> / <%= total_value %></h2>
+  <p>
+    <%= label %>
+    <% if tooltip.present? %>
+      <span class="tooltip-trigger" data-tooltip="<%= tooltip %>">
+        <%= icon_info(size: 14, class: "info-icon") %>
+      </span>
+    <% end %>
+  </p>
+  <% remaining = [total_value - current_value, 0].max %>
+  <% if remaining > 0 %>
+    <small><%= remaining.round(1) %> hours remaining</small>
+  <% else %>
+    <small class="complete"><%= icon_check(size: 16, class: "check-icon") %> Complete!</small>
+  <% end %>
+</div>

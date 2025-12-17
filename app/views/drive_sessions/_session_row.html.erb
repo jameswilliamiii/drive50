@@ -34,13 +34,13 @@
   </td>
   <td data-label="Time of Day" class="night-indicator time-of-day-cell">
     <span class="desktop-content">
-      <%= session.is_night_drive ? icon_moon(size: 20, class: "night-icon") : icon_sun(size: 20, class: "day-icon") %>
+      <%= render "drive_sessions/night_day_indicator", is_night: session.is_night_drive, size: 20 %>
     </span>
     <div class="card-stats-row mobile-only">
       <div class="card-stat">
         <div class="card-stat-label">Time of Day</div>
         <div class="card-stat-value night-indicator">
-          <%= session.is_night_drive ? icon_moon(size: 18, class: "night-icon") : icon_sun(size: 18, class: "day-icon") %>
+          <%= render "drive_sessions/night_day_indicator", is_night: session.is_night_drive, size: 18 %>
         </div>
       </div>
       <div class="card-stat">
@@ -64,4 +64,3 @@
                   } %>
   </td>
 </tr>
-

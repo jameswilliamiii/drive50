@@ -1,0 +1,59 @@
+/* ============================================
+   Page Header - Native App Style
+   ============================================ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+}
+
+.page-header-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.page-header-back:hover,
+.page-header-back:active {
+  background-color: var(--color-border-light);
+  color: var(--color-primary);
+}
+
+.page-header-icon {
+  display: block;
+}
+
+.page-header-title {
+  flex: 1;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.page-header-spacer {
+  width: 44px;
+  min-width: 44px;
+}
+
+.page-header-no-margin {
+  margin-bottom: 0;
+}
+
+@media (min-width: 768px) {
+  .page-header-title {
+    font-size: 1.5rem;
+  }
+}

@@ -1,17 +1,7 @@
 <h2>Sign In</h2>
 
 <%= form_with url: session_path, class: "drive-form" do |form| %>
-  <% if flash[:alert].present? %>
-    <div class="error-messages">
-      <p><%= flash[:alert] %></p>
-    </div>
-  <% end %>
-
-  <% if flash[:notice].present? %>
-    <div class="notice">
-      <p><%= flash[:notice] %></p>
-    </div>
-  <% end %>
+  <%= render "shared/flash_messages" %>
 
   <div class="field">
     <%= form.label :email_address, "Email Address" %>

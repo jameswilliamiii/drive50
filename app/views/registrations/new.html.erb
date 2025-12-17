@@ -1,16 +1,7 @@
 <h2>Sign Up</h2>
 
 <%= form_with model: @user, url: registrations_path, class: "drive-form" do |form| %>
-  <% if @user.errors.any? %>
-    <div class="error-messages">
-      <h3><%= pluralize(@user.errors.count, "error") %> prevented this account from being created:</h3>
-      <ul>
-        <% @user.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/error_messages", object: @user, object_name: "account" %>
 
   <div class="field">
     <%= form.label :name, "Name" %>
