@@ -52,9 +52,18 @@ export default class extends Controller {
         delete button.dataset.turboConfirm
       }
 
+      // Ensure body scroll is restored before submitting (in case card menu is open)
+      document.body.style.overflow = ""
+
       // Submit form programmatically (confirmation already handled)
       form.requestSubmit()
     }, this.animationDurationValue)
+  }
+
+  // Cleanup when element is removed from DOM
+  disconnect() {
+    // Ensure scroll is restored if controller is disconnected
+    document.body.style.overflow = ""
   }
 }
 

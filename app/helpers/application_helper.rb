@@ -65,4 +65,47 @@ module ApplicationHelper
       <path d="M12 16v-4M12 8h.01" stroke="#{color}" stroke-width="2" stroke-linecap="round"/>
     </svg>))
   end
+
+  def icon_dots(options = {})
+    size = options[:size] || 20
+    color = options[:color] || "currentColor"
+    classes = options[:class] || ""
+
+    raw(%(<svg class="icon icon-dots #{classes}" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="5" r="1.5" fill="#{color}"/>
+      <circle cx="12" cy="12" r="1.5" fill="#{color}"/>
+      <circle cx="12" cy="19" r="1.5" fill="#{color}"/>
+    </svg>))
+  end
+
+  def icon_home(options = {})
+    size = options[:size] || 24
+    color = options[:color] || "currentColor"
+    classes = options[:class] || ""
+
+    raw(%(<svg class="icon icon-home #{classes}" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="#{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 22V12h6v10" stroke="#{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>))
+  end
+
+  def icon_list(options = {})
+    size = options[:size] || 24
+    color = options[:color] || "currentColor"
+    classes = options[:class] || ""
+
+    raw(%(<svg class="icon icon-list #{classes}" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="#{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>))
+  end
+
+  def icon_plus(options = {})
+    size = options[:size] || 24
+    color = options[:color] || "currentColor"
+    classes = options[:class] || ""
+
+    raw(%(<svg class="icon icon-plus #{classes}" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 5v14M5 12h14" stroke="#{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>))
+  end
 end
