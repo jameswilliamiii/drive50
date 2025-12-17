@@ -11,10 +11,73 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should update user" do
+  test "should update user name" do
     patch user_url, params: { user: { name: "Updated Name", email_address: @user.email_address } }
     assert_redirected_to root_url
     @user.reload
     assert_equal "Updated Name", @user.name
+  end
+
+  test "should update user email" do
+    patch user_url, params: { user: { name: @user.name, email_address: "newemail@example.com" } }
+    assert_redirected_to root_url
+    @user.reload
+    assert_equal "newemail@example.com", @user.email_address
+  end
+
+  test "should update user password" do
+    new_password = "newpassword123"
+    patch user_url, params: {
+      user: {
+        name: @user.name,
+        email_address: @user.email_address,
+        password: new_password,
+        password_confirmation: new_password
+      }
+    }
+
+    assert_redirected_to root_url
+    @user.reload
+    assert @user.authenticate(new_password)
+  end
+
+  test "should not update user with invalid data" do
+    patch user_url, params: { user: { name: "", email_address: "" } }
+    assert_response :unprocessable_entity
+  end
+
+  test "should not update user with mismatched passwords" do
+    patch user_url, params: {
+      user: {
+        name: @user.name,
+        email_address: @user.email_address,
+        password: "newpassword",
+        password_confirmation: "different"
+      }
+    }
+    assert_response :unprocessable_entity
+  end
+
+  test "should not update to duplicate email" do
+    other_user = users(:two)
+    patch user_url, params: { user: { name: @user.name, email_address: other_user.email_address } }
+    assert_response :unprocessable_entity
+  end
+
+  test "should require authentication" do
+    delete session_url
+    get edit_user_url
+    assert_redirected_to new_session_url
+  end
+
+  test "should only update current user" do
+    patch user_url, params: { user: { name: "Updated Name", email_address: @user.email_address } }
+    @user.reload
+    assert_equal "Updated Name", @user.name
+
+    # Other users should not be affected
+    other_user = users(:two)
+    other_user.reload
+    assert_not_equal "Updated Name", other_user.name
   end
 end

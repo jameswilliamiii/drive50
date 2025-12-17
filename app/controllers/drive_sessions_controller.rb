@@ -3,15 +3,14 @@ class DriveSessionsController < ApplicationController
 
   def index
     user_sessions = Current.user.drive_sessions
-    @in_progress = user_sessions.in_progress.first
-
-    # Show only recent 3 drives for summary view
     @recent_sessions = user_sessions.completed.ordered.limit(3)
 
-    @total_hours = user_sessions.completed.sum(:duration_minutes) / 60.0
-    @night_hours = user_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
-    @hours_needed = [ 50 - @total_hours, 0 ].max
-    @night_hours_needed = [ 10 - @night_hours, 0 ].max
+    stats = DriveSession.statistics_for(Current.user)
+    @in_progress = stats[:in_progress]
+    @total_hours = stats[:total_hours]
+    @night_hours = stats[:night_hours]
+    @hours_needed = stats[:hours_needed]
+    @night_hours_needed = stats[:night_hours_needed]
   end
 
   def all
@@ -20,10 +19,11 @@ class DriveSessionsController < ApplicationController
     # Use pagy for pagination (v43 API: pagy(:offset, collection))
     @pagy, @sessions = pagy(:offset, user_sessions.completed.ordered, limit: 20)
 
-    @total_hours = user_sessions.completed.sum(:duration_minutes) / 60.0
-    @night_hours = user_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
-    @hours_needed = [ 50 - @total_hours, 0 ].max
-    @night_hours_needed = [ 10 - @night_hours, 0 ].max
+    stats = DriveSession.statistics_for(Current.user)
+    @total_hours = stats[:total_hours]
+    @night_hours = stats[:night_hours]
+    @hours_needed = stats[:hours_needed]
+    @night_hours_needed = stats[:night_hours_needed]
 
     # Handle turbo frame requests for infinite scroll
     if turbo_frame_request?

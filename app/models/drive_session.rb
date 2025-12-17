@@ -1,4 +1,6 @@
 class DriveSession < ApplicationRecord
+  include DriveSessionStatistics
+
   HOURS_NEEDED = 50
   NIGHT_HOURS_NEEDED = 10
 
@@ -91,22 +93,13 @@ class DriveSession < ApplicationRecord
   def broadcast_create
     if completed?
       # If completed, add to recent drives (if in top 3) and all drives
-      recent_sessions = user.drive_sessions.completed.ordered.limit(3)
-      broadcast_replace_to user, target: "recent-drives-table", html: ApplicationController.render(partial: "drive_sessions/recent_drives_table", locals: { recent_sessions: recent_sessions })
+      broadcast_recent_drives_table
       broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
     else
       # If in progress, update the in-progress section
       broadcast_replace_to user, target: "in-progress-drive", html: ApplicationController.render(partial: "drive_sessions/in_progress_drive", locals: { in_progress: self })
     end
-    # Update stats
-    in_progress = user.drive_sessions.in_progress.first
-    total_hours = user.drive_sessions.completed.sum(:duration_minutes) / 60.0
-    night_hours = user.drive_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
-    broadcast_replace_to user, target: "progress-summary", html: ApplicationController.render(partial: "drive_sessions/progress_summary", locals: {
-      in_progress: in_progress,
-      total_hours: total_hours,
-      night_hours: night_hours
-    })
+    broadcast_progress_summary
   end
 
   def broadcast_update
@@ -123,38 +116,32 @@ class DriveSession < ApplicationRecord
         broadcast_replace_to user, target: ActionView::RecordIdentifier.dom_id(self), html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
       end
 
-      # Update recent drives table
-      recent_sessions = user.drive_sessions.completed.ordered.limit(3)
-      broadcast_replace_to user, target: "recent-drives-table", html: ApplicationController.render(partial: "drive_sessions/recent_drives_table", locals: { recent_sessions: recent_sessions })
+      broadcast_recent_drives_table
     else
       # Update in-progress section
       broadcast_replace_to user, target: "in-progress-drive", html: ApplicationController.render(partial: "drive_sessions/in_progress_drive", locals: { in_progress: self })
     end
-    # Update stats
-    in_progress = user.drive_sessions.in_progress.first
-    total_hours = user.drive_sessions.completed.sum(:duration_minutes) / 60.0
-    night_hours = user.drive_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
-    broadcast_replace_to user, target: "progress-summary", html: ApplicationController.render(partial: "drive_sessions/progress_summary", locals: {
-      in_progress: in_progress,
-      total_hours: total_hours,
-      night_hours: night_hours
-    })
+    broadcast_progress_summary
   end
 
   def broadcast_destroy
     # Remove from both tables
     broadcast_remove_to user, target: ActionView::RecordIdentifier.dom_id(self)
-    # Update recent drives table (load next oldest if needed)
+    broadcast_recent_drives_table
+    broadcast_progress_summary
+  end
+
+  def broadcast_recent_drives_table
     recent_sessions = user.drive_sessions.completed.ordered.limit(3)
     broadcast_replace_to user, target: "recent-drives-table", html: ApplicationController.render(partial: "drive_sessions/recent_drives_table", locals: { recent_sessions: recent_sessions })
-    # Update stats
-    in_progress = user.drive_sessions.in_progress.first
-    total_hours = user.drive_sessions.completed.sum(:duration_minutes) / 60.0
-    night_hours = user.drive_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
+  end
+
+  def broadcast_progress_summary
+    statistics = DriveSession.statistics_for(user)
     broadcast_replace_to user, target: "progress-summary", html: ApplicationController.render(partial: "drive_sessions/progress_summary", locals: {
-      in_progress: in_progress,
-      total_hours: total_hours,
-      night_hours: night_hours
+      in_progress: statistics[:in_progress],
+      total_hours: statistics[:total_hours],
+      night_hours: statistics[:night_hours]
     })
   end
 end

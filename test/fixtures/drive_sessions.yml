@@ -2,18 +2,18 @@
 
 one:
   user: one
-  started_at: 2025-12-15 17:13:47
+  started_at: 2025-12-15 16:13:47
   ended_at: 2025-12-15 17:13:47
-  duration_minutes: 1
+  duration_minutes: 60
   is_night_drive: false
   notes: MyText
   driver_name: MyString
 
 two:
   user: one
-  started_at: 2025-12-15 17:13:47
-  ended_at: 2025-12-15 17:13:47
-  duration_minutes: 1
+  started_at: 2025-12-15 15:13:47
+  ended_at: 2025-12-15 16:13:47
+  duration_minutes: 60
   is_night_drive: false
   notes: MyText
   driver_name: MyString
