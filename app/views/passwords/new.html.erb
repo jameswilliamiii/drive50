@@ -1,15 +1,23 @@
-<h2>Forgot your password?</h2>
-
-<%= form_with url: passwords_path, class: "drive-form" do |form| %>
-  <%= render "shared/flash_messages" %>
-
-  <div class="field">
-    <%= form.label :email_address, "Email Address" %>
-    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %>
+<div class="authentication-form-container">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-header-title">Forgot your password?</h1>
+    </div>
   </div>
 
-  <div class="actions">
-    <%= form.submit "Email reset instructions", class: "button-primary" %>
-    <%= link_to "Back to Sign In", new_session_path, class: "button" %>
-  </div>
-<% end %>
+  <%= form_with url: passwords_path, class: "drive-form" do |form| %>
+    <%= render "shared/flash_messages" %>
+
+    <h1 class="form-title">Forgot your password?</h1>
+
+    <div class="field">
+      <%= form.label :email_address, "Email Address" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %>
+    </div>
+
+    <div class="actions">
+      <%= form.submit "Email reset instructions", class: "button-primary" %>
+      <%= link_to "Back to Sign In", new_session_path, class: "button" %>
+    </div>
+  <% end %>
+</div>

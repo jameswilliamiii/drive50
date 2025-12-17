@@ -1,24 +1,32 @@
-<h2>Sign In</h2>
-
-<%= form_with url: session_path, class: "drive-form" do |form| %>
-  <%= render "shared/flash_messages" %>
-
-  <div class="field">
-    <%= form.label :email_address, "Email Address" %>
-    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %>
+<div class="authentication-form-container">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-header-title">Sign In</h1>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :password, "Password" %>
-    <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72 %>
-  </div>
+  <%= form_with url: session_path, class: "drive-form" do |form| %>
+    <%= render "shared/flash_messages" %>
 
-  <div class="actions">
-    <%= form.submit "Sign In", class: "button-primary" %>
-    <%= link_to "Sign Up", new_registration_path, class: "button" %>
-  </div>
+    <h1 class="form-title">Sign In</h1>
 
-  <div class="form-footer">
-    <%= link_to "Forgot password?", new_password_path %>
-  </div>
-<% end %>
+    <div class="field">
+      <%= form.label :email_address, "Email Address" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password, "Password" %>
+      <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72 %>
+    </div>
+
+    <div class="actions">
+      <%= form.submit "Sign In", class: "button-primary" %>
+      <%= link_to "Sign Up", new_registration_path, class: "button" %>
+    </div>
+
+    <div class="form-footer">
+      <%= link_to "Forgot password?", new_password_path %>
+    </div>
+  <% end %>
+</div>

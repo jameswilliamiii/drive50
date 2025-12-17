@@ -225,6 +225,7 @@ table td.actions form button.action-link-danger:active {
   flex-direction: column;
   gap: var(--spacing-md);
   width: 100%;
+  margin-top: var(--spacing-xl);
 }
 
 .actions .button,

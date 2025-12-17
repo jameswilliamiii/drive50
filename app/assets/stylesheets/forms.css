@@ -157,6 +157,51 @@
   opacity: 0.8;
 }
 
+/* Form Title */
+.form-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-xl) 0;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+/* Desktop Form Styles */
+@media (min-width: 769px) {
+  .authentication-form-container .drive-form {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-3xl);
+    box-shadow: var(--shadow-md);
+    max-width: 480px;
+    width: 100%;
+  }
+
+  /* Hide separate page header on desktop, show title inside form */
+  .authentication-form-container .page-header {
+    display: none;
+  }
+
+  .authentication-form-container .form-title {
+    display: block;
+  }
+
+  /* Full-width buttons in authentication forms on desktop */
+  .authentication-form-container .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .authentication-form-container .actions .button,
+  .authentication-form-container .actions .button-primary {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1.0625rem;
+  }
+}
+
 /* Mobile Form Styles */
 @media (max-width: 768px) {
   .drive-form {
@@ -165,6 +210,17 @@
     width: 100%;
     max-width: none;
     gap: var(--spacing-lg);
+  }
+
+  /* Hide separate page header on mobile, show title inside form */
+  .authentication-form-container .page-header {
+    display: none;
+  }
+
+  .authentication-form-container .form-title {
+    display: block;
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-lg);
   }
 
   .form-section {
