@@ -2066,22 +2066,22 @@ button.drawer-item-primary:focus,
     box-shadow: none;
   }
 
-  table {
+  .drive-history table {
     font-size: 0.875rem;
     display: block;
   }
 
-  table thead,
-  table tbody,
-  table tr {
+  .drive-history table thead,
+  .drive-history table tbody,
+  .drive-history table tr {
     display: block;
   }
 
-  table thead {
+  .drive-history table thead {
     display: none;
   }
 
-  table tbody tr {
+  .drive-history table tbody tr {
     display: block;
     margin-bottom: calc(var(--spacing-unit) * 1);
     border: 1px solid var(--color-border);
@@ -2091,7 +2091,7 @@ button.drawer-item-primary:focus,
     position: relative;
   }
 
-  table td {
+  .drive-history table td {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2101,14 +2101,14 @@ button.drawer-item-primary:focus,
     font-size: 0.8125rem;
   }
 
-  table td:first-child {
+  .drive-history table td:first-child {
     padding-top: 0;
     padding-bottom: calc(var(--spacing-unit) * 0.5);
     border-bottom: 1px solid var(--color-border-light);
     margin-bottom: calc(var(--spacing-unit) * 0.5);
   }
 
-  table td:first-child::before {
+  .drive-history table td:first-child::before {
     display: none;
   }
 
@@ -2125,7 +2125,7 @@ button.drawer-item-primary:focus,
     display: block;
   }
 
-  table td::before {
+  .drive-history table td::before {
     content: attr(data-label);
     font-weight: 600;
     color: var(--color-text-secondary);
@@ -2136,7 +2136,7 @@ button.drawer-item-primary:focus,
     flex-shrink: 0;
   }
 
-  table td.actions {
+  .drive-history table td.actions {
     display: none;
   }
 
@@ -2150,17 +2150,17 @@ button.drawer-item-primary:focus,
   }
 
   /* Hide Duration cell on mobile since it's combined with Time of Day */
-  table td.duration-cell {
+  .drive-history table td.duration-cell {
     display: none;
   }
 
   /* Show combined stats row in Time of Day cell on mobile */
-  table td.time-of-day-cell {
+  .drive-history table td.time-of-day-cell {
     width: 100%;
     padding: calc(var(--spacing-unit) * 0.5) 0;
   }
 
-  table td.time-of-day-cell::before {
+  .drive-history table td.time-of-day-cell::before {
     display: none;
   }
 
@@ -2208,11 +2208,11 @@ button.drawer-item-primary:focus,
     justify-content: flex-start;
   }
 
-  table td.night-indicator {
+  .drive-history table td.night-indicator {
     justify-content: flex-start;
   }
 
-  table td.night-indicator .icon {
+  .drive-history table td.night-indicator .icon {
     width: 18px;
     height: 18px;
   }
@@ -2417,16 +2417,16 @@ button.drawer-item-primary:focus,
     padding: calc(var(--spacing-unit) * 0.625) calc(var(--spacing-unit) * 0.875);
   }
 
-  table tbody tr {
+  .drive-history table tbody tr {
     padding: calc(var(--spacing-unit) * 0.75);
   }
 
-  table td {
+  .drive-history table td {
     padding: calc(var(--spacing-unit) * 0.25) 0;
     font-size: 0.75rem;
   }
 
-  table td::before {
+  .drive-history table td::before {
     font-size: 0.625rem;
   }
 }

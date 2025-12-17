@@ -10,10 +10,12 @@ export default class extends Controller {
   static targets = ["display"]
 
   connect() {
+    // Update immediately and then every second to ensure accuracy
+    // This ensures all browsers show the same time based on the start time
     this.updateTime()
     this.interval = setInterval(() => {
       this.updateTime()
-    }, 60000) // Update every minute
+    }, 1000) // Update every second for accuracy
   }
 
   disconnect() {

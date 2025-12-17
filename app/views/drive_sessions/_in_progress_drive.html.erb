@@ -1,0 +1,12 @@
+<% if in_progress %>
+  <div class="in-progress-drive stat-card" id="in-progress-drive" data-controller="timer" data-timer-started-at-value="<%= in_progress.started_at.iso8601 %>">
+    <div class="drive-duration">
+      <span class="duration-value" data-timer-target="display"><%= in_progress.elapsed_time %></span>
+    </div>
+    <p>Drive in Progress</p>
+    <div class="drive-actions">
+      <%= button_to "Complete Drive", complete_drive_session_path(in_progress), class: "button-primary" %>
+    </div>
+  </div>
+<% end %>
+
