@@ -1,21 +1,18 @@
 <div class="dashboard">
-  <% if @in_progress %>
-    <div class="in-progress-drive">
-      <h3>Drive in Progress</h3>
-      <div class="drive-info">
-        <p>
-          <strong>Started:</strong> <%= local_time(@in_progress.started_at, format: "%B %d, %Y at %I:%M %p") %>
-        </p>
-      </div>
-      <div class="drive-actions">
-        <%= button_to "Complete Drive", complete_drive_session_path(@in_progress),
-                      class: "button-primary" %>
-        <%= link_to "Edit", edit_drive_session_path(@in_progress), class: "button" %>
-      </div>
-    </div>
-  <% end %>
-
   <div class="progress-summary">
+    <% if @in_progress %>
+      <div class="in-progress-drive stat-card" data-controller="timer" data-timer-started-at-value="<%= @in_progress.started_at.iso8601 %>">
+        <div class="drive-duration">
+          <span class="duration-value" data-timer-target="display"><%= @in_progress.elapsed_time %></span>
+        </div>
+        <p>Drive in Progress</p>
+        <div class="drive-actions">
+          <%= button_to "Complete Drive", complete_drive_session_path(@in_progress),
+                        class: "button-primary" %>
+          <%= link_to "Edit", edit_drive_session_path(@in_progress), class: "button" %>
+        </div>
+      </div>
+    <% end %>
     <div class="stat-card">
       <h2><%= @total_hours.round(1) %> / 50</h2>
       <p>

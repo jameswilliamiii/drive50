@@ -47,6 +47,19 @@ class DriveSession < ApplicationRecord
     (duration_minutes / 60.0).round(2)
   end
 
+  def elapsed_time
+    return nil unless in_progress? && started_at
+    elapsed_seconds = (Time.current - started_at).to_i
+    hours = elapsed_seconds / 3600
+    minutes = (elapsed_seconds % 3600) / 60
+
+    if hours > 0
+      "#{hours}h #{minutes}m"
+    else
+      "#{minutes}m"
+    end
+  end
+
   private
 
   def ended_at_after_started_at
