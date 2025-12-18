@@ -29,16 +29,6 @@
             <%= link_to "Sign Out", session_path, data: { turbo_method: :delete }, class: "menu-item" %>
           </nav>
         </div>
-      <% else %>
-        <div class="header-nav" data-controller="menu" data-action="click@window->menu#handleClickOutside">
-          <button type="button" class="menu-button" data-menu-target="button" data-action="click->menu#toggle" aria-label="Toggle menu" aria-expanded="false">
-            <%= icon_menu(size: 24, class: "menu-icon") %>
-          </button>
-          <nav class="menu" data-menu-target="menu">
-            <%= link_to "Sign In", new_session_path, class: "menu-item" %>
-            <%= link_to "Sign Up", new_registration_path, class: "menu-item menu-item-primary" %>
-          </nav>
-        </div>
       <% end %>
     </div>
   </div>
