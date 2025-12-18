@@ -2,11 +2,9 @@
 
 <%= turbo_stream_from Current.user %>
 
-<div class="dashboard">
-  <div class="page-header">
-    <h1 class="page-header-title">Dashboard</h1>
-  </div>
+<%= render "shared/page_header", title: "Dashboard" %>
 
+<div class="dashboard">
   <%= render partial: "progress_summary", locals: {
     in_progress: @in_progress,
     total_hours: @total_hours,

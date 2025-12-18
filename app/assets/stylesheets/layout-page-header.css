@@ -6,6 +6,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 .page-header-back {
@@ -44,13 +45,12 @@
   text-transform: uppercase;
 }
 
-.page-header-spacer {
-  width: 44px;
-  min-width: 44px;
-}
-
 .page-header-no-margin {
   margin-bottom: 0;
+}
+
+.page-header .padding-spacer {
+  padding-right: 44px;
 }
 
 @media (min-width: 768px) {

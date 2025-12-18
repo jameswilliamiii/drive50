@@ -19,18 +19,17 @@
           <% end %>
         </div>
 
-        <% if drive_session.persisted? %>
-          <div class="field">
-            <%= f.label :ended_at, "End Time" %>
-            <% if drive_session.ended_at.present? %>
-              <%= f.datetime_local_field :ended_at,
-                                          value: drive_session.ended_at.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M"),
-                                          class: "form-input" %>
-            <% else %>
-              <%= f.datetime_local_field :ended_at, class: "form-input" %>
-            <% end %>
-          </div>
-        <% end %>
+        <div class="field">
+          <%= f.label :ended_at, "End Time" %>
+          <% if drive_session.ended_at.present? %>
+            <%= f.datetime_local_field :ended_at,
+                                        value: drive_session.ended_at.in_time_zone(Time.zone).strftime("%Y-%m-%dT%H:%M"),
+                                        class: "form-input",
+                                        required: true %>
+          <% else %>
+            <%= f.datetime_local_field :ended_at, class: "form-input", required: true %>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>

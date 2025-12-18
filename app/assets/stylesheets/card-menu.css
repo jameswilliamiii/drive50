@@ -13,6 +13,25 @@
   display: none;
 }
 
+.card-menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-out, visibility 0.3s;
+  backdrop-filter: blur(2px);
+}
+
+.card-menu-backdrop.card-menu-backdrop-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
 @media (max-width: 768px) {
   .card-header.mobile-only {
     display: flex;
@@ -51,25 +70,6 @@
     display: block;
   }
 
-  .card-menu-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease-out, visibility 0.3s;
-    backdrop-filter: blur(2px);
-  }
-
-  .card-menu-backdrop.card-menu-backdrop-visible {
-    opacity: 1;
-    visibility: visible;
-  }
-
   .card-menu {
     display: block;
     position: fixed;
@@ -93,16 +93,23 @@
 
   .card-menu-options {
     padding: var(--spacing-sm) 0;
+    font-weight: 600;
   }
 
-  .card-menu-item {
+  .card-menu-form {
+    margin: 0;
+    display: block;
+  }
+
+  .card-menu-item,
+  button.card-menu-item {
     display: block;
     width: 100%;
     padding: var(--spacing-lg) var(--spacing-xl);
     color: var(--color-text);
     text-decoration: none;
     font-size: 1.0625rem;
-    font-weight: 400;
+    font-weight: 600;
     border: none;
     background: none;
     text-align: center;
@@ -110,7 +117,8 @@
     transition: background-color 0.15s ease;
     font-family: inherit;
     -webkit-tap-highlight-color: transparent;
-    border-bottom: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: none;
   }
 
   .card-menu-item:last-child {
@@ -146,6 +154,9 @@
     font-weight: inherit;
     font-family: inherit;
     cursor: pointer;
+    box-shadow: none;
+    border-radius: 0;
+    min-height: auto;
   }
 
   button.card-menu-item-danger {

@@ -78,7 +78,7 @@
   margin: 0;
 }
 
-form.fab-new-drive-form button.fab-new-drive {
+.fab-new-drive-form .fab-new-drive {
   display: inline-flex;
   align-items: center;
   justify-content: center;

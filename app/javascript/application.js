@@ -6,7 +6,6 @@ import "controllers"
 // Initialize LocalTime for timezone conversion
 try {
   LocalTime.start()
-  console.log("LocalTime initialized")
 } catch (error) {
   console.error("LocalTime initialization error:", error)
 }
@@ -16,7 +15,6 @@ const runLocalTime = () => {
   try {
     if (LocalTime && LocalTime.run) {
       LocalTime.run()
-      console.log("LocalTime.run() executed")
     }
   } catch (error) {
     console.error("LocalTime.run() error:", error)

@@ -17,11 +17,6 @@
     <span class="bottom-nav-label">Export</span>
   <% end %>
 
-  <!-- Floating New/Complete Drive button (mobile only, state managed via turbo streams) -->
-  <div id="fab-new-drive-wrapper">
-    <%= render "shared/fab_new_drive" %>
-  </div>
-
   <%= link_to edit_user_path, class: "bottom-nav-item #{'active' if request.path == edit_user_path}" do %>
     <%= bottom_nav_icon(:settings, active: request.path == edit_user_path, size: 24, class: "bottom-nav-icon") %>
     <span class="bottom-nav-label">Settings</span>

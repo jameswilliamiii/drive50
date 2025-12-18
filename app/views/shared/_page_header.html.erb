@@ -1,10 +1,11 @@
 <%
-  no_margin ||= false
+  back_path ||= nil
 %>
-<div class="page-header <%= 'page-header-no-margin' if no_margin %>">
-  <%= link_to back_path, class: "page-header-back" do %>
-    <%= icon_arrow_left(size: 24, class: "page-header-icon") %>
+<div class="page-header">
+  <% if back_path %>
+    <%= link_to back_path, class: "page-header-back" do %>
+      <%= icon_arrow_left(size: 24, class: "page-header-icon") %>
+    <% end %>
   <% end %>
-  <h1 class="page-header-title"><%= title %></h1>
-  <div class="page-header-spacer"></div>
+  <h1 class="page-header-title <%= 'padding-spacer' if back_path %>"><%= title %></h1>
 </div>

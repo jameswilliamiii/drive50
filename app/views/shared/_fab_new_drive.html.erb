@@ -10,12 +10,44 @@
       <%= icon_stop(size: 24, class: "fab-new-drive-icon") %>
     <% end %>
   <% else %>
-    <%= button_to drive_sessions_path,
-                  method: :post,
-                  class: "fab-new-drive",
-                  form: { class: "fab-new-drive-form" } do %>
-      <%= icon_plus(size: 24, class: "fab-new-drive-icon") %>
-    <% end %>
+    <div class="fab-new-drive-form" data-controller="card-menu">
+      <button type="button"
+              class="fab-new-drive"
+              data-card-menu-target="button"
+              data-action="click->card-menu#toggle"
+              aria-label="Drive options"
+              aria-expanded="false">
+        <%= icon_plus(size: 24, class: "fab-new-drive-icon") %>
+      </button>
+
+      <div class="card-menu-backdrop"
+           data-card-menu-target="backdrop"
+           data-action="click->card-menu#handleBackdropClick"></div>
+
+      <div class="card-menu"
+           data-card-menu-target="menu"
+           data-action="click->card-menu#handleMenuItemClick">
+        <div class="card-menu-options">
+          <%= button_to "Start Drive Timer",
+                        drive_sessions_path,
+                        method: :post,
+                        class: "card-menu-item",
+                        form: {
+                          class: "card-menu-form",
+                          data: { action: "submit->card-menu#handleFormSubmit" }
+                        } %>
+
+          <%= link_to "Add Past Drive",
+                      new_drive_session_path,
+                      class: "card-menu-item" %>
+          <button type="button"
+                  class="card-menu-cancel"
+                  data-action="click->card-menu#close">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   <% end %>
 <% end %>
 

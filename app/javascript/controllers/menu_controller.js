@@ -4,6 +4,10 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["menu", "button"]
 
+  connect() {
+    this.close()
+  }
+
   toggle() {
     const isOpen = this.menuTarget.classList.contains("menu-open")
 

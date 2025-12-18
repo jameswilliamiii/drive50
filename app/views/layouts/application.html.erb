@@ -42,6 +42,11 @@
       </div>
 
       <%= render "shared/bottom_nav" %>
+
+      <!-- Floating New/Complete Drive button (mobile only, state managed via turbo streams) -->
+      <div id="fab-new-drive-wrapper">
+        <%= render "shared/fab_new_drive" %>
+      </div>
     <% end %>
 
     <%= render "shared/toasts" %>

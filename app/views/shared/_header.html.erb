@@ -14,13 +14,14 @@
             <%= icon_menu(size: 24, class: "menu-icon") %>
           </button>
           <nav class="menu" data-menu-target="menu">
-            <%= button_to "Start New Drive", drive_sessions_path,
+            <%= button_to "Start Drive Timer", drive_sessions_path,
                           method: :post,
                           class: "menu-item menu-item-primary-link",
                           form: { style: "display: inline;" } %>
+            <%= link_to "Add Past Drive", new_drive_session_path, class: "menu-item" %>
             <hr class="menu-divider">
             <%= link_to "All Drives", all_drive_sessions_path, class: "menu-item" %>
-            <%= link_to "Export Log",
+            <%= link_to "Export Drive Log",
                         export_drive_sessions_path(format: :csv),
                         data: { turbo: false },
                         class: "menu-item" %>
