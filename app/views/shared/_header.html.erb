@@ -20,7 +20,10 @@
                           form: { style: "display: inline;" } %>
             <hr class="menu-divider">
             <%= link_to "All Drives", all_drive_sessions_path, class: "menu-item" %>
-            <%= link_to "Export Log", export_drive_sessions_path(format: :csv), class: "menu-item" %>
+            <%= link_to "Export Log",
+                        export_drive_sessions_path(format: :csv),
+                        data: { turbo: false },
+                        class: "menu-item" %>
             <%= link_to "Settings", edit_user_path, class: "menu-item" %>
             <hr class="menu-divider">
             <%= link_to "Sign Out", session_path, data: { turbo_method: :delete }, class: "menu-item" %>

@@ -10,7 +10,9 @@
     <span class="bottom-nav-label">Log</span>
   <% end %>
 
-  <%= link_to export_drive_sessions_path(format: :csv), class: "bottom-nav-item #{'active' if request.path == export_drive_sessions_path(format: :csv)}" do %>
+  <%= link_to export_drive_sessions_path(format: :csv),
+              data: { turbo: false },
+              class: "bottom-nav-item #{'active' if request.path == export_drive_sessions_path(format: :csv)}" do %>
     <%= bottom_nav_icon(:export, active: request.path == export_drive_sessions_path(format: :csv), size: 24, class: "bottom-nav-icon") %>
     <span class="bottom-nav-label">Export</span>
   <% end %>
