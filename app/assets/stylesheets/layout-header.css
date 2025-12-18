@@ -62,20 +62,37 @@ header .container {
 }
 
 header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
   margin: 0;
 }
 
-header h1 a {
-  color: var(--color-text);
+.app-logo a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15em;
   text-decoration: none;
-  transition: var(--transition);
 }
 
-header h1 a:hover {
+.app-logo-wordmark {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.app-logo-drive {
   color: var(--color-primary);
+}
+
+a:hover .app-logo-drive {
+  color: var(--color-primary-dark);
+}
+
+.app-logo-50 {
+  color: var(--color-text-secondary);
+}
+
+a:hover .app-logo-50 {
+  color: var(--color-text);
 }
 
 .header-nav {
@@ -101,12 +118,13 @@ section header {
   background: none;
   box-shadow: none;
   border: none;
-  margin-bottom: 0;
-  font-size: 1.0rem;
-  text-align: center;
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.875rem;
+  text-align: left;
   font-weight: 600;
   color: var(--color-text-secondary);
   text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 /* Mobile */
@@ -133,6 +151,7 @@ section header {
 
   section header {
     font-size: 0.875rem;
+    text-align: center;
   }
 
   /* Show in-progress banner only on mobile */

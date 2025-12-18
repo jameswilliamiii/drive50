@@ -1,7 +1,13 @@
 <header>
   <div class="container">
     <div class="header-content">
-      <h1><%= link_to "Drive50", root_path %></h1>
+      <h1 class="app-logo">
+        <%= link_to root_path do %>
+          <span class="app-logo-wordmark">
+            <span class="app-logo-drive">Drive</span><span class="app-logo-50">50</span>
+          </span>
+        <% end %>
+      </h1>
       <% if authenticated? %>
         <div class="header-nav" data-controller="menu" data-action="click@window->menu#handleClickOutside">
           <button type="button" class="menu-button" data-menu-target="button" data-action="click->menu#toggle" aria-label="Toggle menu" aria-expanded="false">

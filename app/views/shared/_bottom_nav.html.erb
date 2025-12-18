@@ -2,7 +2,7 @@
 <nav class="bottom-nav">
   <%= link_to root_path, class: "bottom-nav-item #{'active' if request.path == root_path}" do %>
     <%= bottom_nav_icon(:home, active: request.path == root_path, size: 24, class: "bottom-nav-icon") %>
-    <span class="bottom-nav-label">Home</span>
+    <span class="bottom-nav-label">Dashboard</span>
   <% end %>
 
   <%= link_to all_drive_sessions_path, class: "bottom-nav-item #{'active' if request.path == all_drive_sessions_path}" do %>

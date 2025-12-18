@@ -35,12 +35,13 @@
 
 .page-header-title {
   flex: 1;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 700;
   color: var(--color-text);
   margin: 0;
   text-align: center;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .page-header-spacer {
@@ -54,6 +55,6 @@
 
 @media (min-width: 768px) {
   .page-header-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 }
