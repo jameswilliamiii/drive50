@@ -52,6 +52,7 @@
 
 .bottom-nav-label {
   font-size: 0.6875rem;
+  font-weight: 600;
   line-height: 1.2;
   color: var(--color-primary);
 }
