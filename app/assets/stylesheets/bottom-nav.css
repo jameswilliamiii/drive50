@@ -6,12 +6,12 @@
   bottom: 0;
   left: 0;
   right: 0;
-  /* Frosted glass effect (neutral, no blue tint) */
-  background-color: rgba(255, 255, 255, 0.5);
+  /* Frosted glass effect */
+  background-color: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  /* Subtle border to enhance the glass illusion */
   border-top: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 -8px 20px rgba(15, 23, 42, 0.12);
   display: flex;
   justify-content: space-around;
   align-items: center;

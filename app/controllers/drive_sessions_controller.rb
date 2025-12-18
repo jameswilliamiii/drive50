@@ -77,7 +77,7 @@ class DriveSessionsController < ApplicationController
     @drive_session.driver_name = Current.user.name
 
     if @drive_session.save
-      redirect_to drive_sessions_path, notice: "Drive updated."
+      redirect_to drive_sessions_path
     else
       render :edit, status: :unprocessable_entity
     end
@@ -85,7 +85,7 @@ class DriveSessionsController < ApplicationController
 
   def complete
     @drive_session.update(ended_at: Time.current)
-    redirect_to drive_sessions_path, notice: "Drive completed!"
+    redirect_to drive_sessions_path
   end
 
   def destroy
