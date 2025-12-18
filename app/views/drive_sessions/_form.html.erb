@@ -47,8 +47,8 @@
   </div>
 
   <div class="form-actions">
-    <%= f.submit class: "button-primary button-large" %>
-    <%= link_to "Cancel", drive_sessions_path, class: "button button-large cancel-button" %>
+    <%= f.submit "Save", class: "button-primary button-large" %>
+    <%= link_to "Cancel", (request.referer || drive_sessions_path), class: "button button-large cancel-button" %>
   </div>
 <% end %>
 
