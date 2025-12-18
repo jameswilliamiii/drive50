@@ -11,7 +11,6 @@ header {
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.95);
 }
 
 /* In-progress banner (mobile only) */
@@ -168,4 +167,12 @@ section header {
   header .container {
     padding: 0 var(--spacing-md);
   }
+}
+
+/* Dark mode header tweaks */
+[data-theme="dark"] header,
+body[data-theme="dark"] header {
+  background-color: var(--color-surface);
+  border-bottom-color: var(--color-border);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.6), 0 1px 2px -1px rgb(0 0 0 / 0.7);
 }

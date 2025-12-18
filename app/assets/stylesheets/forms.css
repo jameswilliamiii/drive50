@@ -103,8 +103,8 @@
 }
 
 .error-messages {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  border: 2px solid #fca5a5;
+  background: linear-gradient(135deg, var(--color-error-soft) 0%, var(--color-error-soft-strong) 100%);
+  border: 2px solid var(--color-error-soft-border);
   border-radius: var(--border-radius-sm);
   padding: calc(var(--spacing-unit) * 1.25);
   margin-bottom: var(--spacing-2xl);
@@ -112,7 +112,7 @@
 }
 
 .error-messages h3 {
-  color: #991b1b;
+  color: var(--color-error-strong);
   font-size: 0.9375rem;
   font-weight: 600;
   margin-bottom: var(--spacing-md);
@@ -120,7 +120,7 @@
 
 .error-messages ul {
   margin-left: var(--spacing-xl);
-  color: #991b1b;
+  color: var(--color-error-strong);
   font-size: 0.875rem;
   list-style-type: disc;
 }
@@ -258,4 +258,18 @@
   .form-textarea {
     min-height: 100px;
   }
+}
+
+/* Dark mode error state tweaks */
+[data-theme="dark"] .error-messages,
+body[data-theme="dark"] .error-messages {
+  background: linear-gradient(135deg, var(--color-error-soft) 0%, var(--color-error-soft-strong) 100%);
+  border-color: #b91c1c;
+}
+
+[data-theme="dark"] .error-messages h3,
+body[data-theme="dark"] .error-messages h3,
+[data-theme="dark"] .error-messages ul,
+body[data-theme="dark"] .error-messages ul {
+  color: var(--color-error-soft-strong);
 }

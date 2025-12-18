@@ -24,15 +24,15 @@
 }
 
 .notice {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e40af;
-  border: 1px solid #93c5fd;
+  background: linear-gradient(135deg, var(--color-info-soft) 0%, var(--color-info-soft-strong) 100%);
+  color: var(--color-info-strong);
+  border: 1px solid var(--color-primary-light);
 }
 
 .alert {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #991b1b;
-  border: 1px solid #fca5a5;
+  background: linear-gradient(135deg, var(--color-error-soft) 0%, var(--color-error-soft-strong) 100%);
+  color: var(--color-error-strong);
+  border: 1px solid var(--color-error-soft-border);
 }
 
 .toast-container {
@@ -78,15 +78,15 @@
 }
 
 .toast-success {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e40af;
-  border-color: #93c5fd;
+  background: linear-gradient(135deg, var(--color-info-soft) 0%, var(--color-info-soft-strong) 100%);
+  color: var(--color-info-strong);
+  border-color: var(--color-primary-light);
 }
 
 .toast-error {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #991b1b;
-  border-color: #fca5a5;
+  background: linear-gradient(135deg, var(--color-error-soft) 0%, var(--color-error-soft-strong) 100%);
+  color: var(--color-error-strong);
+  border-color: var(--color-error-soft-border);
 }
 
 .toast-content {
@@ -136,4 +136,33 @@
   .toast-container {
     top: var(--spacing-sm);
   }
+}
+
+/* Dark mode toast and flash colors */
+[data-theme="dark"] .notice,
+body[data-theme="dark"] .notice {
+  background: linear-gradient(135deg, var(--color-info-soft) 0%, var(--color-info-soft-strong) 100%);
+  color: var(--color-info-strong);
+  border-color: var(--color-info-accent-border);
+}
+
+[data-theme="dark"] .alert,
+body[data-theme="dark"] .alert {
+  background: linear-gradient(135deg, var(--color-error-soft) 0%, var(--color-error-soft-strong) 100%);
+  color: var(--color-error-strong);
+  border-color: var(--color-error-soft-border);
+}
+
+[data-theme="dark"] .toast-success,
+body[data-theme="dark"] .toast-success {
+  background: linear-gradient(135deg, var(--color-info-soft) 0%, var(--color-info-soft-strong) 100%);
+  color: var(--color-info-strong);
+  border-color: var(--color-info-accent-border);
+}
+
+[data-theme="dark"] .toast-error,
+body[data-theme="dark"] .toast-error {
+  background: linear-gradient(135deg, var(--color-error-soft) 0%, var(--color-error-soft-strong) 100%);
+  color: var(--color-error-strong);
+  border-color: var(--color-error-soft-border);
 }

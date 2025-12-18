@@ -6,7 +6,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  /* Frosted glass effect */
+  /* Frosted glass effect (light theme by default) */
   background-color: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -113,4 +113,21 @@ form.fab-new-drive-form button.fab-new-drive {
   .bottom-nav {
     display: none;
   }
+}
+
+/* Dark mode bottom nav: keep frosted look but on a dark base */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .bottom-nav,
+  body:not([data-theme="light"]) .bottom-nav {
+    background-color: rgba(15, 23, 42, 0.85);
+    border-top: 1px solid rgba(15, 23, 42, 0.95);
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.6);
+  }
+}
+
+[data-theme="dark"] .bottom-nav,
+body[data-theme="dark"] .bottom-nav {
+  background-color: rgba(15, 23, 42, 0.85);
+  border-top: 1px solid rgba(15, 23, 42, 0.95);
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.6);
 }

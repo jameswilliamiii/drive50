@@ -92,7 +92,7 @@ table td.night-indicator {
 }
 
 .night-indicator .icon-sun {
-  color: #f59e0b;
+  color: var(--color-warning);
 }
 
 .icon {
