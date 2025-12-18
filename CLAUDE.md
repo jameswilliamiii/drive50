@@ -112,7 +112,6 @@ Uses custom session-based authentication (not Devise):
 - `timer_controller.js` - Live elapsed time for in-progress drives
 - `drive_session_controller.js` - Drive session form interactions
 - `infinite_scroll_controller.js` - Pagination on all drives page
-- `drawer_controller.js`, `menu_controller.js` - Mobile UI
 - `toast_controller.js` - Flash message notifications
 
 **LocalTime gem** - Converts UTC times to user's local timezone in browser

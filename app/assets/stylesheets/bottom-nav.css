@@ -6,8 +6,12 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--color-primary);
-  border-top: none;
+  /* Frosted glass effect (neutral, no blue tint) */
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  /* Subtle border to enhance the glass illusion */
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -39,39 +43,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.bottom-nav-item form,
-.bottom-nav-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  flex: 1;
-}
-
-.bottom-nav-form button.bottom-nav-item {
-  width: 100%;
-  box-shadow: none;
-  background-color: transparent;
-  border: none;
-}
-
 .bottom-nav-icon {
   width: 24px;
   height: 24px;
   transition: transform 0.2s ease;
-  color: var(--color-white);
+  color: var(--color-primary);
 }
 
 .bottom-nav-label {
   font-size: 0.6875rem;
   line-height: 1.2;
-  color: var(--color-white);
+  color: var(--color-primary);
 }
 
 .bottom-nav-item:active .bottom-nav-icon,
@@ -84,6 +66,45 @@
 .bottom-nav-item:hover {
   color: var(--color-white);
   opacity: 0.8;
+}
+
+/* Floating New Drive button (mobile only) */
+.fab-new-drive-form {
+  position: fixed;
+  right: var(--spacing-lg);
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  z-index: 110;
+  margin: 0;
+}
+
+form.fab-new-drive-form button.fab-new-drive {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  min-height: 50px;
+  border-radius: 9999px;
+  border: none;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fab-new-drive-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-white) !important;
+}
+
+@media (min-width: 769px) {
+  .fab-new-drive-form {
+    display: none;
+  }
 }
 
 /* Desktop: Hide bottom nav */

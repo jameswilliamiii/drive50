@@ -14,11 +14,10 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= 'has-bottom-nav' if authenticated? %>" <% if authenticated? %>data-controller="drawer" data-action="click@window->drawer#handleClickOutside"<% end %>>
+  <body class="<%= 'has-bottom-nav' if authenticated? %>">
     <%= render "shared/header" %>
 
     <% if authenticated? %>
-      <%= render "shared/drawer_mobile" %>
       <%= render "shared/bottom_nav" %>
     <% end %>
 

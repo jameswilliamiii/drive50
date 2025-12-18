@@ -308,3 +308,15 @@ table td.actions form button.action-link-danger:active {
     width: 100%;
   }
 }
+
+/* Header menu items (including form buttons in the dropdown) should look like links, not buttons */
+header .menu .menu-item {
+  display: block;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  background: none;
+  box-shadow: none;
+  min-height: auto;
+  font-weight: 500;
+  line-height: 1.4;
+}

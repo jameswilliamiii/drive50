@@ -1,33 +1,49 @@
 <div class="dashboard">
-  <h2>Edit Profile</h2>
+  <div class="page-header">
+    <h1 class="page-header-title">Settings</h1>
+  </div>
 
-  <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
-    <%= render "shared/error_messages", object: @user, object_name: "profile" %>
-
-    <div class="field">
-      <%= f.label :name, "Name" %>
-      <%= f.text_field :name, required: true %>
+  <!-- Session / Sign out section (mobile only) -->
+  <section class="card settings-section settings-section-session">
+    <div class="card-body">
+      <%= link_to "Sign Out",
+                  session_path,
+                  data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to sign out?" },
+                  class: "button button-small" %>
     </div>
+  </section>
 
-    <div class="field">
-      <%= f.label :email_address, "Email" %>
-      <%= f.email_field :email_address, required: true %>
-    </div>
+  <!-- Account information section -->
+  <section class="card settings-section">
+    <div class="card-body">
+      <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
+        <%= render "shared/error_messages", object: @user, object_name: "profile" %>
 
-    <div class="field">
-      <%= f.label :password, "New Password (leave blank to keep current)" %>
-      <%= f.password_field :password %>
-      <small>Leave blank if you don't want to change it</small>
-    </div>
+        <div class="field">
+          <%= f.label :name, "Name" %>
+          <%= f.text_field :name, required: true %>
+        </div>
 
-    <div class="field">
-      <%= f.label :password_confirmation, "Confirm New Password" %>
-      <%= f.password_field :password_confirmation %>
-    </div>
+        <div class="field">
+          <%= f.label :email_address, "Email" %>
+          <%= f.email_field :email_address, required: true %>
+        </div>
 
-    <div class="actions">
-      <%= f.submit "Update Profile", class: "button-primary" %>
-      <%= link_to "Cancel", root_path, class: "button" %>
+        <div class="field">
+          <%= f.label :password, "New Password" %>
+          <%= f.password_field :password %>
+        </div>
+
+        <div class="field">
+          <%= f.label :password_confirmation, "Confirm New Password" %>
+          <%= f.password_field :password_confirmation %>
+        </div>
+
+        <div class="actions">
+          <%= f.submit "Update Account", class: "button-primary" %>
+          <%= link_to "Cancel", root_path, class: "button" %>
+        </div>
+      <% end %>
     </div>
-  <% end %>
+  </section>
 </div>

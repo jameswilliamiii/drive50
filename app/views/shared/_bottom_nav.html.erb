@@ -4,13 +4,30 @@
     <%= icon_home(size: 24, class: "bottom-nav-icon") %>
     <span class="bottom-nav-label">Home</span>
   <% end %>
-  <%= button_to drive_sessions_path, method: :post, class: "bottom-nav-item", form: { class: "bottom-nav-form" } do %>
-    <%= icon_plus(size: 24, class: "bottom-nav-icon") %>
-    <span class="bottom-nav-label">New Drive</span>
+
+  <%= link_to all_drive_sessions_path, class: "bottom-nav-item #{'active' if request.path == all_drive_sessions_path}" do %>
+    <%= icon_list(size: 24, class: "bottom-nav-icon") %>
+    <span class="bottom-nav-label">Log</span>
   <% end %>
-  <button type="button" class="bottom-nav-item" data-drawer-target="button" data-action="click->drawer#toggle" aria-label="Toggle menu" aria-expanded="false">
-    <%= icon_menu(size: 24, class: "bottom-nav-icon") %>
-    <span class="bottom-nav-label">Menu</span>
-  </button>
+
+  <%= link_to export_drive_sessions_path(format: :csv), class: "bottom-nav-item" do %>
+    <%= icon_export(size: 24, class: "bottom-nav-icon") %>
+    <span class="bottom-nav-label">Export</span>
+  <% end %>
+
+  <!-- Floating New Drive button (mobile only, hidden if a drive is in progress) -->
+  <% if Current.user && !Current.user.drive_sessions.in_progress.exists? %>
+    <%= button_to drive_sessions_path,
+                 method: :post,
+                 class: "fab-new-drive",
+                 form: { class: "fab-new-drive-form" } do %>
+      <%= icon_plus(size: 24, class: "fab-new-drive-icon") %>
+    <% end %>
+  <% end %>
+
+  <%= link_to edit_user_path, class: "bottom-nav-item #{'active' if request.path == edit_user_path}" do %>
+    <%= icon_settings(size: 24, class: "bottom-nav-icon") %>
+    <span class="bottom-nav-label">Settings</span>
+  <% end %>
 </nav>
 

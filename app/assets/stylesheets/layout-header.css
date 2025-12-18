@@ -84,6 +84,19 @@ header nav span {
   header nav span {
     display: none;
   }
+
+  section header {
+    display: block;
+    background: none;
+    box-shadow: none;
+    border: none;
+    margin-bottom: 0;
+    font-size: 1.0rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+  }
 }
 
 @media (max-width: 480px) {

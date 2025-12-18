@@ -200,6 +200,11 @@
     min-height: 52px;
     font-size: 1.0625rem;
   }
+
+  /* Hide mobile-only settings session block on desktop */
+  .settings-section-session {
+    display: none;
+  }
 }
 
 /* Mobile Form Styles */

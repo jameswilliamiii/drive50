@@ -176,7 +176,7 @@
 /* Mobile Card Styles */
 @media (max-width: 768px) {
   .dashboard {
-    gap: calc(var(--spacing-unit) * 2.75);
+    gap: calc(var(--spacing-unit) * 2);
   }
 
   .progress-summary {
