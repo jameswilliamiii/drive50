@@ -6,6 +6,21 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : 'Drive50 helps you track and log your driving practice hours.' %>">
+
+    <%# Open Graph (Facebook, LinkedIn, etc.) %>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<%= content_for?(:meta_title) ? content_for(:meta_title) : 'Drive50' %>">
+    <meta property="og:description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : 'Drive50 helps you track and log your driving practice hours.' %>">
+    <meta property="og:url" content="<%= request.base_url + request.fullpath %>">
+    <meta property="og:image" content="<%= "#{request.base_url}/images/social-card.png" %>">
+
+    <%# Twitter Card %>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= content_for?(:meta_title) ? content_for(:meta_title) : 'Drive50' %>">
+    <meta name="twitter:description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : 'Drive50 helps you track and log your driving practice hours.' %>">
+    <meta name="twitter:image" content="<%= "#{request.base_url}/images/social-card.png" %>">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
