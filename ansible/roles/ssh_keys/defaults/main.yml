@@ -1,0 +1,7 @@
+---
+ssh_authorized_keys:
+  # Add your public keys here, for example:
+  "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6DnNNXmr1lSZA4ljpXKjCRJ7AqWsmf5n/CdPaBXkrbUlPOGG2nNQvf9D0AOfEO1Q9HYZPyuevKs41EOAi7ZAGQbvM2zPqOxYj8s9k+Gt1yh+TlR4CEL/UIabkUQaC8omd1x/QGWmHq13LVrfjC1W/wFZ3i/FM6m1GAsF2lHMLwXmBPync257r5mX36rSLeM1JYzFj5RwoRP72PT+zvQuVH0d+aZp+zsiXQv1C2yzxIduplG4KYMy22fqswPyr5H4iViCkzIiI4sMrEnuwXcG4F+zI4EEk2e2yWllUY2Qn4i9FSwqnwectAAwAuxwLsbU+TL/a9Ovs/oqeT5Q/DYap"
+
+  # Github Actions
+  # - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINwGB5UzBViHSdD3v+YPa+ooTsBcMfthecAxeyU4pSsT"

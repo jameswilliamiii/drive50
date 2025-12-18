@@ -1,0 +1,6 @@
+# This file is managed by Ansible
+# DO NOT EDIT MANUALLY
+
+{% for key in ssh_authorized_keys %}
+{{ key }}
+{% endfor %}

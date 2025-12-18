@@ -1,0 +1,20 @@
+---
+- name: Provisioning webservers group
+  hosts: webservers
+  gather_facts: false
+  become: true
+  roles:
+    - role: wait_for_connection
+    - role: packages
+    - role: docker
+    - role: firewall
+    - role: ssh_keys
+    - role: security
+      vars:
+        # Whether to reboot when needed during unattended upgrades.
+        security_autoupdate_reboot: "false"
+        # The time to trigger a reboot, when needed, if security_autoupdate_reboot is set to true. In 24h "hh:mm" clock format.
+        security_autoupdate_reboot_time: "03:00"
+    - role: geerlingguy.swap
+    - role: christiangda.awscli_configure
+    - role: reboot_if_needed

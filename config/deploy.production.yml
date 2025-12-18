@@ -1,0 +1,35 @@
+<% require "dotenv"; Dotenv.load(".kamal/.env.production") %>
+
+# Deploy to these servers.
+servers:
+  web:
+    hosts:
+      - 5.161.205.198
+  job:
+    hosts:
+      - 5.161.205.198
+    cmd: bin/jobs
+
+# Name of your application. Used to uniquely configure containers.
+service: drive50_production
+
+# Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
+# Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
+#
+# Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
+proxy:
+  app_port: 3000
+  ssl: true
+  host: drive50.app
+
+# Credentials for your image host.
+# Inject ENV variables into containers (secrets come from .kamal/secrets).
+env:
+  clear:
+    RAILS_ENV: production
+    RAILS_SERVE_STATIC_FILES: true
+    RAILS_LOG_LEVEL: info
+    SOLID_QUEUE_IN_PUMA: true
+  secret:
+    - RAILS_MASTER_KEY
+    - SECRET_KEY_BASE

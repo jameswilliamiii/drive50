@@ -2,8 +2,8 @@
 # check=error=true
 
 # This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t ava_drive_tracker .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name ava_drive_tracker ava_drive_tracker
+# docker build -t drive50 .
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name drive50 drive50
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
