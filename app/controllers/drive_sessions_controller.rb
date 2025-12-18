@@ -25,11 +25,10 @@ class DriveSessionsController < ApplicationController
     @hours_needed = stats[:hours_needed]
     @night_hours_needed = stats[:night_hours_needed]
 
-    # Handle turbo frame requests for infinite scroll
+    # Handle turbo frame requests for infinite scroll.
+    # Turbo frames still use the HTML format, so we render the turbo_stream partial explicitly.
     if turbo_frame_request?
-      respond_to do |format|
-        format.turbo_stream { render partial: "pagination_frame" }
-      end
+      render partial: "pagination_frame", formats: :turbo_stream
     end
   end
 

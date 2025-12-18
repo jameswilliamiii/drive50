@@ -86,6 +86,7 @@ header nav span {
   }
 
   section header {
+    z-index: 1;
     display: block;
     background: none;
     box-shadow: none;

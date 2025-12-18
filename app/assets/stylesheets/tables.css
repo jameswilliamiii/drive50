@@ -106,12 +106,6 @@ table td.night-indicator {
   padding: var(--spacing-lg) 0;
 }
 
-.pagination-info {
-  margin-top: var(--spacing-lg);
-  color: var(--color-text-light);
-  font-size: 0.875rem;
-}
-
 /* Desktop Table Styles */
 @media (min-width: 768px) {
   table th {
