@@ -1,11 +1,12 @@
 <% require "dotenv"; Dotenv.load(".kamal/.env") %>
 
 # Name of the container image.
-image: todo/todo
+image: ghcr.io/jameswilliamiii/drive50
 
 # Credentials for your image host.
 registry:
-  username: todo
+  server: ghcr.io
+  username: jameswilliamiii
   password:
     - KAMAL_REGISTRY_PASSWORD
 
