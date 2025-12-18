@@ -15,15 +15,10 @@
     <span class="bottom-nav-label">Export</span>
   <% end %>
 
-  <!-- Floating New Drive button (mobile only, hidden if a drive is in progress) -->
-  <% if Current.user && !Current.user.drive_sessions.in_progress.exists? %>
-    <%= button_to drive_sessions_path,
-                 method: :post,
-                 class: "fab-new-drive",
-                 form: { class: "fab-new-drive-form" } do %>
-      <%= icon_plus(size: 24, class: "fab-new-drive-icon") %>
-    <% end %>
-  <% end %>
+  <!-- Floating New/Complete Drive button (mobile only, state managed via turbo streams) -->
+  <div id="fab-new-drive-wrapper">
+    <%= render "shared/fab_new_drive" %>
+  </div>
 
   <%= link_to edit_user_path, class: "bottom-nav-item #{'active' if request.path == edit_user_path}" do %>
     <%= icon_settings(size: 24, class: "bottom-nav-icon") %>

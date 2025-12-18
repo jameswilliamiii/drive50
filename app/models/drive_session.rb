@@ -154,11 +154,38 @@ class DriveSession < ApplicationRecord
   end
 
   def broadcast_progress_summary
-    statistics = DriveSession.statistics_for(user)
-    broadcast_replace_to user, target: "progress-summary", html: ApplicationController.render(partial: "drive_sessions/progress_summary", locals: {
-      in_progress: statistics[:in_progress],
-      total_hours: statistics[:total_hours],
-      night_hours: statistics[:night_hours]
-    })
+    # Reset association cache so we always see the latest drives across requests/devices
+    user.association(:drive_sessions).reset
+    relation = user.drive_sessions
+
+    statistics = DriveSession.statistics_for(relation)
+    in_progress = statistics[:in_progress]
+
+    broadcast_replace_to user,
+                         target: "progress-summary",
+                         html: ApplicationController.render(
+                           partial: "drive_sessions/progress_summary",
+                           locals: {
+                             in_progress: in_progress,
+                             total_hours: statistics[:total_hours],
+                             night_hours: statistics[:night_hours]
+                           }
+                         )
+
+    # Update mobile in-progress banner on all pages
+    broadcast_update_to user,
+                        target: "in-progress-banner-container",
+                        html: ApplicationController.render(
+                          partial: "shared/in_progress_banner",
+                          locals: { in_progress: in_progress }
+                        )
+
+    # Update floating FAB button (Start vs Complete) on mobile
+    broadcast_update_to user,
+                        target: "fab-new-drive-wrapper",
+                        html: ApplicationController.render(
+                          partial: "shared/fab_new_drive",
+                          locals: { in_progress: in_progress }
+                        )
   end
 end

@@ -188,6 +188,10 @@
     padding: var(--spacing-xl);
   }
 
+  .in-progress-drive.stat-card {
+    display: none;
+  }
+
   .stat-card h2 {
     font-size: 2.25rem;
   }

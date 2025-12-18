@@ -28,7 +28,7 @@ class DriveSessionsController < ApplicationController
     # Handle turbo frame requests for infinite scroll.
     # Turbo frames still use the HTML format, so we render the turbo_stream partial explicitly.
     if turbo_frame_request?
-      render partial: "pagination_frame", formats: :turbo_stream
+      render partial: "pagination_frame", formats: :turbo_stream and return
     end
   end
 

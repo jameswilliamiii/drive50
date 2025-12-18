@@ -1,0 +1,11 @@
+<%# Mobile-only in-progress notification banner, updated via turbo streams %>
+<% if in_progress %>
+  <div class="in-progress-banner" data-controller="timer" data-timer-started-at-value="<%= in_progress.started_at.iso8601 %>">
+    <div class="in-progress-banner-content">
+      <span class="in-progress-banner-label">Drive in progress</span>
+      <span class="in-progress-banner-time" data-timer-target="display"><%= in_progress.elapsed_time %></span>
+    </div>
+  </div>
+<% end %>
+
+

@@ -1,0 +1,22 @@
+<%# Floating New Drive / Complete Drive FAB - controlled via turbo streams %>
+<% if Current.user %>
+  <% in_progress ||= Current.user.drive_sessions.in_progress.first %>
+
+  <% if in_progress %>
+    <%= button_to complete_drive_session_path(in_progress),
+                  method: :post,
+                  class: "fab-new-drive fab-new-drive-stop",
+                  form: { class: "fab-new-drive-form" } do %>
+      <%= icon_stop(size: 24, class: "fab-new-drive-icon") %>
+    <% end %>
+  <% else %>
+    <%= button_to drive_sessions_path,
+                  method: :post,
+                  class: "fab-new-drive",
+                  form: { class: "fab-new-drive-form" } do %>
+      <%= icon_plus(size: 24, class: "fab-new-drive-icon") %>
+    <% end %>
+  <% end %>
+<% end %>
+
+
