@@ -17,6 +17,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # PWA manifest
+  get "/manifest.json", to: "pwa#manifest", defaults: { format: :json }
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end

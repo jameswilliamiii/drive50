@@ -4,12 +4,14 @@
     <title><%= content_for?(:title) ? "#{content_for(:title)} - Drive50" : "Drive50" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <% turbo_refreshes_with method: :morph, scroll: :preserve %>
 
+    <link rel="manifest" href="/manifest.json">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
