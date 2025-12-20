@@ -12,7 +12,7 @@
         <%= icon_dots(size: 20, class: "card-menu-icon") %>
       </button>
       <div class="card-menu-backdrop" data-card-menu-target="backdrop" data-action="click->card-menu#handleBackdropClick"></div>
-      <div class="card-menu" data-card-menu-target="menu" data-action="click->card-menu#handleMenuItemClick">
+      <div class="card-menu hidden" data-card-menu-target="menu" data-action="click->card-menu#handleMenuItemClick">
         <div class="card-menu-options">
           <%= link_to edit_drive_session_path(session), class: "card-menu-item" do %>
             <span>Edit</span>

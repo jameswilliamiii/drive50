@@ -5,8 +5,9 @@ export default class extends Controller {
   static targets = ["menu", "button", "backdrop"]
 
   connect() {
-    // Close this menu when page is loaded or restored from cache
+    // Ensure menu is closed and hidden when page loads
     this.close()
+    this.hide()
 
     // Listen for Turbo navigation events to close all menus
     this.boundCloseAllMenus = this.closeAllMenus.bind(this)
@@ -23,6 +24,7 @@ export default class extends Controller {
 
     // Ensure scroll is restored if controller is disconnected
     this.close()
+    this.hide()
   }
 
   toggle(event) {
@@ -48,6 +50,8 @@ export default class extends Controller {
   }
 
   open() {
+    // Remove hidden class before opening
+    this.show()
     // Prevent body scroll when menu is open
     document.body.style.overflow = "hidden"
     this.backdropTarget.classList.add("card-menu-backdrop-visible")
@@ -67,12 +71,23 @@ export default class extends Controller {
         this.buttonTarget.setAttribute("aria-expanded", "false")
       }
     }
+    // Always hide the menu when closing to prevent flash
+    this.hide()
+  }
+
+  hide() {
+    this.menuTarget.classList.add("hidden")
+  }
+
+  show() {
+    this.menuTarget.classList.remove("hidden")
   }
 
   // Close all card menus on the page
   closeAllMenus() {
     document.querySelectorAll(".card-menu-open").forEach(menu => {
       menu.classList.remove("card-menu-open")
+      menu.classList.add("hidden")
     })
     document.querySelectorAll(".card-menu-backdrop-visible").forEach(backdrop => {
       backdrop.classList.remove("card-menu-backdrop-visible")

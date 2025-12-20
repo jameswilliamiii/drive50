@@ -13,6 +13,14 @@
   display: none;
 }
 
+/* Ensure hidden class works everywhere, including iOS Safari */
+.card-menu.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 .card-menu-backdrop {
   position: fixed;
   top: 0;
@@ -85,6 +93,15 @@
     max-height: calc(90vh - 80px - env(safe-area-inset-bottom));
     overflow-y: auto;
     padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+
+  /* Ensure hidden class always hides the menu, even in media query */
+  /* This is critical for iOS Safari which can render before JS runs */
+  .card-menu.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 
   .card-menu.card-menu-open {
