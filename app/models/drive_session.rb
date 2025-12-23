@@ -111,7 +111,9 @@ class DriveSession < ApplicationRecord
     if completed?
       # If completed, add to recent drives (if in top 3) and all drives
       broadcast_recent_drives_table
-      broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
+      # Broadcast to both desktop table and mobile cards (only one will exist in DOM)
+      broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self }, formats: :html)
+      broadcast_append_to user, target: "sessions-cards", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self }, formats: :html, variants: :mobile)
     else
       # If in progress, update the in-progress section
       broadcast_replace_to user, target: "in-progress-drive", html: ApplicationController.render(partial: "drive_sessions/in_progress_drive", locals: { in_progress: self })
@@ -127,10 +129,13 @@ class DriveSession < ApplicationRecord
       if was_in_progress
         # Drive was just completed - remove from in-progress and add to all drives
         broadcast_remove_to user, target: "in-progress-drive"
-        broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
+        # Broadcast to both desktop table and mobile cards
+        broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self }, formats: :html)
+        broadcast_append_to user, target: "sessions-cards", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self }, formats: :html, variants: :mobile)
       else
-        # Drive was already completed - just update the row
-        broadcast_replace_to user, target: ActionView::RecordIdentifier.dom_id(self), html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
+        # Drive was already completed - just update the row/card
+        broadcast_replace_to user, target: ActionView::RecordIdentifier.dom_id(self), html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self }, formats: :html)
+        broadcast_replace_to user, target: ActionView::RecordIdentifier.dom_id(self), html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self }, formats: :html, variants: :mobile)
       end
 
       broadcast_recent_drives_table
@@ -150,7 +155,9 @@ class DriveSession < ApplicationRecord
 
   def broadcast_recent_drives_table
     recent_sessions = user.drive_sessions.completed.ordered.limit(3)
-    broadcast_replace_to user, target: "recent-drives-table", html: ApplicationController.render(partial: "drive_sessions/recent_drives_table", locals: { recent_sessions: recent_sessions })
+    # Broadcast to both desktop table and mobile cards
+    broadcast_replace_to user, target: "recent-drives-table", html: ApplicationController.render(partial: "drive_sessions/recent_drives_table", locals: { recent_sessions: recent_sessions }, formats: :html)
+    broadcast_replace_to user, target: "recent-drives-cards", html: ApplicationController.render(partial: "drive_sessions/recent_drives_cards", locals: { recent_sessions: recent_sessions }, formats: :html, variants: [:mobile])
   end
 
   def broadcast_progress_summary

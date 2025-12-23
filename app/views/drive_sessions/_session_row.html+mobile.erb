@@ -1,0 +1,66 @@
+<div id="<%= dom_id(session) %>" class="drive-card" data-controller="drive-session card-menu notes-toggle">
+  <div class="drive-card-header">
+    <span class="drive-card-date"><%= local_time(session.started_at, format: "%B %d, %Y") %></span>
+    <button type="button"
+            class="card-menu-button"
+            data-card-menu-target="button"
+            data-action="click->card-menu#toggle"
+            aria-label="More options"
+            aria-expanded="false">
+      <%= icon_dots(size: 20, class: "card-menu-icon") %>
+    </button>
+  </div>
+
+  <div class="card-menu-backdrop" data-card-menu-target="backdrop" data-action="click->card-menu#handleBackdropClick"></div>
+  <div class="card-menu hidden" data-card-menu-target="menu" data-action="click->card-menu#handleMenuItemClick">
+    <div class="card-menu-options">
+      <%= link_to edit_drive_session_path(session), class: "card-menu-item" do %>
+        <span>Edit</span>
+      <% end %>
+      <%= button_to drive_session_path(session),
+                    method: :delete,
+                    data: { turbo_confirm: "Are you sure?" },
+                    class: "card-menu-item card-menu-item-danger",
+                    form: {
+                      style: "display: inline;",
+                      data: { action: "submit->drive-session#handleDelete submit->card-menu#handleFormSubmit" }
+                    } do %>
+        <span>Delete</span>
+      <% end %>
+      <button type="button" class="card-menu-cancel" data-action="click->card-menu#close">Cancel</button>
+    </div>
+  </div>
+
+  <div class="drive-card-stats">
+    <div class="drive-card-stat">
+      <div class="drive-card-stat-label">Duration</div>
+      <div class="drive-card-stat-value"><%= session.duration_hours %> hrs</div>
+    </div>
+    <div class="drive-card-stat">
+      <div class="drive-card-stat-label">Time of Day</div>
+      <div class="drive-card-stat-value night-indicator">
+        <%= render "drive_sessions/night_day_indicator", is_night: session.is_night_drive, size: 20 %>
+      </div>
+    </div>
+  </div>
+
+  <% if session.notes.present? %>
+    <div class="drive-card-notes-toggle">
+      <button type="button"
+              class="drive-card-notes-toggle-button"
+              data-action="click->notes-toggle#toggle"
+              data-notes-toggle-target="button"
+              aria-expanded="false">
+        <span>View Notes</span>
+        <span class="drive-card-notes-toggle-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
+      <div class="drive-card-notes-content-wrapper" data-notes-toggle-target="content">
+        <div class="drive-card-notes-content"><%= session.notes %></div>
+      </div>
+    </div>
+  <% end %>
+</div>

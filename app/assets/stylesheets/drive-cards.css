@@ -1,0 +1,141 @@
+/* ============================================
+   Drive Cards (Mobile)
+   ============================================ */
+
+.drive-cards-container {
+  margin-top: var(--spacing-lg);
+}
+
+#recent-drives-cards,
+#sessions-cards {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.drive-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-lg);
+  position: relative;
+  animation: fadeIn 0.3s ease-in;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.drive-card.fade-out {
+  opacity: 0 !important;
+  transform: translateY(-10px) !important;
+  pointer-events: none;
+}
+
+.drive-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.drive-card-date {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+}
+
+.drive-card-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.drive-card-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.drive-card-stat-label {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.2;
+}
+
+.drive-card-stat-value {
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing-unit) * 0.375);
+  line-height: 1.4;
+  min-height: 1.4em;
+}
+
+.drive-card-notes-toggle {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.drive-card-notes-toggle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  padding: var(--spacing-sm);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.drive-card-notes-toggle-button:active {
+  opacity: 0.7;
+}
+
+.drive-card-notes-toggle-icon {
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.drive-card-notes-toggle-button[aria-expanded="true"] .drive-card-notes-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.drive-card-notes-content-wrapper {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 0;
+  opacity: 0;
+}
+
+.drive-card-notes-content-wrapper.expanded {
+  max-height: 500px;
+  opacity: 1;
+  margin-top: var(--spacing-sm);
+}
+
+.drive-card-notes-content {
+  padding: var(--spacing-md);
+  background-color: var(--color-background);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

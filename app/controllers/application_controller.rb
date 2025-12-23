@@ -10,6 +10,10 @@ class ApplicationController < ActionController::Base
 
   # Set user's timezone for the request so Rails parses datetimes correctly
   before_action :set_time_zone
+  # Set request variant based on device type
+  before_action :set_variant
+
+  helper_method :mobile_device?
 
   private
 
@@ -26,5 +30,13 @@ class ApplicationController < ActionController::Base
         Current.user.update_column(:timezone, timezone)
       end
     end
+  end
+
+  def set_variant
+    request.variant = :mobile if mobile_device?
+  end
+
+  def mobile_device?
+    browser.device.mobile? || browser.device.tablet?
   end
 end

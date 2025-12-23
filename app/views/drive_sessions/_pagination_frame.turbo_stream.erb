@@ -1,4 +1,5 @@
-<%= turbo_stream.append "sessions-tbody" do %>
+<% target_id = mobile_device? ? "sessions-cards" : "sessions-tbody" %>
+<%= turbo_stream.append target_id do %>
   <%= render partial: "session_row", collection: @sessions, as: :session %>
 <% end %>
 

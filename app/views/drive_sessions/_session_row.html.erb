@@ -1,56 +1,20 @@
-<tr id="<%= dom_id(session) %>" class="drive-session-row" data-controller="drive-session card-menu">
-  <td data-label="Date">
-    <span class="desktop-content"><%= local_time(session.started_at, format: "%B %d, %Y") %></span>
-    <div class="card-header mobile-only">
-      <span><%= local_time(session.started_at, format: "%B %d, %Y") %></span>
-      <button type="button"
-              class="card-menu-button"
-              data-card-menu-target="button"
-              data-action="click->card-menu#toggle"
-              aria-label="More options"
-              aria-expanded="false">
-        <%= icon_dots(size: 20, class: "card-menu-icon") %>
-      </button>
-      <div class="card-menu-backdrop" data-card-menu-target="backdrop" data-action="click->card-menu#handleBackdropClick"></div>
-      <div class="card-menu hidden" data-card-menu-target="menu" data-action="click->card-menu#handleMenuItemClick">
-        <div class="card-menu-options">
-          <%= link_to edit_drive_session_path(session), class: "card-menu-item" do %>
-            <span>Edit</span>
-          <% end %>
-          <%= button_to drive_session_path(session),
-                        method: :delete,
-                        data: { turbo_confirm: "Are you sure?" },
-                        class: "card-menu-item card-menu-item-danger",
-                        form: {
-                          style: "display: inline;",
-                          data: { action: "submit->drive-session#handleDelete submit->card-menu#handleFormSubmit" }
-                        } do %>
-            <span>Delete</span>
-          <% end %>
-          <button type="button" class="card-menu-cancel" data-action="click->card-menu#close">Cancel</button>
-        </div>
-      </div>
-    </div>
+<tr id="<%= dom_id(session) %>" class="drive-session-row" data-controller="drive-session">
+  <td><%= local_time(session.started_at, format: "%B %d, %Y") %></td>
+  <td class="night-indicator time-of-day-cell">
+    <%= render "drive_sessions/night_day_indicator", is_night: session.is_night_drive, size: 20 %>
   </td>
-  <td data-label="Time of Day" class="night-indicator time-of-day-cell">
-    <span class="desktop-content">
-      <%= render "drive_sessions/night_day_indicator", is_night: session.is_night_drive, size: 20 %>
-    </span>
-    <div class="card-stats-row mobile-only">
-      <div class="card-stat">
-        <div class="card-stat-label">Time of Day</div>
-        <div class="card-stat-value night-indicator">
-          <%= render "drive_sessions/night_day_indicator", is_night: session.is_night_drive, size: 18 %>
-        </div>
-      </div>
-      <div class="card-stat">
-        <div class="card-stat-label">Duration</div>
-        <div class="card-stat-value"><%= session.duration_hours %> hrs</div>
-      </div>
-    </div>
-  </td>
-  <td data-label="Duration" class="duration-cell">
-    <span class="desktop-content"><%= session.duration_hours %> hrs</span>
+  <td class="duration-cell"><%= session.duration_hours %> hrs</td>
+  <td class="notes-cell">
+    <% if session.notes.present? %>
+      <span class="tooltip-trigger"
+            data-tooltip="<%= session.notes %>"
+            data-controller="notes-tooltip"
+            data-notes-tooltip-target="trigger">
+        <span class="notes-text" data-notes-tooltip-target="text"><%= session.notes %></span>
+      </span>
+    <% else %>
+      <span class="notes-empty">—</span>
+    <% end %>
   </td>
   <td class="actions">
     <%= link_to "Edit", edit_drive_session_path(session), class: "action-link" %>

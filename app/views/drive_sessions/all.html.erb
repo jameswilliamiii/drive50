@@ -9,14 +9,20 @@
 
   <div class="drive-history">
     <% if @sessions.any? %>
-      <div id="sessions-table">
-        <table>
-          <%= render "table_header" %>
-          <tbody id="sessions-tbody">
-            <%= render partial: "session_row", collection: @sessions, as: :session %>
-          </tbody>
-        </table>
-      </div>
+      <% if mobile_device? %>
+        <div id="sessions-cards" class="drive-cards-container">
+          <%= render partial: "session_row", collection: @sessions, as: :session %>
+        </div>
+      <% else %>
+        <div id="sessions-table">
+          <table>
+            <%= render "table_header" %>
+            <tbody id="sessions-tbody">
+              <%= render partial: "session_row", collection: @sessions, as: :session %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
 
       <turbo-frame id="sessions-pagination" data-controller="infinite-scroll">
         <div id="pagination-container" class="pagination-wrapper">

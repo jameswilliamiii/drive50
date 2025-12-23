@@ -14,14 +14,20 @@
   <section class="drive-history">
     <header>Recent Drives</header>
     <% if Current.user.drive_sessions.completed.any? %>
-      <table class="recent-drives-table-wrapper">
-        <%= render "table_header" %>
-        <tbody id="recent-drives-table">
-          <%= render partial: "session_row", collection: @recent_sessions, as: :session %>
-        </tbody>
-      </table>
+      <% if mobile_device? %>
+        <div class="drive-cards-container">
+          <%= render "recent_drives_cards", recent_sessions: @recent_sessions %>
+        </div>
+      <% else %>
+        <table>
+          <%= render "table_header" %>
+          <tbody id="recent-drives-table">
+            <%= render "recent_drives_table", recent_sessions: @recent_sessions %>
+          </tbody>
+        </table>
+      <% end %>
       <% if Current.user.drive_sessions.completed.count > 3 %>
-        <section class="view-all-link">
+        <div class="view-all-link">
           <%= link_to "View All Drives", all_drive_sessions_path, class: "button" %>
         </div>
       <% end %>

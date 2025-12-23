@@ -1,0 +1,7 @@
+<div id="recent-drives-cards">
+  <% if recent_sessions.any? %>
+    <%= render partial: "drive_sessions/session_row", collection: recent_sessions, as: :session %>
+  <% else %>
+    <p class="empty-state">No drives recorded yet. Start your first drive!</p>
+  <% end %>
+</div>
