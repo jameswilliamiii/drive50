@@ -36,7 +36,7 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Pagination
-gem "pagy", "~> 43.0"
+gem "pagy", "~> 43.2"
 
 # Display times in user's local timezone
 gem "local_time"
