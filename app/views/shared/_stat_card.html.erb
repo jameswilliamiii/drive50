@@ -1,17 +1,25 @@
 <div class="stat-card">
-  <h2><%= current_value.round(1) %> / <%= total_value %></h2>
-  <p>
-    <%= label %>
-    <% if tooltip.present? %>
-      <span class="tooltip-trigger" data-tooltip="<%= tooltip %>">
-        <%= icon_info(size: 14, class: "info-icon") %>
-      </span>
+  <div class="stat-card-progress">
+    <%= circular_progress(current: current_value, total: total_value, size: 120, stroke_width: 10) %>
+    <div class="stat-card-value">
+      <div class="stat-number"><%= current_value.round(1) %></div>
+      <div class="stat-total">of <%= total_value %></div>
+    </div>
+  </div>
+  <div class="stat-card-info">
+    <p class="stat-label">
+      <%= label %>
+      <% if tooltip.present? %>
+        <span class="tooltip-trigger" data-tooltip="<%= tooltip %>">
+          <%= icon_info(size: 14, class: "info-icon") %>
+        </span>
+      <% end %>
+    </p>
+    <% remaining = [total_value - current_value, 0].max %>
+    <% if remaining > 0 %>
+      <p class="stat-remaining"><%= format_duration(remaining) %> remaining</p>
+    <% else %>
+      <p class="stat-complete"><%= icon_check(size: 16, class: "check-icon") %> Complete!</p>
     <% end %>
-  </p>
-  <% remaining = [total_value - current_value, 0].max %>
-  <% if remaining > 0 %>
-    <small><%= remaining.round(1) %> hours remaining</small>
-  <% else %>
-    <small class="complete"><%= icon_check(size: 16, class: "check-icon") %> Complete!</small>
-  <% end %>
+  </div>
 </div>

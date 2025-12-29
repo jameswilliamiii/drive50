@@ -292,4 +292,139 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert stats.key?(:night_hours_needed)
     assert stats.key?(:in_progress)
   end
+
+  # Activity Calendar
+  test "ACTIVITY_CALENDAR_DAYS constant is set" do
+    assert_equal 28, DriveSession::ACTIVITY_CALENDAR_DAYS
+  end
+
+  test "activity_by_date returns hash of dates to counts" do
+    @user.drive_sessions.destroy_all
+
+    # Create drives on specific dates in UTC
+    3.times do
+      @user.drive_sessions.create!(
+        driver_name: "Test",
+        started_at: 2.days.ago.beginning_of_day + 10.hours,
+        ended_at: 2.days.ago.beginning_of_day + 11.hours
+      )
+    end
+
+    2.times do
+      @user.drive_sessions.create!(
+        driver_name: "Test",
+        started_at: 1.day.ago.beginning_of_day + 10.hours,
+        ended_at: 1.day.ago.beginning_of_day + 11.hours
+      )
+    end
+
+    result = @user.drive_sessions.activity_by_date(days: 28, timezone: "UTC")
+
+    assert_equal 3, result[2.days.ago.to_date]
+    assert_equal 2, result[1.day.ago.to_date]
+    assert_nil result[Date.today]
+  end
+
+  test "activity_by_date respects timezone parameter" do
+    @user.drive_sessions.destroy_all
+
+    # Create a drive at 11 PM UTC on Jan 1
+    # In Tokyo (UTC+9), this would be 8 AM on Jan 2
+    drive_time = Time.zone.parse("2025-01-01 23:00:00 UTC")
+    @user.drive_sessions.create!(
+      driver_name: "Test",
+      started_at: drive_time,
+      ended_at: drive_time + 1.hour
+    )
+
+    utc_result = @user.drive_sessions.activity_by_date(days: 365, timezone: "UTC")
+    tokyo_result = @user.drive_sessions.activity_by_date(days: 365, timezone: "Asia/Tokyo")
+
+    # UTC should count it on Jan 1
+    assert_equal 1, utc_result[Date.parse("2025-01-01")]
+    # Tokyo should count it on Jan 2
+    assert_equal 1, tokyo_result[Date.parse("2025-01-02")]
+  end
+
+  test "activity_by_date only includes completed drives" do
+    @user.drive_sessions.destroy_all
+
+    # Completed drive
+    @user.drive_sessions.create!(
+      driver_name: "Test",
+      started_at: 1.day.ago,
+      ended_at: 1.day.ago + 1.hour
+    )
+
+    # In-progress drive
+    @user.drive_sessions.create!(
+      driver_name: "Test",
+      started_at: 1.day.ago
+    )
+
+    result = @user.drive_sessions.activity_by_date(days: 28)
+    assert_equal 1, result[1.day.ago.to_date]
+  end
+
+  test "activity_by_date filters by date range" do
+    @user.drive_sessions.destroy_all
+
+    # Drive within range (10 days ago)
+    @user.drive_sessions.create!(
+      driver_name: "Test",
+      started_at: 10.days.ago,
+      ended_at: 10.days.ago + 1.hour
+    )
+
+    # Drive outside range (40 days ago)
+    @user.drive_sessions.create!(
+      driver_name: "Test",
+      started_at: 40.days.ago,
+      ended_at: 40.days.ago + 1.hour
+    )
+
+    result = @user.drive_sessions.activity_by_date(days: 28)
+    assert_equal 1, result.values.sum
+  end
+
+  test "activity_by_date handles nil timezone gracefully" do
+    @user.drive_sessions.destroy_all
+    @user.drive_sessions.create!(
+      driver_name: "Test",
+      started_at: 1.day.ago,
+      ended_at: 1.day.ago + 1.hour
+    )
+
+    # Should not raise error and should default to Time.zone or UTC
+    assert_nothing_raised do
+      result = @user.drive_sessions.activity_by_date(days: 28, timezone: nil)
+      assert_kind_of Hash, result
+      assert_equal 1, result.values.sum
+    end
+  end
+
+  test "activity_by_date handles empty results" do
+    @user.drive_sessions.destroy_all
+
+    result = @user.drive_sessions.activity_by_date(days: 28)
+    assert_equal({}, result)
+    assert_kind_of Hash, result
+  end
+
+  test "activity_by_date groups multiple drives on same date" do
+    @user.drive_sessions.destroy_all
+
+    # Create 5 drives on the same date
+    date = 5.days.ago.beginning_of_day
+    5.times do |i|
+      @user.drive_sessions.create!(
+        driver_name: "Test",
+        started_at: date + i.hours,
+        ended_at: date + i.hours + 30.minutes
+      )
+    end
+
+    result = @user.drive_sessions.activity_by_date(days: 28)
+    assert_equal 5, result[5.days.ago.to_date]
+  end
 end

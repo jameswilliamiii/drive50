@@ -8,3 +8,11 @@
     <% end %>
   <% end %>
 </div>
+
+<%# Template for dynamically creating toasts from JavaScript %>
+<template id="toast-template">
+  <div class="toast toast-success" data-controller="toast" data-toast-type-value="success" data-toast-duration-value="2000">
+    <div class="toast-content"></div>
+    <button type="button" class="toast-close" data-action="click->toast#close" aria-label="Close"></button>
+  </div>
+</template>

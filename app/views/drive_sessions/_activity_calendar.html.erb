@@ -1,0 +1,33 @@
+<div class="activity-calendar" data-controller="activity-calendar">
+  <div class="activity-calendar-grid-wrapper">
+    <div class="activity-calendar-grid">
+      <% days.each do |day| %>
+        <div class="activity-day level-<%= day[:level] %>"
+             title="<%= day[:date].strftime('%B %d, %Y') %>: <%= day[:count] %> <%= 'drive'.pluralize(day[:count]) %>"
+             data-activity-calendar-target="day"
+             data-date="<%= day[:date].strftime('%B %d, %Y') %>"
+             data-count="<%= day[:count] %>"
+             data-action="click->activity-calendar#showDayInfo">
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="activity-calendar-info">
+    <p class="stat-label">
+      Driving Activity
+      <span class="tooltip-trigger" data-tooltip="<%= label %> of driving sessions">
+        <%= icon_info(size: 14, class: "info-icon") %>
+      </span>
+    </p>
+    <div class="activity-calendar-legend">
+      <span class="legend-label">Less</span>
+      <div class="activity-day level-0"></div>
+      <div class="activity-day level-1"></div>
+      <div class="activity-day level-2"></div>
+      <div class="activity-day level-3"></div>
+      <div class="activity-day level-4"></div>
+      <span class="legend-label">More</span>
+    </div>
+  </div>
+</div>
