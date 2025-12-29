@@ -45,12 +45,12 @@
       </div>
       <div class="card-stat">
         <div class="card-stat-label">Duration</div>
-        <div class="card-stat-value"><%= session.duration_hours %> hrs</div>
+        <div class="card-stat-value"><%= format_duration(session.duration_hours) %></div>
       </div>
     </div>
   </td>
   <td data-label="Duration" class="duration-cell">
-    <span class="desktop-content"><%= session.duration_hours %> hrs</span>
+    <span class="desktop-content"><%= format_duration(session.duration_hours) %></span>
   </td>
   <td class="actions">
     <%= link_to "Edit", edit_drive_session_path(session), class: "action-link" %>

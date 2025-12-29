@@ -11,6 +11,9 @@ class DriveSessionsController < ApplicationController
     @night_hours = stats[:night_hours]
     @hours_needed = stats[:hours_needed]
     @night_hours_needed = stats[:night_hours_needed]
+
+    # Get activity data for calendar
+    @activity_data = user_sessions.activity_by_date(days: DriveSession::ACTIVITY_CALENDAR_DAYS, timezone: Current.user.timezone)
   end
 
   def all
