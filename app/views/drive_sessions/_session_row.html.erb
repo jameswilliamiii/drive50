@@ -2,7 +2,14 @@
   <td data-label="Date">
     <span class="desktop-content"><%= local_time(session.started_at, format: "%B %d, %Y") %></span>
     <div class="card-header mobile-only">
-      <span><%= local_time(session.started_at, format: "%B %d, %Y") %></span>
+      <span class="date-with-notes">
+        <%= local_time(session.started_at, format: "%B %d, %Y") %>
+        <% if session.notes.present? %>
+          <span class="tooltip-trigger mobile-notes-tooltip" data-tooltip="<%= session.notes %>">
+            <%= icon_info(size: 14, class: "info-icon") %>
+          </span>
+        <% end %>
+      </span>
       <button type="button"
               class="card-menu-button"
               data-card-menu-target="button"
@@ -51,6 +58,9 @@
   </td>
   <td data-label="Duration" class="duration-cell">
     <span class="desktop-content"><%= format_duration(session.duration_hours) %></span>
+  </td>
+  <td class="notes-column">
+    <span class="desktop-content notes-text"><%= session.notes %></span>
   </td>
   <td class="actions">
     <%= link_to "Edit", edit_drive_session_path(session), class: "action-link" %>
