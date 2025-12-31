@@ -44,6 +44,9 @@ gem "local_time"
 # CSV generation
 gem "csv"
 
+# Calculate sunset/sunrise times for night drive detection
+gem "RubySunrise"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

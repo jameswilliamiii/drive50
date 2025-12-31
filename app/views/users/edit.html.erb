@@ -5,19 +5,56 @@
     <h1 class="page-header-title">Settings</h1>
   </div>
 
-  <!-- Session / Sign out section (mobile only) -->
-  <section class="card settings-section settings-section-session">
+  <!-- Location section for night drive detection -->
+  <section class="card settings-section" data-controller="location">
     <div class="card-body">
-      <%= link_to "Sign Out",
-                  session_path,
-                  data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to sign out?" },
-                  class: "button button-small" %>
+      <h2 class="settings-section-title">Location</h2>
+      <p class="settings-section-description">
+        Your location helps us accurately determine when night driving occurs based on actual sunset/sunrise times.
+      </p>
+
+      <%= form_with model: @user, url: user_path, class: "drive-form", data: { location_target: "form" } do |f| %>
+        <%= f.hidden_field :latitude, data: { location_target: "latitude" } %>
+        <%= f.hidden_field :longitude, data: { location_target: "longitude" } %>
+
+        <div class="location-status" data-location-target="status">
+          <% if @user.latitude.present? && @user.longitude.present? %>
+            <p class="location-set">
+              ✓ Location set (lat: <%= @user.latitude.round(4) %>, lon: <%= @user.longitude.round(4) %>)
+            </p>
+          <% else %>
+            <p class="location-not-set">
+              Location not set. Using timezone-based approximation.
+            </p>
+          <% end %>
+        </div>
+
+        <div class="actions no-margin">
+          <button type="button"
+                  class="button button-primary"
+                  data-action="click->location#requestLocation">
+            <% if @user.latitude.present? && @user.longitude.present? %>
+              Update Location
+            <% else %>
+              Set My Location
+            <% end %>
+          </button>
+          <% if @user.latitude.present? && @user.longitude.present? %>
+            <button type="button"
+                    class="button-danger"
+                    data-action="click->location#clearLocation">
+              Clear Location
+            </button>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   </section>
 
   <!-- Account information section -->
   <section class="card settings-section">
     <div class="card-body">
+      <h2 class="settings-section-title">Account</h2>
       <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
         <%= render "shared/error_messages", object: @user, object_name: "profile" %>
 
@@ -46,6 +83,17 @@
           <%= link_to "Cancel", root_path, class: "button" %>
         </div>
       <% end %>
+    </div>
+  </section>
+
+  <!-- Session / Sign out section (mobile only) -->
+  <section class="card settings-section settings-section-session">
+    <div class="card-body">
+      <h2 class="settings-section-title">Session</h2>
+      <%= link_to "Sign Out",
+                  session_path,
+                  data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to sign out?" },
+                  class: "button button-small" %>
     </div>
   </section>
 </div>

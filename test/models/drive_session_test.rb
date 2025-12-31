@@ -39,31 +39,70 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert_equal 60, session.duration_minutes
   end
 
-  test "determines night drive based on start time" do
-    # Night drive
+  test "determines night drive based on sunset/sunrise times in winter" do
+    # Set user timezone and location (Chicago)
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+
+    # Winter: sunset around 4:50pm
+    winter_date = Date.new(2024, 12, 15)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+
+    # 5pm drive in winter should be night (after sunset)
     night_session = @user.drive_sessions.create!(
       driver_name: "Test Driver",
-      started_at: Time.current.change(hour: 21),
-      ended_at: Time.current.change(hour: 22)
+      started_at: tz.local(2024, 12, 15, 17, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 18, 0, 0)
     )
-    assert night_session.is_night_drive
+    assert night_session.is_night_drive, "5pm in winter should be night drive"
 
-    # Day drive
+    # 2pm drive in winter should be day (before sunset)
     day_session = @user.drive_sessions.create!(
       driver_name: "Test Driver",
-      started_at: Time.current.change(hour: 14),
-      ended_at: Time.current.change(hour: 15)
+      started_at: tz.local(2024, 12, 15, 14, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 15, 0, 0)
     )
-    assert_not day_session.is_night_drive
+    assert_not day_session.is_night_drive, "2pm in winter should be day drive"
   end
 
   test "determines night drive for early morning" do
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+
     night_session = @user.drive_sessions.create!(
       driver_name: "Test Driver",
       started_at: Time.current.change(hour: 2),
       ended_at: Time.current.change(hour: 3)
     )
-    assert night_session.is_night_drive
+    assert night_session.is_night_drive, "Early morning should be night drive"
+  end
+
+  test "uses timezone fallback when user has no coordinates" do
+    # User has timezone but no lat/long
+    @user.update!(timezone: "America/Chicago", latitude: nil, longitude: nil)
+
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+
+    # Should still work using timezone-based coordinates
+    night_session = @user.drive_sessions.create!(
+      driver_name: "Test Driver",
+      started_at: tz.local(2024, 12, 15, 21, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 22, 0, 0)
+    )
+    assert night_session.is_night_drive, "Should use timezone fallback coordinates"
+  end
+
+  test "night_time? handles polar regions with no sunset" do
+    @user.update!(timezone: "UTC", latitude: 89.0, longitude: 0.0) # Near North Pole
+
+    # During polar summer, there may be no sunset
+    # Should return false (not night) when sunrise/sunset are nil
+    time = Time.zone.parse("2024-06-15 12:00:00")
+    session = @user.drive_sessions.new(driver_name: "Test")
+
+    # This should not raise an error
+    assert_nothing_raised do
+      result = session.send(:night_time?, time, 89.0, 0.0)
+      assert_equal false, result
+    end
   end
 
   test "duration_hours returns 0 for nil duration" do
@@ -112,15 +151,19 @@ class DriveSessionTest < ActiveSupport::TestCase
   end
 
   test "night_drives scope returns only night drives" do
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+
     night = @user.drive_sessions.create!(
       driver_name: "Test",
-      started_at: Time.current.change(hour: 21),
-      ended_at: Time.current.change(hour: 22)
+      started_at: tz.local(2024, 12, 15, 21, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 22, 0, 0)
     )
     day = @user.drive_sessions.create!(
       driver_name: "Test",
-      started_at: Time.current.change(hour: 14),
-      ended_at: Time.current.change(hour: 15)
+      started_at: tz.local(2024, 12, 15, 14, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 15, 0, 0)
     )
 
     assert_includes @user.drive_sessions.night_drives, night
@@ -216,10 +259,13 @@ class DriveSessionTest < ActiveSupport::TestCase
 
   test "night_hours calculates total night hours" do
     @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
     @user.drive_sessions.create!(
       driver_name: "Test",
-      started_at: Time.current.change(hour: 21),
-      ended_at: Time.current.change(hour: 22)
+      started_at: tz.local(2024, 12, 15, 21, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 22, 0, 0)
     )
 
     assert_in_delta 1.0, @user.drive_sessions.night_hours, 0.1

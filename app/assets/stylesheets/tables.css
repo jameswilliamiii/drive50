@@ -87,12 +87,32 @@ table td.night-indicator {
   vertical-align: middle;
 }
 
-.night-indicator .icon-moon {
-  color: #6366f1;
+.time-of-day-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
-.night-indicator .icon-sun {
-  color: var(--color-warning);
+.time-of-day-badge-night {
+  background-color: var(--color-night-badge-bg);
+  color: var(--color-night-badge-text);
+}
+
+.time-of-day-badge-night .icon-moon {
+  color: var(--color-night-badge-icon);
+}
+
+.time-of-day-badge-day {
+  background-color: var(--color-day-badge-bg);
+  color: var(--color-day-badge-text);
+}
+
+.time-of-day-badge-day .icon-sun {
+  color: var(--color-day-badge-icon);
 }
 
 .icon {

@@ -1,5 +1,11 @@
 <% if is_night %>
-  <%= icon_moon(size: size, class: "night-icon") %>
+  <span class="time-of-day-badge time-of-day-badge-night">
+    <%= icon_moon(size: size, class: "night-icon") %>
+    <span class="time-of-day-text">Night</span>
+  </span>
 <% else %>
-  <%= icon_sun(size: size, class: "day-icon") %>
+  <span class="time-of-day-badge time-of-day-badge-day">
+    <%= icon_sun(size: size, class: "day-icon") %>
+    <span class="time-of-day-text">Day</span>
+  </span>
 <% end %>

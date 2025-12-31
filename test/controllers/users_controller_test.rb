@@ -13,14 +13,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "should update user name" do
     patch user_url, params: { user: { name: "Updated Name", email_address: @user.email_address } }
-    assert_redirected_to root_url
+    assert_redirected_to edit_user_url
     @user.reload
     assert_equal "Updated Name", @user.name
   end
 
   test "should update user email" do
     patch user_url, params: { user: { name: @user.name, email_address: "newemail@example.com" } }
-    assert_redirected_to root_url
+    assert_redirected_to edit_user_url
     @user.reload
     assert_equal "newemail@example.com", @user.email_address
   end
@@ -36,7 +36,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to root_url
+    assert_redirected_to edit_user_url
     @user.reload
     assert @user.authenticate(new_password)
   end
@@ -79,5 +79,39 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     other_user = users(:two)
     other_user.reload
     assert_not_equal "Updated Name", other_user.name
+  end
+
+  test "should update user location coordinates" do
+    patch user_url, params: {
+      user: {
+        name: @user.name,
+        email_address: @user.email_address,
+        latitude: 41.8781,
+        longitude: -87.6298
+      }
+    }
+
+    assert_redirected_to edit_user_url
+    @user.reload
+    assert_equal 41.8781, @user.latitude.to_f
+    assert_equal(-87.6298, @user.longitude.to_f)
+  end
+
+  test "should clear user location coordinates" do
+    @user.update!(latitude: 41.8781, longitude: -87.6298)
+
+    patch user_url, params: {
+      user: {
+        name: @user.name,
+        email_address: @user.email_address,
+        latitude: "",
+        longitude: ""
+      }
+    }
+
+    assert_redirected_to edit_user_url
+    @user.reload
+    assert_nil @user.latitude
+    assert_nil @user.longitude
   end
 end

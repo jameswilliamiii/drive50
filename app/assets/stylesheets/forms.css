@@ -6,7 +6,7 @@
   border: none;
   padding: 0;
   width: 100%;
-  max-width: 600px;
+  max-width: var(--form-max-width);
   box-shadow: none;
   display: flex;
   flex-direction: column;
@@ -258,6 +258,39 @@
   .form-textarea {
     min-height: 100px;
   }
+}
+
+/* Settings page styles */
+.settings-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 auto var(--spacing-sm) auto;
+  max-width: var(--form-max-width);
+}
+
+.settings-section-description {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 auto var(--spacing-lg) auto;
+  max-width: var(--form-max-width);
+}
+
+.location-status {
+  border-radius: var(--border-radius-sm);
+}
+
+.location-set {
+  color: var(--color-success);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.location-not-set {
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+  margin: 0;
 }
 
 /* Dark mode error state tweaks */

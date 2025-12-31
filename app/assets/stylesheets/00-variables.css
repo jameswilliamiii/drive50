@@ -21,6 +21,14 @@
   --color-error-strong: #991b1b;
   --color-error-soft-border: #fca5a5;
 
+  /* Badge colors (light theme) */
+  --color-night-badge-bg: #eef2ff;
+  --color-night-badge-text: #4338ca;
+  --color-night-badge-icon: #6366f1;
+  --color-day-badge-bg: #fef3c7;
+  --color-day-badge-text: #92400e;
+  --color-day-badge-icon: #f59e0b;
+
   /* Light theme (default) */
   --color-background: #f8fafc;
   --color-surface: #ffffff;
@@ -48,6 +56,7 @@
 
   /* Layout */
   --max-width: 1200px;
+  --form-max-width: 600px;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -79,6 +88,14 @@ body[data-theme="dark"] {
   --color-error-soft-strong: #7f1d1d;
   --color-error-strong: #fee2e2;
   --color-error-soft-border: #fca5a5;
+
+  /* Badge colors (dark theme) */
+  --color-night-badge-bg: #312e81;
+  --color-night-badge-text: #c7d2fe;
+  --color-night-badge-icon: #a5b4fc;
+  --color-day-badge-bg: #78350f;
+  --color-day-badge-text: #fef3c7;
+  --color-day-badge-icon: #fbbf24;
 }
 
 @media (prefers-color-scheme: dark) {

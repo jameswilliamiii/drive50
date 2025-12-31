@@ -1,3 +1,5 @@
+require "solareventcalculator"
+
 class DriveSession < ApplicationRecord
   include DriveSessionStatistics
 
@@ -45,11 +47,6 @@ class DriveSession < ApplicationRecord
   def self.activity_by_date(days: ACTIVITY_CALENDAR_DAYS, timezone: "UTC")
     start_date = days.days.ago.to_date
 
-    # Fetch all completed drives in the date range and group by date in user's timezone
-    # NOTE: This loads records into memory for timezone conversion since SQLite doesn't
-    # support timezone-aware DATE functions. For PostgreSQL, this could be optimized with:
-    # .group("DATE(started_at AT TIME ZONE '#{timezone}')").count
-    # Current performance: ~5ms for 28 days of data, acceptable for typical use case (50-100 drives max)
     completed
       .where("started_at >= ?", start_date.beginning_of_day)
       .group_by { |session| session.started_at.in_time_zone(timezone).to_date }
@@ -99,36 +96,43 @@ class DriveSession < ApplicationRecord
   def determine_night_drive
     return unless started_at
 
-    # Simple heuristic: 8pm - 6am is night (in user's timezone)
-    # For production, could use sunrise/sunset API
-    # Convert UTC time to user's timezone to check the hour
     user_timezone = user.timezone || "UTC"
     local_start = started_at.in_time_zone(user_timezone)
-    start_hour = local_start.hour
 
-    # Check if started during night hours (8pm - 6am)
-    started_at_night = start_hour >= 20 || start_hour < 6
+    coords = if user.latitude.present? && user.longitude.present?
+      { lat: user.latitude.to_f, lon: user.longitude.to_f }
+    else
+      TimezoneCoordinates.coordinates_for_timezone(user_timezone)
+    end
 
-    # If drive is completed, also check if it ended during night hours
-    # A drive is considered a night drive if it starts OR ends during night hours
+    started_at_night = night_time?(local_start, coords[:lat], coords[:lon])
+
     if ended_at.present?
       local_end = ended_at.in_time_zone(user_timezone)
-      end_hour = local_end.hour
-      ended_at_night = end_hour >= 20 || end_hour < 6
+      ended_at_night = night_time?(local_end, coords[:lat], coords[:lon])
       self.is_night_drive = started_at_night || ended_at_night
     else
-      # In-progress drives: only check start time
       self.is_night_drive = started_at_night
     end
   end
 
+  def night_time?(time, latitude, longitude)
+    local_date = time.to_date
+    solar_event = SolarEventCalculator.new(local_date, latitude, longitude)
+    sunrise_utc = solar_event.compute_utc_civil_sunrise
+    sunset_utc = solar_event.compute_utc_civil_sunset
+
+    return false if sunrise_utc.nil? || sunset_utc.nil?
+
+    time_utc = time.utc.to_datetime
+    time_utc < sunrise_utc || time_utc > sunset_utc
+  end
+
   def broadcast_create
     if completed?
-      # If completed, add to recent drives (if in top 3) and all drives
       broadcast_recent_drives_table
       broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
     else
-      # If in progress, update the in-progress section
       broadcast_replace_to user, target: "in-progress-drive", html: ApplicationController.render(partial: "drive_sessions/in_progress_drive", locals: { in_progress: self })
     end
     broadcast_progress_summary
@@ -136,28 +140,23 @@ class DriveSession < ApplicationRecord
 
   def broadcast_update
     if completed?
-      # Check if this was just completed (transitioned from in-progress)
       was_in_progress = saved_change_to_ended_at? && ended_at.present? && ended_at_before_last_save.nil?
 
       if was_in_progress
-        # Drive was just completed - remove from in-progress and add to all drives
         broadcast_remove_to user, target: "in-progress-drive"
         broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
       else
-        # Drive was already completed - just update the row
         broadcast_replace_to user, target: ActionView::RecordIdentifier.dom_id(self), html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
       end
 
       broadcast_recent_drives_table
     else
-      # Update in-progress section
       broadcast_replace_to user, target: "in-progress-drive", html: ApplicationController.render(partial: "drive_sessions/in_progress_drive", locals: { in_progress: self })
     end
     broadcast_progress_summary
   end
 
   def broadcast_destroy
-    # Remove from both tables
     broadcast_remove_to user, target: ActionView::RecordIdentifier.dom_id(self)
     broadcast_recent_drives_table
     broadcast_progress_summary
@@ -169,14 +168,12 @@ class DriveSession < ApplicationRecord
   end
 
   def broadcast_progress_summary
-    # Reset association cache so we always see the latest drives across requests/devices
     user.association(:drive_sessions).reset
     relation = user.drive_sessions
 
     statistics = DriveSession.statistics_for(relation)
     in_progress = statistics[:in_progress]
 
-    # Get activity data for calendar with user's timezone
     activity_data = relation.activity_by_date(days: ACTIVITY_CALENDAR_DAYS, timezone: user.timezone || "UTC")
 
     broadcast_replace_to user,
@@ -191,7 +188,6 @@ class DriveSession < ApplicationRecord
                            }
                          )
 
-    # Update mobile in-progress banner on all pages
     broadcast_update_to user,
                         target: "in-progress-banner-container",
                         html: ApplicationController.render(
@@ -199,7 +195,6 @@ class DriveSession < ApplicationRecord
                           locals: { in_progress: in_progress }
                         )
 
-    # Update floating FAB button (Start vs Complete) on mobile
     broadcast_update_to user,
                         target: "fab-new-drive-wrapper",
                         html: ApplicationController.render(
