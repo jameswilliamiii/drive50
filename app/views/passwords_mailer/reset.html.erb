@@ -1,21 +1,21 @@
 <!-- Header -->
 <tr>
   <td class="email-header">
-    <h1>Reset Your Password</h1>
+    <h1><span class="logo-drive">Drive</span><span class="logo-50">50</span></h1>
   </td>
 </tr>
 
 <!-- Body -->
 <tr>
   <td class="email-body">
-    <h2>Hello<%= " #{@user.name}" if @user.name.present? %>!</h2>
+    <h2>Reset Your Password</h2>
 
-    <p>We received a request to reset your password. Click the button below to create a new password:</p>
+    <p>Hello<%= " #{@user.name}" if @user.name.present? %>! We received a request to reset your password. Click the button below to create a new password:</p>
 
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="button-container">
       <tr>
         <td align="center" style="padding: 0;">
-          <a href="<%= edit_password_url(@user.password_reset_token) %>" class="button">Reset Password</a>
+          <a href="<%= edit_password_url(@user.password_reset_token) %>" class="button" style="color: #ffffff !important;">Reset Password</a>
         </td>
       </tr>
     </table>
@@ -32,7 +32,7 @@
 
     <p class="text-muted">
       If the button doesn't work, copy and paste this link into your browser:<br>
-      <a href="<%= edit_password_url(@user.password_reset_token) %>" style="color: #0ea5e9; word-break: break-all;"><%= edit_password_url(@user.password_reset_token) %></a>
+      <a href="<%= edit_password_url(@user.password_reset_token) %>" style="color: #2563eb; word-break: break-all;"><%= edit_password_url(@user.password_reset_token) %></a>
     </p>
   </td>
 </tr>

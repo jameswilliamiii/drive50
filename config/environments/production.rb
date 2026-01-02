@@ -58,18 +58,17 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: Rails.application.credentials.dig(:mail, :host) || "example.com" }
+  config.action_mailer.default_url_options = { host: Rails.application.credentials.dig(:mail, :host) || "drive50.app" }
 
   # Configure Resend SMTP for email delivery
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: "smtp.resend.com",
-    port: 465,
+    port: 587,
     user_name: "resend",
     password: Rails.application.credentials.dig(:resend, :api_key),
     authentication: :plain,
-    enable_starttls_auto: true,
-    tls: true
+    enable_starttls_auto: true
   }
   config.action_mailer.raise_delivery_errors = true
 

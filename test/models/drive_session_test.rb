@@ -374,9 +374,9 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "activity_by_date respects timezone parameter" do
     @user.drive_sessions.destroy_all
 
-    # Create a drive at 11 PM UTC on Jan 1
-    # In Tokyo (UTC+9), this would be 8 AM on Jan 2
-    drive_time = Time.zone.parse("2025-01-01 23:00:00 UTC")
+    # Create a drive at 11 PM UTC on a specific date
+    # In Tokyo (UTC+9), this would be 8 AM the next day
+    drive_time = 2.days.ago.beginning_of_day.utc + 23.hours
     @user.drive_sessions.create!(
       driver_name: "Test",
       started_at: drive_time,
@@ -386,10 +386,13 @@ class DriveSessionTest < ActiveSupport::TestCase
     utc_result = @user.drive_sessions.activity_by_date(days: 365, timezone: "UTC")
     tokyo_result = @user.drive_sessions.activity_by_date(days: 365, timezone: "Asia/Tokyo")
 
-    # UTC should count it on Jan 1
-    assert_equal 1, utc_result[Date.parse("2025-01-01")]
-    # Tokyo should count it on Jan 2
-    assert_equal 1, tokyo_result[Date.parse("2025-01-02")]
+    # UTC should count it on the date at 11 PM UTC
+    utc_date = drive_time.in_time_zone("UTC").to_date
+    # Tokyo should count it on the next day (since 11 PM UTC = 8 AM next day in Tokyo)
+    tokyo_date = drive_time.in_time_zone("Asia/Tokyo").to_date
+
+    assert_equal 1, utc_result[utc_date]
+    assert_equal 1, tokyo_result[tokyo_date]
   end
 
   test "activity_by_date only includes completed drives" do

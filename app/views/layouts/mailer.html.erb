@@ -1,18 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+    <title><%= yield(:email_subject) || 'Drive50' %></title>
     <style>
-      /* Email client reset - these are safe and widely supported */
+      /* Email client reset */
       body, table, td, p, a, li, blockquote {
         -webkit-text-size-adjust: 100%;
         -ms-text-size-adjust: 100%;
       }
+
       table, td {
         mso-table-lspace: 0pt;
         mso-table-rspace: 0pt;
       }
+
       img {
         -ms-interpolation-mode: bicubic;
         border: 0;
@@ -20,21 +25,33 @@
         text-decoration: none;
       }
 
-      /* Common reusable classes - will work in most modern email clients */
-      /* Fallback inline styles are still used for maximum compatibility */
+      a {
+        text-decoration: none;
+      }
+
+      /* Email layout */
       .email-header {
-        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-        padding: 40px 40px 30px;
+        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+        border-bottom: 2px solid #e2e8f0;
+        padding: 40px;
         text-align: center;
       }
 
       .email-header h1 {
         margin: 0;
-        color: #ffffff;
-        font-size: 28px;
-        font-weight: 600;
-        letter-spacing: -0.01em;
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+
+      .logo-drive {
+        color: #2563eb;
+      }
+
+      .logo-50 {
+        color: #475569;
       }
 
       .email-body {
@@ -70,20 +87,20 @@
       .button {
         display: inline-block;
         padding: 14px 32px;
-        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
         color: #ffffff !important;
-        text-decoration: none;
+        text-decoration: none !important;
         border-radius: 8px;
         font-weight: 600;
         font-size: 16px;
         line-height: 1.5;
-        box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       }
 
       .email-footer {
         padding: 30px 40px;
-        background-color: #f8fafc;
+        background: linear-gradient(to top, #ffffff 0%, #f8fafc 100%);
         border-top: 1px solid #e2e8f0;
         text-align: center;
       }
@@ -111,35 +128,96 @@
 
       /* Mobile responsive - supported by most modern clients */
       @media only screen and (max-width: 600px) {
+        /* Make table full width on mobile */
+        table[class="email-container"] {
+          width: 100% !important;
+        }
+
+        /* Adjust padding for mobile */
         .email-header,
         .email-body,
         .email-footer {
-          padding: 30px 24px !important;
+          padding: 24px 20px !important;
+        }
+
+        /* Scale down logo text */
+        .email-header h1 {
+          font-size: 28px !important;
+        }
+
+        /* Scale down body heading */
+        .email-body h2 {
+          font-size: 20px !important;
+          margin-bottom: 16px !important;
+        }
+
+        /* Scale down body text */
+        .email-body p {
+          font-size: 15px !important;
+          line-height: 1.5 !important;
+        }
+
+        /* Make button full-width and more touch-friendly */
+        .button {
+          display: block !important;
+          width: 100% !important;
+          padding: 14px 20px !important;
+          font-size: 16px !important;
+          box-sizing: border-box !important;
+        }
+
+        /* Adjust button container */
+        .button-container {
+          margin: 24px 0 !important;
+        }
+
+        /* Scale down footer text */
+        .email-footer p {
+          font-size: 13px !important;
+        }
+
+        .text-small {
+          font-size: 11px !important;
+        }
+
+        /* Better word breaking for long URLs on mobile */
+        .text-muted a {
+          word-break: break-all !important;
+        }
+      }
+
+      /* Extra small mobile devices */
+      @media only screen and (max-width: 400px) {
+        .email-header,
+        .email-body,
+        .email-footer {
+          padding: 20px 16px !important;
         }
 
         .email-header h1 {
           font-size: 24px !important;
         }
-
-        .email-body h2 {
-          font-size: 20px !important;
-        }
-
-        .button {
-          padding: 12px 24px !important;
-          font-size: 15px !important;
-        }
       }
     </style>
   </head>
 
-  <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f8fafc;">
+  <body style="margin: 0; padding: 0; width: 100%; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f8fafc; margin: 0; padding: 0;">
       <tr>
         <td align="center" style="padding: 40px 20px;">
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);">
+          <!--[if mso]>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600">
+          <tr>
+          <td>
+          <![endif]-->
+          <table role="presentation" class="email-container" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);">
             <%= yield %>
           </table>
+          <!--[if mso]>
+          </td>
+          </tr>
+          </table>
+          <![endif]-->
         </td>
       </tr>
     </table>
