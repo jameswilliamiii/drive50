@@ -83,7 +83,7 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
         ended_at: 1.hour.ago
       }
     }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
   end
 
   test "should complete drive_session" do

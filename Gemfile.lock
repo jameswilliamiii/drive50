@@ -134,6 +134,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.18.0)
+    jwt (3.1.2)
+      base64
     kamal (2.10.1)
       activesupport (>= 7.0)
       base64 (~> 0.2)
@@ -162,6 +164,8 @@ GEM
     matrix (0.4.3)
     mini_mime (1.1.5)
     minitest (5.27.0)
+    mocha (3.0.1)
+      ruby2_keywords (>= 0.0.5)
     msgpack (1.8.0)
     net-imap (0.6.0)
       date
@@ -192,6 +196,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.10-x86_64-linux-musl)
       racc (~> 1.4)
+    openssl (4.0.0)
     ostruct (0.6.3)
     pagy (43.2.2)
       json
@@ -293,6 +298,7 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
+    ruby2_keywords (0.0.5)
     rubyzip (3.2.2)
     securerandom (0.4.1)
     selenium-webdriver (4.39.0)
@@ -356,6 +362,9 @@ GEM
       activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
       railties (>= 6.0.0)
+    web-push (3.1.0)
+      jwt (~> 3.0)
+      openssl (>= 3.0)
     websocket (1.2.11)
     websocket-driver (0.8.0)
       base64
@@ -389,6 +398,7 @@ DEPENDENCIES
   importmap-rails
   kamal
   local_time
+  mocha
   pagy (~> 43.2)
   propshaft
   puma (>= 5.0)
@@ -404,6 +414,7 @@ DEPENDENCIES
   turbo-rails
   tzinfo-data
   web-console
+  web-push
 
 BUNDLED WITH
    2.7.2

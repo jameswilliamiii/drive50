@@ -145,13 +145,15 @@ class DriveSessionHelperTest < ActionView::TestCase
   end
 
   test "activity_calendar_data includes all dates in range" do
-    activity_data = { 3.days.ago.to_date => 2 }
-    result = activity_calendar_data(activity_data, days: 7)
+    travel_to Time.zone.local(2025, 1, 15, 12, 0, 0) do
+      activity_data = { 3.days.ago.to_date => 2 }
+      result = activity_calendar_data(activity_data, days: 7)
 
-    # Should have exactly 7 consecutive days ending today
-    assert_equal 7, result[:days].length
-    assert_equal Date.today, result[:days].last[:date]
-    assert_equal 6.days.ago.to_date, result[:days].first[:date]
+      # Should have exactly 7 consecutive days ending today
+      assert_equal 7, result[:days].length
+      assert_equal Date.today, result[:days].last[:date]
+      assert_equal 6.days.ago.to_date, result[:days].first[:date]
+    end
   end
 
   test "activity_calendar_data returns hash with required keys" do

@@ -43,7 +43,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "should not update user with invalid data" do
     patch user_url, params: { user: { name: "", email_address: "" } }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
   end
 
   test "should not update user with mismatched passwords" do
@@ -55,13 +55,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         password_confirmation: "different"
       }
     }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
   end
 
   test "should not update to duplicate email" do
     other_user = users(:two)
     patch user_url, params: { user: { name: @user.name, email_address: other_user.email_address } }
-    assert_response :unprocessable_entity
+    assert_response :unprocessable_content
   end
 
   test "should require authentication" do

@@ -345,30 +345,32 @@ class DriveSessionTest < ActiveSupport::TestCase
   end
 
   test "activity_by_date returns hash of dates to counts" do
-    @user.drive_sessions.destroy_all
+    travel_to Time.zone.local(2025, 1, 15, 12, 0, 0) do
+      @user.drive_sessions.destroy_all
 
-    # Create drives on specific dates in UTC
-    3.times do
-      @user.drive_sessions.create!(
-        driver_name: "Test",
-        started_at: 2.days.ago.beginning_of_day + 10.hours,
-        ended_at: 2.days.ago.beginning_of_day + 11.hours
-      )
+      # Create drives on specific dates in UTC
+      3.times do
+        @user.drive_sessions.create!(
+          driver_name: "Test",
+          started_at: 2.days.ago.beginning_of_day + 10.hours,
+          ended_at: 2.days.ago.beginning_of_day + 11.hours
+        )
+      end
+
+      2.times do
+        @user.drive_sessions.create!(
+          driver_name: "Test",
+          started_at: 1.day.ago.beginning_of_day + 10.hours,
+          ended_at: 1.day.ago.beginning_of_day + 11.hours
+        )
+      end
+
+      result = @user.drive_sessions.activity_by_date(days: 28, timezone: "UTC")
+
+      assert_equal 3, result[2.days.ago.to_date]
+      assert_equal 2, result[1.day.ago.to_date]
+      assert_nil result[Date.today]
     end
-
-    2.times do
-      @user.drive_sessions.create!(
-        driver_name: "Test",
-        started_at: 1.day.ago.beginning_of_day + 10.hours,
-        ended_at: 1.day.ago.beginning_of_day + 11.hours
-      )
-    end
-
-    result = @user.drive_sessions.activity_by_date(days: 28, timezone: "UTC")
-
-    assert_equal 3, result[2.days.ago.to_date]
-    assert_equal 2, result[1.day.ago.to_date]
-    assert_nil result[Date.today]
   end
 
   test "activity_by_date respects timezone parameter" do

@@ -5,9 +5,9 @@
     <h1 class="page-header-title">Settings</h1>
   </div>
 
-  <!-- Location section for night drive detection -->
-  <section class="card settings-section" data-controller="location">
-    <div class="card-body">
+  <div class="settings-container">
+    <!-- Location section for night drive detection -->
+    <section class="settings-section" data-controller="location">
       <h2 class="settings-section-title">Location</h2>
       <p class="settings-section-description">
         Your location helps us accurately determine when night driving occurs based on actual sunset/sunrise times.
@@ -48,12 +48,40 @@
           <% end %>
         </div>
       <% end %>
-    </div>
-  </section>
+    </section>
 
-  <!-- Account information section -->
-  <section class="card settings-section">
-    <div class="card-body">
+    <!-- Push Notifications section -->
+    <section class="settings-section" data-controller="push-notifications">
+      <h2 class="settings-section-title">Push Notifications</h2>
+      <p class="settings-section-description">
+        Get notified when important events happen, even when you're not using the app.
+      </p>
+
+      <div class="notification-status" data-push-notifications-target="statusContainer">
+        <p class="notification-status-text" data-push-notifications-target="status">
+          Checking notification status...
+        </p>
+      </div>
+
+      <div class="notification-toggle-container">
+        <label class="toggle-switch">
+          <input type="checkbox"
+                 data-push-notifications-target="toggle"
+                 data-action="change->push-notifications#toggleSubscription">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label" data-push-notifications-target="toggleLabel">
+          Enable Notifications
+        </span>
+      </div>
+
+      <div class="ios-note" data-push-notifications-target="iosNote">
+        <strong>iOS Note:</strong> Push notifications only work when this app is installed to your home screen and opened from there (standalone mode).
+      </div>
+    </section>
+
+    <!-- Account information section -->
+    <section class="settings-section">
       <h2 class="settings-section-title">Account</h2>
       <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
         <%= render "shared/error_messages", object: @user, object_name: "profile" %>
@@ -83,17 +111,15 @@
           <%= link_to "Cancel", root_path, class: "button" %>
         </div>
       <% end %>
-    </div>
-  </section>
+    </section>
 
-  <!-- Session / Sign out section (mobile only) -->
-  <section class="card settings-section settings-section-session">
-    <div class="card-body">
+    <!-- Session / Sign out section (mobile only) -->
+    <section class="settings-section settings-section-session">
       <h2 class="settings-section-title">Session</h2>
       <%= link_to "Sign Out",
                   session_path,
                   data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to sign out?" },
                   class: "button button-small" %>
-    </div>
-  </section>
+    </section>
+  </div>
 </div>

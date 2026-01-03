@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bin/ci:*)",
+      "Bash(bin/rubocop:*)",
+      "Bash(bin/rails test:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

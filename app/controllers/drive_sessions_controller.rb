@@ -12,14 +12,11 @@ class DriveSessionsController < ApplicationController
     @hours_needed = stats[:hours_needed]
     @night_hours_needed = stats[:night_hours_needed]
 
-    # Get activity data for calendar
     @activity_data = user_sessions.activity_by_date(days: DriveSession::ACTIVITY_CALENDAR_DAYS, timezone: Current.user.timezone)
   end
 
   def all
     user_sessions = Current.user.drive_sessions
-
-    # Use pagy for pagination (v43 API: pagy(:offset, collection))
     @pagy, @sessions = pagy(:offset, user_sessions.completed.ordered, limit: 20)
 
     stats = DriveSession.statistics_for(Current.user)
@@ -28,15 +25,12 @@ class DriveSessionsController < ApplicationController
     @hours_needed = stats[:hours_needed]
     @night_hours_needed = stats[:night_hours_needed]
 
-    # Handle turbo frame requests for infinite scroll.
-    # Turbo frames still use the HTML format, so we render the turbo_stream partial explicitly.
     if turbo_frame_request?
       render partial: "pagination_frame", formats: :turbo_stream and return
     end
   end
 
   def new
-    # Check if there's already an active drive
     existing_active = Current.user.drive_sessions.in_progress.first
     if existing_active
       redirect_to drive_sessions_path, alert: "You already have an active drive. Please complete it before starting a new one."
@@ -49,7 +43,6 @@ class DriveSessionsController < ApplicationController
   end
 
   def create
-    # Check if there's already an active drive
     existing_active = Current.user.drive_sessions.in_progress.first
     if existing_active
       redirect_to drive_sessions_path, alert: "You already have an active drive. Please complete it before starting a new one."
@@ -68,7 +61,7 @@ class DriveSessionsController < ApplicationController
     if @drive_session.save
       redirect_to drive_sessions_path
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -82,7 +75,7 @@ class DriveSessionsController < ApplicationController
     if @drive_session.save
       redirect_to drive_sessions_path
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -94,12 +87,6 @@ class DriveSessionsController < ApplicationController
   def destroy
     @drive_session.destroy
 
-    # Clear association cache and reload user
-    Current.user.association(:drive_sessions).reset
-    Current.user.reload
-
-    # Get updated recent sessions for the table (always show up to 3)
-    # Query directly to bypass any caching issues
     @recent_sessions = DriveSession.where(user_id: Current.user.id)
                                    .completed
                                    .ordered
