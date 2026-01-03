@@ -6,6 +6,7 @@ class DriveSession < ApplicationRecord
   HOURS_NEEDED = 50
   NIGHT_HOURS_NEEDED = 10
   ACTIVITY_CALENDAR_DAYS = 28
+  REMINDER_DELAY = 45.minutes
 
   belongs_to :user
 
@@ -24,6 +25,7 @@ class DriveSession < ApplicationRecord
   before_save :calculate_duration, if: -> { ended_at.present? && ended_at_changed? }
   before_save :determine_night_drive, if: -> { started_at_changed? || ended_at_changed? }
   after_create_commit :broadcast_create
+  after_create_commit :schedule_reminder, if: :in_progress?
   after_update_commit :broadcast_update
   after_destroy_commit :broadcast_destroy
 
@@ -203,5 +205,12 @@ class DriveSession < ApplicationRecord
                           partial: "shared/fab_new_drive",
                           locals: { in_progress: in_progress }
                         )
+  end
+
+  def schedule_reminder
+    # Only schedule if user has push subscriptions
+    return unless user.push_subscriptions.exists?
+
+    DriveSessionReminderJob.set(wait: REMINDER_DELAY).perform_later(id)
   end
 end

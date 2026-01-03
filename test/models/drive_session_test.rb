@@ -1,6 +1,8 @@
 require "test_helper"
 
 class DriveSessionTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     @user = users(:one)
   end
@@ -477,5 +479,48 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     result = @user.drive_sessions.activity_by_date(days: 28)
     assert_equal 5, result[5.days.ago.to_date]
+  end
+
+  # Reminder Job
+  test "schedules reminder job when in-progress session is created" do
+    # User needs a push subscription for reminder to be scheduled
+    @user.push_subscriptions.create!(
+      endpoint: "https://example.com/push",
+      p256dh_key: "test_key",
+      auth_key: "test_auth"
+    )
+
+    assert_enqueued_jobs 1, only: DriveSessionReminderJob do
+      @user.drive_sessions.create!(
+        driver_name: "Test",
+        started_at: Time.current
+      )
+    end
+  end
+
+  test "does not schedule reminder job when completed session is created" do
+    # User needs a push subscription for reminder to be scheduled
+    @user.push_subscriptions.create!(
+      endpoint: "https://example.com/push",
+      p256dh_key: "test_key",
+      auth_key: "test_auth"
+    )
+
+    assert_no_enqueued_jobs only: DriveSessionReminderJob do
+      @user.drive_sessions.create!(
+        driver_name: "Test",
+        started_at: 1.hour.ago,
+        ended_at: Time.current
+      )
+    end
+  end
+
+  test "does not schedule reminder job when user has no push subscriptions" do
+    assert_no_enqueued_jobs only: DriveSessionReminderJob do
+      @user.drive_sessions.create!(
+        driver_name: "Test",
+        started_at: Time.current
+      )
+    end
   end
 end
