@@ -45,10 +45,12 @@ class DriveSession < ApplicationRecord
   end
 
   def self.activity_by_date(days: ACTIVITY_CALENDAR_DAYS, timezone: "UTC")
-    start_date = days.days.ago.to_date
+    # Calculate date range in user's timezone
+    end_date = Time.current.in_time_zone(timezone).to_date
+    start_date = end_date - (days - 1).days
 
     completed
-      .where("started_at >= ?", start_date.beginning_of_day)
+      .where("started_at >= ?", start_date.beginning_of_day.in_time_zone(timezone))
       .group_by { |session| session.started_at.in_time_zone(timezone).to_date }
       .transform_values(&:count)
   end
@@ -184,7 +186,7 @@ class DriveSession < ApplicationRecord
                              in_progress: in_progress,
                              total_hours: statistics[:total_hours],
                              night_hours: statistics[:night_hours],
-                             activity_calendar: ApplicationController.helpers.activity_calendar_data(activity_data)
+                             activity_calendar: ApplicationController.helpers.activity_calendar_data(activity_data, timezone: user.timezone || "UTC")
                            }
                          )
 

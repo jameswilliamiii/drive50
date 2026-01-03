@@ -47,8 +47,8 @@ module DriveSessionHelper
     SVG
   end
 
-  def activity_calendar_data(activity_data, days: 28)
-    end_date = Date.today
+  def activity_calendar_data(activity_data, days: 28, timezone: "UTC")
+    end_date = Time.current.in_time_zone(timezone).to_date
     start_date = end_date - (days - 1).days
 
     # Generate all dates in range

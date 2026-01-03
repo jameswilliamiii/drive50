@@ -9,7 +9,7 @@
     in_progress: @in_progress,
     total_hours: @total_hours,
     night_hours: @night_hours,
-    activity_calendar: activity_calendar_data(@activity_data)
+    activity_calendar: activity_calendar_data(@activity_data, timezone: Current.user.timezone || "UTC")
   } %>
 
   <section class="drive-history">
