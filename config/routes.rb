@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   resources :registrations, only: [ :new, :create ]
   resource :user, only: [ :edit, :update ]
 
+  resource :push_subscription, only: [ :new, :create, :destroy ]
+
   resources :drive_sessions, only: [ :index, :new, :create, :edit, :update, :destroy ] do
     member do
       post :complete
@@ -17,8 +19,9 @@ Rails.application.routes.draw do
     end
   end
 
-  # PWA manifest
-  get "/manifest.json", to: "pwa#manifest", defaults: { format: :json }
+  # PWA manifest and service worker (using Rails built-in controller)
+  get "/manifest.json", to: "rails/pwa#manifest", as: :pwa_manifest
+  get "/service-worker.js", to: "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check

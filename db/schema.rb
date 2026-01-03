@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_31_222022) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_02_194729) do
   create_table "drive_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "driver_name", null: false
@@ -24,6 +24,18 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_31_222022) do
     t.index ["ended_at"], name: "index_drive_sessions_on_ended_at"
     t.index ["started_at"], name: "index_drive_sessions_on_started_at"
     t.index ["user_id"], name: "index_drive_sessions_on_user_id"
+  end
+
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.string "auth_key", null: false
+    t.datetime "created_at", null: false
+    t.string "endpoint", null: false
+    t.string "p256dh_key", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -169,6 +181,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_31_222022) do
   end
 
   add_foreign_key "drive_sessions", "users"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

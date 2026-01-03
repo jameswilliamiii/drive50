@@ -205,6 +205,21 @@
   .settings-section-session {
     display: none;
   }
+
+  /* Desktop settings layout - two columns */
+  .settings-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-2xl);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Full-width sections on desktop */
+  .settings-section:has(.drive-form) {
+    grid-column: 1 / -1;
+  }
 }
 
 /* Mobile Form Styles */
@@ -258,23 +273,49 @@
   .form-textarea {
     min-height: 100px;
   }
+
+  /* Mobile settings layout - stack everything */
+  .settings-container {
+    gap: var(--spacing-lg);
+  }
+
+  .settings-section {
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius);
+  }
 }
 
 /* Settings page styles */
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+}
+
+.settings-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-sm);
+}
+
 .settings-section-title {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--color-text);
-  margin: 0 auto var(--spacing-sm) auto;
-  max-width: var(--form-max-width);
+  margin: 0 0 var(--spacing-sm) 0;
 }
 
 .settings-section-description {
   color: var(--color-text-secondary);
   font-size: 0.875rem;
   line-height: 1.5;
-  margin: 0 auto var(--spacing-lg) auto;
-  max-width: var(--form-max-width);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.settings-section .drive-form {
+  margin: 0;
 }
 
 .location-status {
@@ -291,6 +332,123 @@
   color: var(--color-text-light);
   font-size: 0.875rem;
   margin: 0;
+}
+
+.ios-note {
+  display: none;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--color-day-badge-bg);
+  border: 1px solid var(--color-day-badge-icon);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-day-badge-text);
+}
+
+/* Notification status styles (similar to location status) */
+.notification-status {
+  margin-bottom: var(--spacing-lg);
+}
+
+.notification-status-text {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.notification-status-text.enabled {
+  color: var(--color-success);
+}
+
+.notification-status-text.disabled {
+  color: var(--color-text-light);
+}
+
+.notification-status-text.error {
+  color: var(--color-danger);
+}
+
+/* Toggle switch container */
+.notification-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.toggle-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text);
+  user-select: none;
+}
+
+/* Toggle switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-border);
+  transition: 0.3s;
+  border-radius: 34px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: var(--color-border-light);
+}
+
+.toggle-switch input:disabled + .toggle-slider:before {
+  background-color: var(--color-border);
+}
+
+@media (hover: hover) {
+  .toggle-slider:hover {
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .toggle-switch input:disabled + .toggle-slider:hover {
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* Dark mode error state tweaks */

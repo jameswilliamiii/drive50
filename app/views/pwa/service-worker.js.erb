@@ -1,0 +1,56 @@
+// Handle push notifications
+self.addEventListener("push", async (event) => {
+  if (!event.data) {
+    return
+  }
+
+  try {
+    const payload = event.data.json()
+    const { title, ...options } = payload
+
+    // Default options for better iOS compatibility
+    const notificationOptions = {
+      badge: "/icons/icon-192x192.png",
+      icon: "/icons/icon-192x192.png",
+      ...options
+    }
+
+    event.waitUntil(
+      self.registration.showNotification(title, notificationOptions)
+    )
+  } catch (error) {
+    console.error("Error handling push event:", error)
+  }
+})
+
+// Handle notification clicks
+self.addEventListener("notificationclick", function(event) {
+  event.notification.close()
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      const urlToOpen = event.notification.data?.url || "/"
+      const parsedUrl = new URL(urlToOpen, self.location.origin)
+
+      // Check if there's already a window open with this URL
+      for (let i = 0; i < clientList.length; i++) {
+        let client = clientList[i]
+        let clientUrl = new URL(client.url)
+
+        if (clientUrl.pathname === parsedUrl.pathname && "focus" in client) {
+          return client.focus()
+        }
+      }
+
+      // If not, open a new window
+      if (clients.openWindow) {
+        return clients.openWindow(parsedUrl.pathname)
+      }
+    })
+  )
+})
+
+// Handle notification close (for analytics if needed)
+self.addEventListener("notificationclose", function(event) {
+  // You can track notification dismissals here if needed
+})

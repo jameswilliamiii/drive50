@@ -3,6 +3,17 @@ import "@hotwired/turbo-rails"
 import LocalTime from "local-time"
 import "controllers"
 
+// Register service worker for PWA and push notifications
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(registration => {
+      console.log('Service Worker registered:', registration.scope)
+    })
+    .catch(error => {
+      console.error('Service Worker registration failed:', error)
+    })
+}
+
 // Initialize LocalTime for timezone conversion
 try {
   LocalTime.start()
