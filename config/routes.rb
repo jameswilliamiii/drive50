@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   resources :registrations, only: [ :new, :create ]
   resource :user, only: [ :edit, :update ]
 
+  # Timezone detection endpoint
+  post :timezone, to: "timezones#update"
+
   resource :push_subscription, only: [ :new, :create, :destroy ]
 
   resources :drive_sessions, only: [ :index, :new, :create, :edit, :update, :destroy ] do

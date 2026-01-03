@@ -176,6 +176,23 @@ class DriveSessionHelperTest < ActionView::TestCase
     end
   end
 
+  test "activity_calendar_data respects timezone parameter" do
+    # Test that calendar is generated in the correct timezone
+    # When it's Jan 3 at 2am UTC, it's still Jan 2 at 9pm Eastern
+    travel_to Time.utc(2025, 1, 3, 2, 0, 0) do
+      activity_data = {}
+
+      # In UTC, today is Jan 3
+      utc_result = activity_calendar_data(activity_data, days: 7, timezone: "UTC")
+      # In Eastern, today is Jan 2
+      eastern_result = activity_calendar_data(activity_data, days: 7, timezone: "America/New_York")
+
+      # The last day should be different based on timezone
+      assert_equal Date.new(2025, 1, 3), utc_result[:days].last[:date]
+      assert_equal Date.new(2025, 1, 2), eastern_result[:days].last[:date]
+    end
+  end
+
   # circular_progress tests
   test "circular_progress generates valid SVG" do
     result = circular_progress(current: 25, total: 50)

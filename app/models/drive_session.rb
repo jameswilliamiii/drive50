@@ -48,12 +48,16 @@ class DriveSession < ApplicationRecord
 
   def self.activity_by_date(days: ACTIVITY_CALENDAR_DAYS, timezone: "UTC")
     # Calculate date range in user's timezone
-    end_date = Time.current.in_time_zone(timezone).to_date
+    tz = ActiveSupport::TimeZone[timezone || "UTC"]
+    end_date = Time.current.in_time_zone(tz).to_date
     start_date = end_date - (days - 1).days
 
+    # Convert start_date to beginning of day in the user's timezone
+    start_datetime = tz.local(start_date.year, start_date.month, start_date.day)
+
     completed
-      .where("started_at >= ?", start_date.beginning_of_day.in_time_zone(timezone))
-      .group_by { |session| session.started_at.in_time_zone(timezone).to_date }
+      .where("started_at >= ?", start_datetime)
+      .group_by { |session| session.started_at.in_time_zone(tz).to_date }
       .transform_values(&:count)
   end
 
