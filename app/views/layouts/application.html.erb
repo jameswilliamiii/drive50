@@ -31,7 +31,9 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= 'has-bottom-nav' if authenticated? %>">
+  <body class="<%= 'has-bottom-nav' if authenticated? %>"
+        data-controller="timezone-detector"
+        data-timezone-detector-current-value="<%= Current.user&.timezone || session[:timezone] || 'UTC' %>">
     <%= render "shared/header" %>
 
     <% if authenticated? %>
