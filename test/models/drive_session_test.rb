@@ -402,21 +402,26 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "activity_by_date only includes completed drives" do
     @user.drive_sessions.destroy_all
 
+    # Use UTC timezone consistently to avoid timezone mismatches
+    drive_date = 1.day.ago.utc
+    drive_started_at = drive_date
+    drive_ended_at = drive_date + 1.hour
+
     # Completed drive
     @user.drive_sessions.create!(
       driver_name: "Test",
-      started_at: 1.day.ago,
-      ended_at: 1.day.ago + 1.hour
+      started_at: drive_started_at,
+      ended_at: drive_ended_at
     )
 
     # In-progress drive
     @user.drive_sessions.create!(
       driver_name: "Test",
-      started_at: 1.day.ago
+      started_at: drive_started_at
     )
 
-    result = @user.drive_sessions.activity_by_date(days: 28)
-    assert_equal 1, result[1.day.ago.to_date]
+    result = @user.drive_sessions.activity_by_date(days: 28, timezone: "UTC")
+    assert_equal 1, result[drive_started_at.to_date]
   end
 
   test "activity_by_date filters by date range" do
