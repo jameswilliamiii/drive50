@@ -6,6 +6,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Drive50" />
     <meta name="description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : 'Drive50 helps you track and log your driving practice hours.' %>">
 
     <%# Open Graph (Facebook, LinkedIn, etc.) %>
@@ -20,6 +21,8 @@
     <meta name="twitter:title" content="<%= content_for?(:meta_title) ? content_for(:meta_title) : 'Drive50' %>">
     <meta name="twitter:description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : 'Drive50 helps you track and log your driving practice hours.' %>">
     <meta name="twitter:image" content="<%= "#{request.base_url}/images/social-card.png" %>">
+
+    <%= render "shared/favicon" %>
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
