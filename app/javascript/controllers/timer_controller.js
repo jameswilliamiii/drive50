@@ -34,12 +34,15 @@ export default class extends Controller {
     const elapsedSeconds = Math.floor((now - startedAt) / 1000)
     const hours = Math.floor(elapsedSeconds / 3600)
     const minutes = Math.floor((elapsedSeconds % 3600) / 60)
+    const seconds = elapsedSeconds % 60
 
     let displayText
     if (hours > 0) {
-      displayText = `${hours}h ${minutes}m`
+      // Show hours and minutes:seconds format: "1h 23:45"
+      displayText = `${hours}h ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     } else {
-      displayText = `${minutes}m`
+      // Always show minutes:seconds format: "0:45", "1:23", "2:15", etc.
+      displayText = `${minutes}:${seconds.toString().padStart(2, '0')}`
     }
 
     this.displayTarget.textContent = displayText

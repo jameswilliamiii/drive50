@@ -73,7 +73,7 @@
 .fab-new-drive-form {
   position: fixed;
   right: var(--spacing-lg);
-  bottom: calc(90px + env(safe-area-inset-bottom));
+  bottom: calc(100px + env(safe-area-inset-bottom));
   z-index: 110;
   margin: 0;
 }

@@ -23,9 +23,9 @@ header {
 
 .in-progress-banner {
   background: linear-gradient(120deg,
-    var(--color-primary),
-    var(--color-primary-dark),
-    var(--color-primary)
+    var(--color-secondary),
+    var(--color-secondary-dark),
+    var(--color-secondary)
   );
   background-size: 200% 200%;
   color: var(--color-white);
@@ -37,16 +37,19 @@ header {
 .in-progress-banner::after {
   content: '';
   position: absolute;
-  bottom: -8px;
+  bottom: 0;
   left: 10%;
   right: 10%;
-  height: 8px;
-  background: transparent;
+  height: 4px;
+  background: linear-gradient(to bottom,
+    var(--color-secondary),
+    transparent
+  );
   border-radius: 50%;
   box-shadow:
-    0 0 20px 8px rgba(147, 197, 253, 0.6),
-    0 0 40px 16px rgba(147, 197, 253, 0.4),
-    0 0 60px 24px rgba(147, 197, 253, 0.2);
+    0 0 6px 4px rgba(251, 113, 133, 0.5),
+    0 0 12px 8px rgba(251, 113, 133, 0.3),
+    0 0 18px 12px rgba(251, 113, 133, 0.15);
   animation: bottomGlowPulse 2s ease-in-out infinite;
 }
 
@@ -223,8 +226,12 @@ body[data-theme="dark"] header {
 
 [data-theme="dark"] .in-progress-banner::after,
 body[data-theme="dark"] .in-progress-banner::after {
+  background: linear-gradient(to bottom,
+    var(--color-secondary),
+    transparent
+  );
   box-shadow:
-    0 0 24px 10px rgba(147, 197, 253, 0.7),
-    0 0 48px 20px rgba(59, 130, 246, 0.5),
-    0 0 72px 30px rgba(37, 99, 235, 0.3);
+    0 0 8px 5px rgba(253, 164, 175, 0.6),
+    0 0 16px 10px rgba(251, 113, 133, 0.4),
+    0 0 24px 15px rgba(244, 63, 94, 0.2);
 }
