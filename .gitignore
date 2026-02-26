@@ -34,3 +34,5 @@
 /config/*.key
 
 /ansible/hosts.ini
+
+.claude/settings.local.json

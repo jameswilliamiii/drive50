@@ -5,9 +5,9 @@ User.destroy_all
 # Create sample user with Chicago timezone
 user = User.create!(
   name: "Sarah Mitchell",
-  email_address: "jameswilliamiii@gmail.com",
-  password: "password",
-  password_confirmation: "password",
+  email_address: "test@example.com",
+  password: "test1234",
+  password_confirmation: "test1234",
   timezone: "America/Chicago"
 )
 
