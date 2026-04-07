@@ -7,11 +7,13 @@ class PushSubscriptionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "new returns VAPID public key when configured" do
+    Rails.application.credentials.stubs(:dig).with(:vapid, :public_key).returns("test_public_key")
+
     get new_push_subscription_url, as: :json
 
     assert_response :success
     json = JSON.parse(response.body)
-    assert json["public_key"].present?
+    assert_equal "test_public_key", json["public_key"]
   end
 
   test "create with valid subscription data" do

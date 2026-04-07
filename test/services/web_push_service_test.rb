@@ -81,7 +81,9 @@ class WebPushServiceTest < ActiveSupport::TestCase
   end
 
   test "validate_configuration! should not raise when keys present" do
-    # Assuming credentials are properly set in test environment
+    Rails.application.credentials.stubs(:dig).with(:vapid, :public_key).returns("test_public_key")
+    Rails.application.credentials.stubs(:dig).with(:vapid, :private_key).returns("test_private_key")
+
     assert_nothing_raised do
       WebPushService.validate_configuration!
     end
