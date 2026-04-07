@@ -199,8 +199,9 @@ GEM
       racc (~> 1.4)
     openssl (4.0.0)
     ostruct (0.6.3)
-    pagy (43.2.2)
+    pagy (43.4.4)
       json
+      uri
       yaml
     parallel (1.27.0)
     parser (3.3.10.0)
@@ -401,7 +402,7 @@ DEPENDENCIES
   local_time
   minitest (~> 5.27)
   mocha
-  pagy (~> 43.2)
+  pagy (~> 43.4)
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.3)
