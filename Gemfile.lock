@@ -164,7 +164,9 @@ GEM
     marcel (1.1.0)
     matrix (0.4.3)
     mini_mime (1.1.5)
-    minitest (5.27.0)
+    minitest (6.0.4)
+      drb (~> 2.0)
+      prism (~> 1.5)
     mocha (3.0.1)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.8.0)
@@ -400,7 +402,7 @@ DEPENDENCIES
   importmap-rails
   kamal
   local_time
-  minitest (~> 5.27)
+  minitest (~> 6.0)
   mocha
   pagy (~> 43.4)
   propshaft
