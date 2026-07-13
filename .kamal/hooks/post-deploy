@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Run any pending Unforgettable release tasks in the freshly deployed container.
+#
+# Kamal 2 runs hooks locally, so we shell back into the app container via
+# `kamal app exec` rather than the README's hand-rolled ssh/docker-exec loop.
+# `app exec` does not take the deploy lock, so this is safe inside a deploy.
+#
+# `-r web -p`: run once on the primary web host. web and job share a host and
+# database, and a multi-host web role would otherwise run the release task
+# concurrently and race on the unforgettable_releases unique index.
+#
+# The release is intentionally non-fatal: post-deploy runs after traffic has
+# already switched, so a failed backfill should be surfaced loudly, not reported
+# as a failed deploy (which would not roll anything back anyway).
+
+set -e
+
+DEST=""
+[ -n "$KAMAL_DESTINATION" ] && DEST="-d $KAMAL_DESTINATION"
+
+echo "Running unforgettable:release on ${KAMAL_DESTINATION:-default} (primary web host)..."
+if ! bin/kamal app exec $DEST -r web -p --reuse "bin/rails unforgettable:release"; then
+  echo "WARNING: unforgettable:release failed; run it manually before relying on the backfill." >&2
+fi

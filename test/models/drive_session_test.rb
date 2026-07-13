@@ -66,6 +66,28 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert_not day_session.is_night_drive, "2pm in winter should be day drive"
   end
 
+  test "midday summer drives are day, not night, across timezones" do
+    # Regression: the sunrise/sunset gem stamps the event's UTC time onto the local
+    # date without letting it roll to the next UTC day. In summer, sunset falls after
+    # 00:00 UTC, so it landed a day early and every daytime drive was flagged night.
+    [
+      [ "America/Chicago", 41.8781, -87.6298 ],
+      [ "America/Los_Angeles", 34.0522, -118.2437 ],
+      [ "America/New_York", 40.7128, -74.0060 ],
+      [ "Pacific/Honolulu", 21.3099, -157.8581 ]
+    ].each do |zone, lat, lon|
+      @user.update!(timezone: zone, latitude: lat, longitude: lon)
+      tz = ActiveSupport::TimeZone.new(zone)
+
+      noon = @user.drive_sessions.create!(
+        driver_name: "Test Driver",
+        started_at: tz.local(2026, 7, 8, 12, 0, 0),
+        ended_at: tz.local(2026, 7, 8, 13, 0, 0)
+      )
+      assert_not noon.is_night_drive, "noon in #{zone} (summer) should be a day drive"
+    end
+  end
+
   test "determines night drive for early morning" do
     @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
 
