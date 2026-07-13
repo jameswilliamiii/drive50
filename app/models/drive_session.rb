@@ -125,15 +125,23 @@ class DriveSession < ApplicationRecord
   end
 
   def night_time?(time, latitude, longitude)
-    local_date = time.to_date
-    solar_event = SolarEventCalculator.new(local_date, latitude, longitude)
+    solar_event = SolarEventCalculator.new(time.to_date, latitude, longitude)
     sunrise_utc = solar_event.compute_utc_civil_sunrise
     sunset_utc = solar_event.compute_utc_civil_sunset
 
     return false if sunrise_utc.nil? || sunset_utc.nil?
 
-    time_utc = time.utc.to_datetime
-    time_utc < sunrise_utc || time_utc > sunset_utc
+    # RubySunrise returns the correct UTC clock time for each event but stamps it onto
+    # the date we passed in, so its raw instant can land on the wrong UTC day (in the
+    # Americas sunset is after 00:00 UTC). Shift each event's UTC time-of-day by the
+    # drive's own offset to get a local time-of-day: this never depends on which
+    # calendar date the gem chose, and avoids reconverting through the shifted date's
+    # (possibly different, across a DST boundary) offset.
+    offset = time.utc_offset
+    event_seconds = ->(event) { (event.hour * 3600 + event.min * 60 + event.sec + offset) % 86_400 }
+
+    tod = time.seconds_since_midnight
+    tod < event_seconds.call(sunrise_utc) || tod > event_seconds.call(sunset_utc)
   end
 
   def broadcast_create
