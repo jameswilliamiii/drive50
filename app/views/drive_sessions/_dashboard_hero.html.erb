@@ -1,0 +1,37 @@
+<div class="dash-hero">
+  <div class="dash-hero-top">
+    <div>
+      <div class="dash-hero-number"><%= stats[:total_hours].round(1) %></div>
+      <div class="dash-hero-caption">of <%= DriveSession::HOURS_NEEDED %> hours · <%= format_duration(stats[:hours_needed]) %> to go</div>
+    </div>
+    <div class="dash-hero-finish">
+      <div class="dash-hero-finish-label">Projected finish</div>
+      <div class="dash-hero-finish-value"><%= stats[:projected_finish] %></div>
+    </div>
+  </div>
+
+  <% goal = DriveSession::HOURS_NEEDED.to_f %>
+  <div class="dash-hero-progress">
+    <div class="dash-hero-bar dash-hero-bar-day" style="width: <%= [ stats[:day_hours] / goal * 100, 100 ].min %>%"></div>
+    <div class="dash-hero-bar dash-hero-bar-night" style="width: <%= [ stats[:night_hours] / goal * 100, 100 ].min %>%"></div>
+  </div>
+
+  <div class="dash-hero-chips">
+    <div class="dash-hero-chip is-day">
+      <span class="dash-hero-chip-key">Day</span>
+      <span class="dash-hero-chip-value"><%= stats[:day_hours].round(1) %></span>
+    </div>
+    <div class="dash-hero-chip is-night">
+      <span class="dash-hero-chip-key">Night</span>
+      <span class="dash-hero-chip-value"><%= stats[:night_hours].round(1) %> <small>/ <%= DriveSession::NIGHT_HOURS_NEEDED %></small></span>
+    </div>
+    <div class="dash-hero-chip">
+      <span class="dash-hero-chip-key">Pace</span>
+      <span class="dash-hero-chip-value"><%= stats[:weekly_pace] %> <small>h/wk</small></span>
+    </div>
+    <div class="dash-hero-chip">
+      <span class="dash-hero-chip-key">Drives</span>
+      <span class="dash-hero-chip-value"><%= stats[:drives_count] %></span>
+    </div>
+  </div>
+</div>

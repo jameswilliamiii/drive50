@@ -1,12 +1,3 @@
-<%= turbo_stream.update "recent-drives-table" do %>
-  <% if @recent_sessions.any? %>
-    <%= render partial: "session_row", collection: @recent_sessions, as: :session %>
-  <% else %>
-    <tr>
-      <td colspan="5" class="empty-state">
-        <p>No drives recorded yet. Start your first drive!</p>
-      </td>
-    </tr>
-  <% end %>
+<%= turbo_stream.replace "recent-drives-table" do %>
+  <%= render "drive_sessions/recent_drives_table", recent_sessions: @recent_sessions %>
 <% end %>
-

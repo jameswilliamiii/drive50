@@ -9,13 +9,8 @@
 
   <div class="drive-history">
     <% if @sessions.any? %>
-      <div id="sessions-table">
-        <table>
-          <%= render "table_header" %>
-          <tbody id="sessions-tbody">
-            <%= render partial: "session_row", collection: @sessions, as: :session %>
-          </tbody>
-        </table>
+      <div id="sessions-list" class="drive-list">
+        <%= render partial: "drive_row", collection: @sessions, as: :session %>
       </div>
 
       <turbo-frame id="sessions-pagination" data-controller="infinite-scroll">

@@ -1,0 +1,50 @@
+<div class="drive-row" id="<%= dom_id(session) %>"
+     data-controller="drive-session card-menu"
+     data-action="click->drive-modal#open keydown->drive-modal#openOnKey"
+     tabindex="0" aria-haspopup="dialog"
+     data-drive-started-at="<%= session.started_at&.iso8601 %>"
+     data-drive-ended-at="<%= session.ended_at&.iso8601 %>"
+     data-drive-night="<%= session.is_night_drive %>"
+     data-drive-duration="<%= format_duration(session.duration_hours) %>"
+     data-drive-driver="<%= session.driver_name %>"
+     data-drive-notes="<%= session.notes %>">
+  <div class="drive-row-badge is-<%= session.is_night_drive ? "night" : "day" %>">
+    <%= session.is_night_drive ? icon_moon(size: 18) : icon_sun(size: 18) %>
+  </div>
+
+  <div class="drive-row-main">
+    <div class="drive-row-date">
+      <span class="drive-row-date-full"><%= local_time(session.started_at, format: "%B %d, %Y") %></span>
+      <span class="drive-row-date-short"><%= local_time(session.started_at, format: "%b %d, %Y") %></span>
+    </div>
+    <% if session.notes.present? %>
+      <div class="drive-row-sub"><%= session.notes %></div>
+    <% end %>
+  </div>
+
+  <div class="drive-row-duration">
+    <div class="drive-row-duration-label">Duration</div>
+    <div class="drive-row-duration-value"><%= format_duration(session.duration_hours, style_units: true) %></div>
+  </div>
+
+  <div class="drive-row-actions">
+    <button type="button" class="card-menu-button drive-row-kebab"
+            data-card-menu-target="button" data-action="click->card-menu#toggle"
+            aria-label="Drive options" aria-expanded="false">
+      <%= icon_dots(size: 20, class: "card-menu-icon") %>
+    </button>
+    <div class="card-menu-backdrop" data-card-menu-target="backdrop" data-action="click->card-menu#handleBackdropClick"></div>
+    <div class="card-menu hidden" data-card-menu-target="menu" data-action="click->card-menu#handleMenuItemClick">
+      <div class="card-menu-options">
+        <%= link_to edit_drive_session_path(session), class: "card-menu-item" do %><span>Edit</span><% end %>
+        <%= button_to drive_session_path(session), method: :delete,
+                      data: { turbo_confirm: "Are you sure?" },
+                      class: "card-menu-item card-menu-item-danger",
+                      form: { style: "display: inline;", data: { action: "submit->drive-session#handleDelete submit->card-menu#handleFormSubmit" } } do %>
+          <span>Delete</span>
+        <% end %>
+        <button type="button" class="card-menu-cancel" data-action="click->card-menu#close">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

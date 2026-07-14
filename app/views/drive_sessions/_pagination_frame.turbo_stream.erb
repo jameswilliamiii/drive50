@@ -1,5 +1,5 @@
-<%= turbo_stream.append "sessions-tbody" do %>
-  <%= render partial: "session_row", collection: @sessions, as: :session %>
+<%= turbo_stream.append "sessions-list" do %>
+  <%= render partial: "drive_row", collection: @sessions, as: :session %>
 <% end %>
 
 <%= turbo_stream.update "sessions-pagination" do %>

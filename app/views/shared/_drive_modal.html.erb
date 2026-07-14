@@ -1,0 +1,44 @@
+<%# Shared drive-detail modal. Populated client-side from the clicked row's data
+    attributes by the drive-modal controller (mounted on <body>). %>
+<dialog class="drive-modal"
+        data-drive-modal-target="dialog"
+        data-action="click->drive-modal#backdropClick cancel->drive-modal#onClose close->drive-modal#onClose"
+        aria-labelledby="drive-modal-date">
+  <div class="drive-modal-card">
+    <div class="drive-modal-header">
+      <span class="drive-modal-badge" data-drive-modal-target="badge">
+        <span class="drive-modal-badge-day"><%= icon_sun(size: 22) %></span>
+        <span class="drive-modal-badge-night"><%= icon_moon(size: 22) %></span>
+      </span>
+      <div class="drive-modal-heading">
+        <h2 class="drive-modal-date" id="drive-modal-date" data-drive-modal-target="date"></h2>
+        <p class="drive-modal-type" data-drive-modal-target="type"></p>
+      </div>
+      <button type="button" class="drive-modal-close" data-action="drive-modal#close" aria-label="Close">
+        <%= icon_close(size: 20) %>
+      </button>
+    </div>
+
+    <div class="drive-modal-body">
+      <dl class="drive-modal-stats">
+        <div class="drive-modal-stat">
+          <dt class="drive-modal-stat-label">Duration</dt>
+          <dd class="drive-modal-stat-value" data-drive-modal-target="duration"></dd>
+        </div>
+        <div class="drive-modal-stat">
+          <dt class="drive-modal-stat-label">Time</dt>
+          <dd class="drive-modal-stat-value" data-drive-modal-target="time"></dd>
+        </div>
+        <div class="drive-modal-stat" data-drive-modal-target="driverRow" hidden>
+          <dt class="drive-modal-stat-label">Driver</dt>
+          <dd class="drive-modal-stat-value" data-drive-modal-target="driver"></dd>
+        </div>
+      </dl>
+
+      <div class="drive-modal-notes-section" data-drive-modal-target="notesSection" hidden>
+        <span class="drive-modal-stat-label">Notes</span>
+        <p class="drive-modal-notes" data-drive-modal-target="notes"></p>
+      </div>
+    </div>
+  </div>
+</dialog>

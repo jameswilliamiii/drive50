@@ -1,33 +1,56 @@
-<div class="activity-calendar" data-controller="activity-calendar">
-  <div class="activity-calendar-grid-wrapper">
-    <div class="activity-calendar-grid">
-      <% days.each do |day| %>
-        <div class="activity-day level-<%= day[:level] %>"
-             title="<%= day[:date].strftime('%B %d, %Y') %>: <%= day[:count] %> <%= 'drive'.pluralize(day[:count]) %>"
-             data-activity-calendar-target="day"
-             data-date="<%= day[:date].strftime('%B %d, %Y') %>"
-             data-count="<%= day[:count] %>"
-             data-action="click->activity-calendar#showDayInfo">
-        </div>
-      <% end %>
-    </div>
+<div class="activity-card">
+  <div class="activity-card-header">
+    <span class="activity-card-title">Momentum</span>
+    <span class="activity-card-sub">last 3 weeks</span>
   </div>
 
-  <div class="activity-calendar-info">
-    <p class="stat-label">
-      Driving Activity
-      <span class="tooltip-trigger" data-tooltip="<%= label %> of driving sessions">
-        <%= icon_info(size: 14, class: "info-icon") %>
-      </span>
+  <div class="activity-card-body">
+    <div class="activity-top">
+      <div class="activity-statement">
+        <div class="activity-streak">
+          <div class="activity-streak-number"><%= stats[:current_streak] %></div>
+          <div class="activity-streak-meta">
+            <div class="activity-streak-label">Day streak</div>
+            <div class="activity-streak-best">Best <b><%= pluralize(stats[:best_streak], "day") %></b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="activity-cal" data-controller="activity-calendar">
+      <div class="activity-weekdays">
+        <% %w[S M T W T F S].each do |label| %><span><%= label %></span><% end %>
+      </div>
+      <div class="activity-grid">
+        <% days.each do |day| %>
+          <div class="activity-cell state-<%= day[:state] %><%= " is-today" if day[:today] %><%= " is-future" if day[:future] %>"
+               title="<%= day[:date].strftime("%B %d, %Y") %>"
+               data-activity-calendar-target="day"
+               data-date="<%= day[:date].strftime("%B %d, %Y") %>"
+               data-state="<%= day[:state] %>"
+               data-action="click->activity-calendar#showDayInfo"></div>
+        <% end %>
+      </div>
+      <div class="activity-legend">
+        <span><span class="activity-swatch is-day"></span>Day</span>
+        <span><span class="activity-swatch is-night"></span>Night</span>
+        <span><span class="activity-swatch is-both"></span>Both</span>
+      </div>
+      </div>
+    </div>
+
+    <p class="activity-sentence">
+      You've driven <b><%= stats[:active_days] %> of the last 21</b> days.
     </p>
-    <div class="activity-calendar-legend">
-      <span class="legend-label">Less</span>
-      <div class="activity-day level-0"></div>
-      <div class="activity-day level-1"></div>
-      <div class="activity-day level-2"></div>
-      <div class="activity-day level-3"></div>
-      <div class="activity-day level-4"></div>
-      <span class="legend-label">More</span>
+
+    <div class="activity-ministats">
+      <div class="activity-ministat">
+        <span class="activity-ministat-key">This week</span>
+        <span class="activity-ministat-value"><%= format_duration_short(stats[:this_week_hours]) %></span>
+      </div>
+      <div class="activity-ministat">
+        <span class="activity-ministat-key">Last week</span>
+        <span class="activity-ministat-value"><%= format_duration_short(stats[:last_week_hours]) %></span>
+      </div>
     </div>
   </div>
 </div>

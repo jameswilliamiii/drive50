@@ -35,7 +35,7 @@
   </head>
 
   <body class="<%= 'has-bottom-nav' if authenticated? %>"
-        data-controller="timezone-detector"
+        data-controller="timezone-detector drive-modal"
         data-timezone-detector-current-value="<%= Current.user&.timezone || session[:timezone] || 'UTC' %>">
     <%= render "shared/header" %>
 
@@ -55,6 +55,10 @@
     <% end %>
 
     <%= render "shared/toasts" %>
+
+    <% if authenticated? %>
+      <%= render "shared/drive_modal" %>
+    <% end %>
 
     <main>
       <div class="container">

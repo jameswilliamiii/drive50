@@ -1,0 +1,234 @@
+/* ============================================
+   Drive detail modal
+   ============================================ */
+
+/* Rows open the modal on click/Enter. Their hover + rounded styles already live
+   in cards.css, so here we only add the pointer affordance and a focus ring. */
+.drive-row {
+  cursor: pointer;
+}
+
+.drive-row:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.drive-modal {
+  /* The global reset zeroes margins, which kills the native dialog's
+     margin:auto centering — restore it explicitly. */
+  margin: auto;
+  width: min(30rem, calc(100vw - 2 * var(--spacing-lg)));
+  max-height: calc(100vh - 2 * var(--spacing-2xl));
+  padding: 0;
+  border: none;
+  border-radius: var(--border-radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+/* Flex layout only while open — applying display:flex unconditionally overrides
+   the UA `dialog:not([open])` hide rule and leaves an empty dialog in the flow. */
+.drive-modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The card fills the dialog and lets the body scroll when the notes are long,
+   keeping the header pinned. min-height:0 lets the flex children shrink below
+   their content size so overflow scrolling engages. */
+.drive-modal-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.drive-modal::backdrop {
+  background: rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.drive-modal[open] {
+  animation: driveModalIn 0.18s ease-out;
+}
+
+@keyframes driveModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.drive-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.drive-modal-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.drive-modal-badge.is-day {
+  background: var(--recent-badge-day-bg);
+  color: var(--recent-badge-day-fg);
+}
+
+.drive-modal-badge.is-night {
+  background: var(--recent-badge-night-bg);
+  color: var(--recent-badge-night-fg);
+}
+
+/* Only the icon matching the drive type is shown. */
+.drive-modal-badge-day,
+.drive-modal-badge-night {
+  display: none;
+}
+
+.drive-modal-badge.is-day .drive-modal-badge-day,
+.drive-modal-badge.is-night .drive-modal-badge-night {
+  display: flex;
+}
+
+.drive-modal-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.drive-modal-date {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.drive-modal-type {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+}
+
+.drive-modal-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  box-shadow: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.drive-modal-close:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.drive-modal-body {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.drive-modal-stats {
+  margin: 0;
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.drive-modal-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+}
+
+.drive-modal-stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-light);
+}
+
+.drive-modal-stat-value {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.drive-modal-notes-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.drive-modal-notes {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* The display rules above would otherwise beat the UA [hidden] rule (equal
+   specificity, later in source order), leaving a driver/notes section visible
+   with the previous row's content when the current drive has none. */
+.drive-modal-stat[hidden],
+.drive-modal-notes-section[hidden] {
+  display: none;
+}
+
+/* Mobile: dock to the bottom as a sheet. margin-top:auto keeps the modal at the
+   bottom of the centering box while margin-bottom:0 flushes it to the edge. */
+@media (max-width: 768px) {
+  .drive-modal {
+    width: 100%;
+    max-height: 85dvh;
+    margin: auto auto 0;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  }
+
+  .drive-modal[open] {
+    animation: driveModalUp 0.22s ease-out;
+  }
+
+  @keyframes driveModalUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}

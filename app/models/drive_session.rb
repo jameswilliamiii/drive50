@@ -61,6 +61,30 @@ class DriveSession < ApplicationRecord
       .transform_values(&:count)
   end
 
+  # Returns { Date => :day | :night | :both } for every day with a completed drive
+  # in the 3 Sunday-aligned weeks ending with the current week.
+  def self.activity_day_states(timezone: "UTC")
+    tz = ActiveSupport::TimeZone[timezone || "UTC"]
+    today = Time.current.in_time_zone(tz).to_date
+    start_of_week = today - today.wday
+    range_start = start_of_week - 14
+    start_datetime = tz.local(range_start.year, range_start.month, range_start.day)
+
+    states = Hash.new { |h, k| h[k] = { day: false, night: false } }
+    completed.where("started_at >= ?", start_datetime).find_each do |session|
+      date = session.started_at.in_time_zone(tz).to_date
+      session.is_night_drive ? states[date][:night] = true : states[date][:day] = true
+    end
+
+    states.transform_values do |v|
+      if v[:day] && v[:night] then :both
+      elsif v[:night] then :night
+      elsif v[:day] then :day
+      else :none
+      end
+    end
+  end
+
   # Instance methods
   def completed?
     ended_at.present?
@@ -147,9 +171,7 @@ class DriveSession < ApplicationRecord
   def broadcast_create
     if completed?
       broadcast_recent_drives_table
-      broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
-    else
-      broadcast_replace_to user, target: "in-progress-drive", html: ApplicationController.render(partial: "drive_sessions/in_progress_drive", locals: { in_progress: self })
+      broadcast_append_to user, target: "sessions-list", html: ApplicationController.render(partial: "drive_sessions/drive_row", locals: { session: self })
     end
     broadcast_progress_summary
   end
@@ -159,15 +181,12 @@ class DriveSession < ApplicationRecord
       was_in_progress = saved_change_to_ended_at? && ended_at.present? && ended_at_before_last_save.nil?
 
       if was_in_progress
-        broadcast_remove_to user, target: "in-progress-drive"
-        broadcast_append_to user, target: "sessions-tbody", html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
+        broadcast_append_to user, target: "sessions-list", html: ApplicationController.render(partial: "drive_sessions/drive_row", locals: { session: self })
       else
-        broadcast_replace_to user, target: ActionView::RecordIdentifier.dom_id(self), html: ApplicationController.render(partial: "drive_sessions/session_row", locals: { session: self })
+        broadcast_replace_to user, target: ActionView::RecordIdentifier.dom_id(self), html: ApplicationController.render(partial: "drive_sessions/drive_row", locals: { session: self })
       end
 
       broadcast_recent_drives_table
-    else
-      broadcast_replace_to user, target: "in-progress-drive", html: ApplicationController.render(partial: "drive_sessions/in_progress_drive", locals: { in_progress: self })
     end
     broadcast_progress_summary
   end
@@ -186,36 +205,32 @@ class DriveSession < ApplicationRecord
   def broadcast_progress_summary
     user.association(:drive_sessions).reset
     relation = user.drive_sessions
+    tz = user.timezone || "UTC"
 
-    statistics = DriveSession.statistics_for(relation)
-    in_progress = statistics[:in_progress]
-
-    activity_data = relation.activity_by_date(days: ACTIVITY_CALENDAR_DAYS, timezone: user.timezone || "UTC")
+    statistics = DriveSession.statistics_for(relation, timezone: tz)
+    activity_days = ApplicationController.helpers.dashboard_activity_days(
+      relation.activity_day_states(timezone: tz), timezone: tz
+    )
 
     broadcast_replace_to user,
                          target: "progress-summary",
                          html: ApplicationController.render(
                            partial: "drive_sessions/progress_summary",
-                           locals: {
-                             in_progress: in_progress,
-                             total_hours: statistics[:total_hours],
-                             night_hours: statistics[:night_hours],
-                             activity_calendar: ApplicationController.helpers.activity_calendar_data(activity_data, timezone: user.timezone || "UTC")
-                           }
+                           locals: { stats: statistics, activity_days: activity_days }
                          )
 
     broadcast_update_to user,
                         target: "in-progress-banner-container",
                         html: ApplicationController.render(
                           partial: "shared/in_progress_banner",
-                          locals: { in_progress: in_progress }
+                          locals: { in_progress: statistics[:in_progress] }
                         )
 
     broadcast_update_to user,
                         target: "fab-new-drive-wrapper",
                         html: ApplicationController.render(
                           partial: "shared/fab_new_drive",
-                          locals: { in_progress: in_progress }
+                          locals: { in_progress: statistics[:in_progress] }
                         )
   end
 

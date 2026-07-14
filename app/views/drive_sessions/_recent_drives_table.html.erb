@@ -1,12 +1,7 @@
-<tbody id="recent-drives-table">
+<div id="recent-drives-table" class="drive-list">
   <% if recent_sessions.any? %>
-    <%= render partial: "drive_sessions/session_row", collection: recent_sessions, as: :session %>
+    <%= render partial: "drive_sessions/drive_row", collection: recent_sessions, as: :session %>
   <% else %>
-    <tr>
-      <td colspan="4" class="empty-state">
-        <p>No drives recorded yet. Start your first drive!</p>
-      </td>
-    </tr>
+    <p class="empty-state">No drives recorded yet. Start your first drive!</p>
   <% end %>
-</tbody>
-
+</div>

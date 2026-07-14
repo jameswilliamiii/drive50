@@ -13,12 +13,13 @@ header {
   backdrop-filter: blur(10px);
 }
 
-/* In-progress banner (mobile only) */
+/* In-progress banner. Shown on every breakpoint (empty when no drive is
+   running). Sticky at the top on mobile; static on desktop so it doesn't fight
+   the sticky site header. */
 #in-progress-banner-container {
-  position: sticky;
-  top: 0;
+  display: block;
+  position: static;
   z-index: 95;
-  display: none; /* Hidden by default; enabled only for mobile via media query */
 }
 
 .in-progress-banner {
@@ -27,50 +28,17 @@ header {
     var(--color-secondary-dark),
     var(--color-secondary)
   );
-  background-size: 200% 200%;
   color: var(--color-white);
   padding: var(--spacing-sm) var(--spacing-lg);
-  animation: inProgressBannerGlow 8s ease-in-out infinite;
-  position: relative;
+  animation: inProgressBannerPulse 2.6s ease-in-out infinite;
 }
 
-.in-progress-banner::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 10%;
-  right: 10%;
-  height: 4px;
-  background: linear-gradient(to bottom,
-    var(--color-secondary),
-    transparent
-  );
-  border-radius: 50%;
-  box-shadow:
-    0 0 6px 4px rgba(251, 113, 133, 0.5),
-    0 0 12px 8px rgba(251, 113, 133, 0.3),
-    0 0 18px 12px rgba(251, 113, 133, 0.15);
-  animation: bottomGlowPulse 2s ease-in-out infinite;
-}
-
-@keyframes inProgressBannerGlow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes bottomGlowPulse {
+@keyframes inProgressBannerPulse {
   0%, 100% {
-    opacity: 0.6;
+    filter: brightness(1);
   }
   50% {
-    opacity: 1;
+    filter: brightness(1.16);
   }
 }
 
@@ -90,6 +58,58 @@ header {
 
 .in-progress-banner-time {
   font-weight: 700;
+}
+
+.in-progress-banner-stop-form {
+  margin: 0;
+  display: inline-flex;
+}
+
+/* Stop control lives on the banner for desktop (mobile stops via the FAB).
+   Scoped under .in-progress-banner so it out-specifies the global
+   button[type="submit"] base (0,1,1) that would otherwise force a tall white
+   box; keeps it a slim ghost pill that doesn't grow the banner's height. */
+.in-progress-banner .in-progress-banner-stop {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  min-height: 0;
+  padding: 3px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: 0.78rem;
+  font-family: inherit;
+  line-height: 1.4;
+  box-shadow: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.in-progress-banner .in-progress-banner-stop:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: var(--color-white);
+  color: var(--color-white);
+}
+
+.in-progress-banner-stop-icon {
+  display: block;
+}
+
+@media (min-width: 769px) {
+  .in-progress-banner .in-progress-banner-stop {
+    display: inline-flex;
+  }
+
+  /* Pull the banner flush under the sticky header, cancelling the header's
+     bottom margin. Applied to the banner itself (only present when a drive is
+     running) so the empty container keeps the dashboard's normal top spacing. */
+  .in-progress-banner {
+    margin-top: calc(var(--spacing-3xl) * -1);
+    margin-bottom: var(--spacing-3xl);
+  }
 }
 
 header .container {
@@ -200,9 +220,10 @@ section header {
     text-align: center;
   }
 
-  /* Show in-progress banner only on mobile */
+  /* Stick the banner to the top on mobile (the site header is hidden there). */
   #in-progress-banner-container {
-    display: block;
+    position: sticky;
+    top: 0;
   }
 }
 
@@ -222,16 +243,4 @@ body[data-theme="dark"] header {
   background-color: var(--color-surface);
   border-bottom-color: var(--color-border);
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.6), 0 1px 2px -1px rgb(0 0 0 / 0.7);
-}
-
-[data-theme="dark"] .in-progress-banner::after,
-body[data-theme="dark"] .in-progress-banner::after {
-  background: linear-gradient(to bottom,
-    var(--color-secondary),
-    transparent
-  );
-  box-shadow:
-    0 0 8px 5px rgba(253, 164, 175, 0.6),
-    0 0 16px 10px rgba(251, 113, 133, 0.4),
-    0 0 24px 15px rgba(244, 63, 94, 0.2);
 }

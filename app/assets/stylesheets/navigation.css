@@ -11,14 +11,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text);
+  color: var(--color-primary);
   transition: var(--transition);
   border-radius: var(--border-radius-sm);
 }
 
 .menu-button:hover {
   background-color: var(--color-background);
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
 }
 
 .menu-button-active {

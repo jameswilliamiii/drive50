@@ -7,15 +7,18 @@ export default class extends Controller {
   showDayInfo(event) {
     const dayElement = event.currentTarget
     const date = dayElement.dataset.date
-    const count = dayElement.dataset.count
-    const drivesText = count === "1" ? "drive" : "drives"
+    const state = dayElement.dataset.state
 
-    // Only show toast on mobile (when hover is not available)
-    // Use matchMedia to detect if device supports hover
+    const label = {
+      day: "day drive",
+      night: "night drive",
+      both: "day & night drives",
+      none: "no drives"
+    }[state] || "no drives"
+
     const isMobile = !window.matchMedia("(hover: hover)").matches
-
     if (isMobile) {
-      this.createToast(`${date}: ${count} ${drivesText}`)
+      this.createToast(`${date}: ${label}`)
     }
   }
 
