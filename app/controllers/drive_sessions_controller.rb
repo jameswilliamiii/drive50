@@ -2,17 +2,12 @@ class DriveSessionsController < ApplicationController
   before_action :set_drive_session, only: [ :edit, :update, :destroy, :complete ]
 
   def index
+    tz = Current.user.timezone || "UTC"
     user_sessions = Current.user.drive_sessions
+
     @recent_sessions = user_sessions.completed.ordered.limit(3)
-
-    stats = DriveSession.statistics_for(Current.user)
-    @in_progress = stats[:in_progress]
-    @total_hours = stats[:total_hours]
-    @night_hours = stats[:night_hours]
-    @hours_needed = stats[:hours_needed]
-    @night_hours_needed = stats[:night_hours_needed]
-
-    @activity_data = user_sessions.activity_by_date(days: DriveSession::ACTIVITY_CALENDAR_DAYS, timezone: Current.user.timezone)
+    @stats = DriveSession.statistics_for(Current.user, timezone: tz)
+    @activity_states = user_sessions.activity_day_states(timezone: tz)
   end
 
   def all

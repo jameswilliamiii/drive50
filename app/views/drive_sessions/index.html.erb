@@ -2,32 +2,24 @@
 
 <%= turbo_stream_from Current.user %>
 
-<%= render "shared/page_header", title: "Dashboard" %>
+<% greeting_tz = Current.user.timezone.presence || "UTC" %>
+<div class="dashboard-greeting">
+  <h1 class="dashboard-greeting-title"><%= dashboard_greeting(Current.user) %></h1>
+  <p class="dashboard-greeting-date"><%= Time.current.in_time_zone(greeting_tz).strftime("%A, %B %-d") %></p>
+</div>
 
 <div class="dashboard">
-  <%= render partial: "progress_summary", locals: {
-    in_progress: @in_progress,
-    total_hours: @total_hours,
-    night_hours: @night_hours,
-    activity_calendar: activity_calendar_data(@activity_data, timezone: Current.user.timezone || "UTC")
-  } %>
+  <%= render "progress_summary",
+             stats: @stats,
+             activity_days: dashboard_activity_days(@activity_states, timezone: Current.user.timezone || "UTC") %>
 
   <section class="drive-history">
-    <header>Recent Drives</header>
-    <% if Current.user.drive_sessions.completed.any? %>
-      <table class="recent-drives-table-wrapper">
-        <%= render "table_header" %>
-        <tbody id="recent-drives-table">
-          <%= render partial: "session_row", collection: @recent_sessions, as: :session %>
-        </tbody>
-      </table>
+    <div class="drive-history-header">
+      <h2 class="drive-history-title">Recent drives</h2>
       <% if Current.user.drive_sessions.completed.count > 3 %>
-        <section class="view-all-link">
-          <%= link_to "View All Drives", all_drive_sessions_path, class: "button" %>
-        </div>
+        <%= link_to "View all →", all_drive_sessions_path, class: "view-all-inline" %>
       <% end %>
-    <% else %>
-      <p class="empty-state">No drives recorded yet. Start your first drive!</p>
-    <% end %>
+    </div>
+    <%= render "recent_drives_table", recent_sessions: @recent_sessions %>
   </section>
 </div>

@@ -7,6 +7,15 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user = users(:one)
   end
 
+  test "creating and completing a drive broadcasts without error" do
+    @user.update!(timezone: "America/Chicago")
+    assert_nothing_raised do
+      d = @user.drive_sessions.create!(driver_name: "D", started_at: 2.hours.ago)
+      d.update!(ended_at: Time.current)
+      d.destroy!
+    end
+  end
+
   # Validations
   test "requires driver name" do
     session = @user.drive_sessions.new(started_at: Time.current)
@@ -363,6 +372,17 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert stats.key?(:in_progress)
   end
 
+  test "statistics_for includes the new dashboard metrics" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    @user.drive_sessions.create!(driver_name: "D", started_at: 2.hours.ago, ended_at: 1.hour.ago)
+    stats = DriveSession.statistics_for(@user, timezone: "America/Chicago")
+    [ :day_hours, :drives_count, :this_week_hours, :last_week_hours,
+      :active_days, :current_streak, :best_streak, :weekly_pace, :projected_finish ].each do |key|
+      assert stats.key?(key), "expected statistics_for to include #{key}"
+    end
+  end
+
   # Activity Calendar
   test "ACTIVITY_CALENDAR_DAYS constant is set" do
     assert_equal 28, DriveSession::ACTIVITY_CALENDAR_DAYS
@@ -548,6 +568,134 @@ class DriveSessionTest < ActiveSupport::TestCase
         driver_name: "Test",
         started_at: Time.current
       )
+    end
+  end
+
+  # --- Derived statistics: hours ---
+  test "day_hours excludes night drives" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    # is_night_drive is derived from the clock times below, not passed in.
+    @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 6, 14, 0, 0), ended_at: tz.local(2026, 7, 6, 15, 0, 0)) # day, 1h
+    @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 6, 21, 0, 0), ended_at: tz.local(2026, 7, 6, 22, 0, 0)) # night, 1h
+    assert_in_delta 1.0, @user.drive_sessions.day_hours, 0.01
+  end
+
+  test "drives_count counts only completed drives" do
+    @user.drive_sessions.destroy_all
+    @user.drive_sessions.create!(driver_name: "D", started_at: 2.hours.ago, ended_at: 1.hour.ago)
+    @user.drive_sessions.create!(driver_name: "D", started_at: 30.minutes.ago) # in progress
+    assert_equal 1, @user.drive_sessions.drives_count
+  end
+
+  test "hours_in_week sums the given calendar week (Sunday start) in the user timezone" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    travel_to Time.zone.parse("2026-07-15 12:00 UTC") do # Wed 2026-07-15
+      # this week (Sun 07-12 .. Sat 07-18): one 1h drive
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-13 15:00", ended_at: "2026-07-13 16:00")
+      # last week (Sun 07-05 .. Sat 07-11): one 2h drive
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-08 15:00", ended_at: "2026-07-08 17:00")
+      assert_in_delta 1.0, @user.drive_sessions.hours_in_week(0, timezone: "America/Chicago"), 0.01
+      assert_in_delta 2.0, @user.drive_sessions.hours_in_week(1, timezone: "America/Chicago"), 0.01
+    end
+  end
+
+  # --- Derived statistics: streaks ---
+  test "current_streak counts consecutive days ending today or yesterday" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    travel_to Time.zone.parse("2026-07-15 18:00 UTC") do # Wed 07-15
+      [ "2026-07-13", "2026-07-14", "2026-07-15" ].each do |d|
+        @user.drive_sessions.create!(driver_name: "D", started_at: "#{d} 15:00", ended_at: "#{d} 16:00")
+      end
+      assert_equal 3, @user.drive_sessions.current_streak(timezone: "America/Chicago")
+    end
+  end
+
+  test "current_streak is zero when the last drive is older than yesterday" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    travel_to Time.zone.parse("2026-07-15 18:00 UTC") do
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-10 15:00", ended_at: "2026-07-10 16:00")
+      assert_equal 0, @user.drive_sessions.current_streak(timezone: "America/Chicago")
+    end
+  end
+
+  test "best_streak returns the longest consecutive run ever" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    [ "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-10" ].each do |d|
+      @user.drive_sessions.create!(driver_name: "D", started_at: "#{d} 15:00", ended_at: "#{d} 16:00")
+    end
+    assert_equal 3, @user.drive_sessions.best_streak(timezone: "America/Chicago")
+  end
+
+  test "active_day_count counts distinct active days within the trailing window" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    travel_to Time.zone.parse("2026-07-21 18:00 UTC") do
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-20 15:00", ended_at: "2026-07-20 16:00")
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-20 20:00", ended_at: "2026-07-20 21:00") # same day
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-06-01 15:00", ended_at: "2026-06-01 16:00") # outside 21d
+      assert_equal 1, @user.drive_sessions.active_day_count(days: 21, timezone: "America/Chicago")
+    end
+  end
+
+  # --- Derived statistics: pace & projection ---
+  test "weekly_pace averages recent hours over weeks of history (capped at 4)" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    travel_to Time.zone.parse("2026-07-15 18:00 UTC") do
+      # 15 days of history -> round(15/7)=2 weeks; 6 total recent hours -> 3.0/wk
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-01 15:00", ended_at: "2026-07-01 18:00") # 3h
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-14 15:00", ended_at: "2026-07-14 18:00") # 3h
+      assert_in_delta 3.0, @user.drive_sessions.weekly_pace(timezone: "America/Chicago"), 0.1
+    end
+  end
+
+  test "weekly_pace is zero with no drives" do
+    @user.drive_sessions.destroy_all
+    assert_equal 0.0, @user.drive_sessions.weekly_pace(timezone: "America/Chicago")
+  end
+
+  test "projected_finish returns a month label when on pace" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    travel_to Time.zone.parse("2026-07-15 18:00 UTC") do
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-01 15:00", ended_at: "2026-07-01 18:00")
+      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-14 15:00", ended_at: "2026-07-14 18:00")
+      label = @user.drive_sessions.projected_finish(timezone: "America/Chicago")
+      assert_match(/\A(Early|Mid|Late) [A-Z][a-z]+\z/, label)
+    end
+  end
+
+  test "projected_finish is 'Keep driving' when pace is zero" do
+    @user.drive_sessions.destroy_all
+    assert_equal "Keep driving", @user.drive_sessions.projected_finish(timezone: "America/Chicago")
+  end
+
+  test "projected_finish is 'Complete' when the goal is met" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-01 08:00", ended_at: "2026-07-03 10:00") # 50h
+    assert_equal "Complete", @user.drive_sessions.projected_finish(timezone: "America/Chicago")
+  end
+
+  test "activity_day_states maps each active day to :day, :night, or :both" do
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    travel_to tz.local(2026, 7, 15, 18, 0, 0) do # Wed; grid window 06-28..07-18
+      # is_night_drive is derived from the clock times, not passed in.
+      @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 14, 14, 0, 0), ended_at: tz.local(2026, 7, 14, 15, 0, 0)) # day only
+      @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 13, 21, 0, 0), ended_at: tz.local(2026, 7, 13, 22, 0, 0)) # night only
+      @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 12, 14, 0, 0), ended_at: tz.local(2026, 7, 12, 15, 0, 0)) # day part of "both"
+      @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 12, 21, 0, 0), ended_at: tz.local(2026, 7, 12, 22, 0, 0)) # night part of "both"
+      states = @user.drive_sessions.activity_day_states(timezone: "America/Chicago")
+      assert_equal :day,   states[Date.new(2026, 7, 14)]
+      assert_equal :night, states[Date.new(2026, 7, 13)]
+      assert_equal :both,  states[Date.new(2026, 7, 12)]
     end
   end
 end

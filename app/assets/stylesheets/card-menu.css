@@ -243,3 +243,90 @@
     width: 100%;
   }
 }
+
+/* ============================================
+   Card Menu (Desktop) — drive-row kebab dropdown
+
+   Scoped to .drive-row-actions so the shared card-menu styles above (used by
+   the FAB and other mobile sheets) keep their default desktop behavior. On the
+   drive rows the kebab becomes a click-to-open anchored dropdown instead of a
+   bottom sheet.
+   ============================================ */
+@media (min-width: 769px) {
+  .drive-row-actions .card-menu-button {
+    display: flex;
+    background: none;
+    border: none;
+    padding: var(--spacing-xs);
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition);
+  }
+  .drive-row-actions .card-menu-button:hover {
+    background-color: var(--color-background);
+    color: var(--color-text);
+  }
+
+  /* Transparent full-viewport backdrop: catches the click-away without dimming. */
+  .drive-row-actions .card-menu-backdrop {
+    background-color: transparent;
+    backdrop-filter: none;
+  }
+
+  .drive-row-actions .card-menu {
+    display: block;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    left: auto;
+    bottom: auto;
+    width: 168px;
+    transform: none;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 1000;
+  }
+
+  .drive-row-actions .card-menu-options {
+    padding: var(--spacing-xs) 0;
+  }
+
+  .drive-row-actions .card-menu-item,
+  .drive-row-actions button.card-menu-item {
+    display: block;
+    width: 100%;
+    padding: 9px 14px;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    background: none;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: none;
+    min-height: auto;
+  }
+  .drive-row-actions .card-menu-item:hover {
+    background-color: var(--color-background);
+  }
+  .drive-row-actions .card-menu-item-danger,
+  .drive-row-actions button.card-menu-item-danger {
+    color: var(--color-danger);
+  }
+
+  .drive-row-actions .card-menu-options form {
+    margin: 0;
+  }
+
+  .drive-row-actions .card-menu-cancel {
+    display: none;
+  }
+}

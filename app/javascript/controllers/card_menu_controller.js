@@ -52,8 +52,11 @@ export default class extends Controller {
   open() {
     // Remove hidden class before opening
     this.show()
-    // Prevent body scroll when menu is open
-    document.body.style.overflow = "hidden"
+    // Lock body scroll only for the mobile bottom-sheet; the desktop dropdown is
+    // a small anchored popover and must not freeze the page behind it.
+    if (window.matchMedia("(max-width: 768px)").matches) {
+      document.body.style.overflow = "hidden"
+    }
     this.backdropTarget.classList.add("card-menu-backdrop-visible")
     this.menuTarget.classList.add("card-menu-open")
     this.buttonTarget.setAttribute("aria-expanded", "true")

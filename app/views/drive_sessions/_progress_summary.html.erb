@@ -1,17 +1,4 @@
-<div id="progress-summary" class="progress-summary">
-  <%= render partial: "drive_sessions/in_progress_drive", locals: { in_progress: in_progress } if in_progress %>
-
-  <%= render "shared/stat_card",
-             current_value: total_hours,
-             total_value: 50,
-             label: "Total Hours",
-             tooltip: "Illinois requires 50 hours total of supervised driving practice" %>
-
-  <%= render "shared/stat_card",
-             current_value: night_hours,
-             total_value: 10,
-             label: "Night Hours",
-             tooltip: "Illinois requires 10 hours of night driving (between sunset and sunrise)" %>
-
-  <%= render partial: "drive_sessions/activity_calendar", locals: activity_calendar %>
+<div id="progress-summary" class="dashboard-summary">
+  <%= render "drive_sessions/dashboard_hero", stats: stats %>
+  <%= render "drive_sessions/activity_calendar", stats: stats, days: activity_days %>
 </div>

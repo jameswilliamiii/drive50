@@ -8,11 +8,11 @@ module DriveSessionHelper
 
     if style_units
       if hours > 0 && minutes > 0
-        "#{hours} <span class='unit'>hrs</span> #{minutes} <span class='unit'>mins</span>".html_safe
+        "#{hours} <span class='unit'>#{'hr'.pluralize(hours)}</span> #{minutes} <span class='unit'>#{'min'.pluralize(minutes)}</span>".html_safe
       elsif hours > 0
         "#{hours} <span class='unit'>#{'hr'.pluralize(hours)}</span>".html_safe
       else
-        "#{minutes} <span class='unit'>mins</span>".html_safe
+        "#{minutes} <span class='unit'>#{'min'.pluralize(minutes)}</span>".html_safe
       end
     else
       if hours > 0 && minutes > 0
@@ -25,58 +25,47 @@ module DriveSessionHelper
     end
   end
 
-  def circular_progress(current:, total:, size: 120, stroke_width: 8)
-    percentage = (current.to_f / total * 100).clamp(0, 100)
-    radius = (size - stroke_width) / 2
-    circumference = 2 * Math::PI * radius
-    stroke_offset = circumference - (percentage / 100 * circumference)
+  # Compact "4h 55m" duration for tight stat chips, mirroring the hero's terse
+  # chip values.
+  def format_duration_short(hours_decimal)
+    return "0h" if hours_decimal.nil? || hours_decimal.zero?
 
-    raw(<<~SVG.squish)
-      <svg class="circular-progress" width="#{size}" height="#{size}" viewBox="0 0 #{size} #{size}">
-        <defs>
-          <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#1d4ed8;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <circle class="progress-bg" cx="#{size / 2}" cy="#{size / 2}" r="#{radius}" fill="none" stroke-width="#{stroke_width}"/>
-        <circle class="progress-bar" cx="#{size / 2}" cy="#{size / 2}" r="#{radius}" fill="none" stroke-width="#{stroke_width}"
-                stroke-dasharray="#{circumference}" stroke-dashoffset="#{stroke_offset}"
-                transform="rotate(-90 #{size / 2} #{size / 2})"/>
-      </svg>
-    SVG
+    hours, minutes = (hours_decimal * 60).round.divmod(60)
+    if hours.positive? && minutes.positive?
+      "#{hours}h #{minutes}m"
+    elsif hours.positive?
+      "#{hours}h"
+    else
+      "#{minutes}m"
+    end
   end
 
-  def activity_calendar_data(activity_data, days: 28, timezone: "UTC")
+  # Time-of-day greeting in the user's own timezone, personalized when we know
+  # their name.
+  def dashboard_greeting(user)
+    tz = ActiveSupport::TimeZone[user.timezone.presence || "UTC"]
+    part = case Time.current.in_time_zone(tz).hour
+    when 5..11 then "Good morning"
+    when 12..16 then "Good afternoon"
+    else "Good evening"
+    end
+    user.name.present? ? "#{part}, #{user.name.split.first}" : part
+  end
+
+  # Expands a { Date => state } hash into 21 Sunday-aligned cells (3 weeks).
+  def dashboard_activity_days(states, timezone: "UTC")
     tz = ActiveSupport::TimeZone[timezone || "UTC"]
-    end_date = Time.current.in_time_zone(tz).to_date
-    start_date = end_date - (days - 1).days
+    today = Time.current.in_time_zone(tz).to_date
+    start_of_week = today - today.wday
+    range_start = start_of_week - 14
 
-    # Generate all dates in range
-    calendar_days = (start_date..end_date).map do |date|
-      count = activity_data[date] || 0
-      level = case count
-      when 0 then 0
-      when 1 then 1
-      when 2 then 2
-      when 3 then 3
-      else 4
-      end
-
+    (range_start..(start_of_week + 6)).map do |date|
       {
         date: date,
-        count: count,
-        level: level
+        state: states[date] || :none,
+        today: date == today,
+        future: date > today
       }
     end
-
-    # Calculate weeks for label
-    weeks = (days / 7.0).round
-
-    {
-      days: calendar_days,
-      label: weeks == 1 ? "Last week" : "Last #{weeks} weeks",
-      total_days: days
-    }
   end
 end

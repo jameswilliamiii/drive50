@@ -1,9 +1,18 @@
-<%# Mobile-only in-progress notification banner, updated via turbo streams %>
+<%# In-progress notification banner, updated via turbo streams. Sticky on mobile;
+    on desktop it sits at the top of the content and carries the stop control
+    (the mobile stop lives on the FAB). %>
 <% if in_progress %>
   <div class="in-progress-banner" data-controller="timer" data-timer-started-at-value="<%= in_progress.started_at.iso8601 %>">
     <div class="in-progress-banner-content">
       <span class="in-progress-banner-label">Drive in progress</span>
       <span class="in-progress-banner-time" data-timer-target="display"><%= in_progress.elapsed_time %></span>
+      <%= button_to complete_drive_session_path(in_progress),
+                    method: :post,
+                    class: "in-progress-banner-stop",
+                    form: { class: "in-progress-banner-stop-form" } do %>
+        <%= icon_stop(size: 15, class: "in-progress-banner-stop-icon") %>
+        <span>Stop drive</span>
+      <% end %>
     </div>
   </div>
 <% end %>

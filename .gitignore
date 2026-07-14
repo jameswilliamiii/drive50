@@ -36,3 +36,5 @@
 /ansible/hosts.ini
 
 .claude/settings.local.json
+# Brainstorm visual companion
+.superpowers/
