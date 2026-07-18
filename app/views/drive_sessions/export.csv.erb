@@ -12,7 +12,7 @@
   session.ended_at&.strftime("%I:%M %p"),
   session.duration_hours,
   session.is_night_drive ? "Yes" : "No",
-  session.driver_name,
+  session.user.full_name,
   notes
 ]) -%>
 <%- end -%>

@@ -11,7 +11,6 @@ class DriveSession < ApplicationRecord
   belongs_to :user
 
   # Validations
-  validates :driver_name, presence: true
   validates :started_at, presence: true
   validate :ended_at_after_started_at, if: -> { ended_at.present? }
 
@@ -20,6 +19,9 @@ class DriveSession < ApplicationRecord
   scope :in_progress, -> { where(ended_at: nil) }
   scope :night_drives, -> { where(is_night_drive: true) }
   scope :ordered, -> { order(started_at: :desc) }
+  # Preload the owning user so views/CSV can render user.full_name without an
+  # N+1. Use on any collection whose rows read through the user association.
+  scope :with_user, -> { includes(:user) }
 
   # Callbacks
   before_save :calculate_duration, if: -> { ended_at.present? && ended_at_changed? }
@@ -198,7 +200,7 @@ class DriveSession < ApplicationRecord
   end
 
   def broadcast_recent_drives_table
-    recent_sessions = user.drive_sessions.completed.ordered.limit(3)
+    recent_sessions = user.drive_sessions.completed.ordered.with_user.limit(3)
     broadcast_replace_to user, target: "recent-drives-table", html: ApplicationController.render(partial: "drive_sessions/recent_drives_table", locals: { recent_sessions: recent_sessions })
   end
 

@@ -38,3 +38,6 @@
 .claude/settings.local.json
 # Brainstorm visual companion
 .superpowers/
+
+# Cursor local hook state
+/.cursor/hooks/state/

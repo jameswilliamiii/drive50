@@ -11,21 +11,38 @@ class UserTest < ActiveSupport::TestCase
     assert_equal("downcased@example.com", user.email_address)
   end
 
-  test "requires name" do
+  test "requires first_name" do
     user = User.new(email_address: "test@example.com", password: "password")
     assert_not user.valid?
-    assert_includes user.errors[:name], "can't be blank"
+    assert_includes user.errors[:first_name], "can't be blank"
+  end
+
+  test "requires last_name" do
+    user = User.new(email_address: "test@example.com", password: "password")
+    assert_not user.valid?
+    assert_includes user.errors[:last_name], "can't be blank"
+  end
+
+  test "full_name joins first and last name" do
+    user = User.new(first_name: "Sarah", last_name: "Mitchell")
+    assert_equal "Sarah Mitchell", user.full_name
+  end
+
+  test "full_name omits a missing last name without trailing space" do
+    user = User.new(first_name: "Cher", last_name: nil)
+    assert_equal "Cher", user.full_name
   end
 
   test "requires email_address" do
-    user = User.new(name: "Test", password: "password")
+    user = User.new(first_name: "Test", last_name: "User", password: "password")
     assert_not user.valid?
     assert_includes user.errors[:email_address], "can't be blank"
   end
 
   test "requires unique email_address" do
     duplicate = User.new(
-      name: "Another User",
+      first_name: "Another",
+      last_name: "User",
       email_address: @user.email_address,
       password: "password"
     )
@@ -34,7 +51,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "requires password" do
-    user = User.new(name: "Test", email_address: "test@example.com")
+    user = User.new(first_name: "Test", last_name: "User", email_address: "test@example.com")
     assert_not user.valid?
     assert_includes user.errors[:password], "can't be blank"
   end

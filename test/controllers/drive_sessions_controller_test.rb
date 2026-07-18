@@ -25,7 +25,7 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not get new when active drive exists" do
-    @user.drive_sessions.create!(driver_name: "Test", started_at: Time.current)
+    @user.drive_sessions.create!(started_at: Time.current)
     get new_drive_session_url
     assert_redirected_to drive_sessions_url
     assert_equal "You already have an active drive. Please complete it before starting a new one.", flash[:alert]
@@ -36,7 +36,6 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_difference("DriveSession.count") do
       post drive_sessions_url, params: {
         drive_session: {
-          driver_name: "Test Driver",
           started_at: Time.current
         }
       }
@@ -46,11 +45,10 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not create drive_session when active drive exists" do
-    @user.drive_sessions.create!(driver_name: "Test", started_at: Time.current)
+    @user.drive_sessions.create!(started_at: Time.current)
     assert_no_difference("DriveSession.count") do
       post drive_sessions_url, params: {
         drive_session: {
-          driver_name: "Test Driver",
           started_at: Time.current
         }
       }
@@ -88,7 +86,6 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "should complete drive_session" do
     in_progress = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 1.hour.ago
     )
 
@@ -112,6 +109,7 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "text/csv", response.content_type
     assert_match(/attachment/, response.headers["Content-Disposition"])
+    assert_match @user.full_name, response.body
   end
 
   test "index displays statistics" do
@@ -125,7 +123,7 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
     tz = ActiveSupport::TimeZone.new("America/Chicago")
     # a completed day drive with notes -> exercises the day badge + note-as-subtitle
-    @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 6, 14, 0, 0), ended_at: tz.local(2026, 7, 6, 15, 0, 0), notes: "Sunny afternoon run")
+    @user.drive_sessions.create!(started_at: tz.local(2026, 7, 6, 14, 0, 0), ended_at: tz.local(2026, 7, 6, 15, 0, 0), notes: "Sunny afternoon run")
 
     get drive_sessions_url
     assert_response :success
@@ -138,7 +136,7 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     # rows carry the data the detail modal is populated from on click
     assert_select ".drive-row[data-action*=?]", "drive-modal#open"
     assert_select ".drive-row[data-drive-notes=?]", "Sunny afternoon run"
-    assert_select ".drive-row[data-drive-driver=?]", "D"
+    assert_select ".drive-row[data-drive-driver=?]", @user.full_name
     assert_select "dialog.drive-modal [data-drive-modal-target='notes']" # shared modal present
   end
 
@@ -146,7 +144,6 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     # Create enough sessions to trigger pagination
     20.times do |i|
       @user.drive_sessions.create!(
-        driver_name: "Test #{i}",
         started_at: (i + 1).hours.ago,
         ended_at: i.hours.ago
       )
@@ -165,7 +162,6 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
   test "should only show current user's drive sessions" do
     other_user = users(:two)
     other_session = other_user.drive_sessions.create!(
-      driver_name: "Other User",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )

@@ -8,7 +8,8 @@ class WebPushServiceTest < ActiveSupport::TestCase
 
   def setup
     @user = User.create!(
-      name: "Test User",
+      first_name: "Test",
+      last_name: "User",
       email_address: "webpush@example.com",
       password: "password123"
     )
@@ -28,7 +29,8 @@ class WebPushServiceTest < ActiveSupport::TestCase
 
   test "notify_user should return false when user has no subscriptions" do
     user_without_subs = User.create!(
-      name: "User Without Subs",
+      first_name: "User",
+      last_name: "Without Subs",
       email_address: "nosubs@example.com",
       password: "password123"
     )
@@ -50,7 +52,8 @@ class WebPushServiceTest < ActiveSupport::TestCase
 
   test "notify_users should enqueue WebPushJob with multiple user_ids" do
     user2 = User.create!(
-      name: "User Two",
+      first_name: "User",
+      last_name: "Two",
       email_address: "user2@example.com",
       password: "password123"
     )

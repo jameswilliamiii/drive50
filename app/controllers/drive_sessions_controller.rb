@@ -5,14 +5,14 @@ class DriveSessionsController < ApplicationController
     tz = Current.user.timezone || "UTC"
     user_sessions = Current.user.drive_sessions
 
-    @recent_sessions = user_sessions.completed.ordered.limit(3)
+    @recent_sessions = user_sessions.completed.ordered.with_user.limit(3)
     @stats = DriveSession.statistics_for(Current.user, timezone: tz)
     @activity_states = user_sessions.activity_day_states(timezone: tz)
   end
 
   def all
     user_sessions = Current.user.drive_sessions
-    @pagy, @sessions = pagy(:offset, user_sessions.completed.ordered, limit: 20)
+    @pagy, @sessions = pagy(:offset, user_sessions.completed.ordered.with_user, limit: 20)
 
     stats = DriveSession.statistics_for(Current.user)
     @total_hours = stats[:total_hours]
@@ -45,8 +45,7 @@ class DriveSessionsController < ApplicationController
     end
 
     @drive_session = Current.user.drive_sessions.build(
-      started_at: params[:drive_session]&.dig(:started_at) || Time.current,
-      driver_name: Current.user.name
+      started_at: params[:drive_session]&.dig(:started_at) || Time.current
     )
 
     if params[:drive_session].present?
@@ -65,7 +64,6 @@ class DriveSessionsController < ApplicationController
 
   def update
     @drive_session.assign_attributes(drive_session_params)
-    @drive_session.driver_name = Current.user.name
 
     if @drive_session.save
       redirect_to drive_sessions_path
@@ -85,6 +83,7 @@ class DriveSessionsController < ApplicationController
     @recent_sessions = DriveSession.where(user_id: Current.user.id)
                                    .completed
                                    .ordered
+                                   .with_user
                                    .limit(3)
                                    .to_a
 
@@ -95,7 +94,7 @@ class DriveSessionsController < ApplicationController
   end
 
   def export
-    @sessions = Current.user.drive_sessions.completed.ordered
+    @sessions = Current.user.drive_sessions.completed.ordered.with_user
 
     respond_to do |format|
       format.csv do

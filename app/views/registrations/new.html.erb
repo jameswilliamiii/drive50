@@ -13,8 +13,13 @@
     <h1 class="form-title">Sign Up</h1>
 
     <div class="field">
-      <%= form.label :name, "Name" %>
-      <%= form.text_field :name, required: true, autofocus: true %>
+      <%= form.label :first_name, "Driver First Name" %>
+      <%= form.text_field :first_name, required: true, autofocus: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :last_name, "Driver Last Name" %>
+      <%= form.text_field :last_name, required: true %>
     </div>
 
     <div class="field">

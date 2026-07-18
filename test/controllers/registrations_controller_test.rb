@@ -10,7 +10,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_difference("User.count") do
       post registrations_url, params: {
         user: {
-          name: "Test User",
+          first_name: "Test",
+          last_name: "User",
           email_address: "test@example.com",
           password: "password123",
           password_confirmation: "password123"
@@ -26,7 +27,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference("User.count") do
       post registrations_url, params: {
         user: {
-          name: "",
+          first_name: "",
+          last_name: "",
           email_address: "invalid",
           password: "password123",
           password_confirmation: "password123"
@@ -41,7 +43,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference("User.count") do
       post registrations_url, params: {
         user: {
-          name: "Test User",
+          first_name: "Test",
+          last_name: "User",
           email_address: "test@example.com",
           password: "password123",
           password_confirmation: "different"
@@ -57,7 +60,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference("User.count") do
       post registrations_url, params: {
         user: {
-          name: "Test User",
+          first_name: "Test",
+          last_name: "User",
           email_address: existing_user.email_address,
           password: "password123",
           password_confirmation: "password123"
@@ -72,7 +76,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_difference("Session.count") do
       post registrations_url, params: {
         user: {
-          name: "Test User",
+          first_name: "Test",
+          last_name: "User",
           email_address: "newuser@example.com",
           password: "password123",
           password_confirmation: "password123"

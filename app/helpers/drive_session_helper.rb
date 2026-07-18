@@ -49,7 +49,7 @@ module DriveSessionHelper
     when 12..16 then "Good afternoon"
     else "Good evening"
     end
-    user.name.present? ? "#{part}, #{user.name.split.first}" : part
+    user.first_name.present? ? "#{part}, #{user.first_name}" : part
   end
 
   # Expands a { Date => state } hash into 21 Sunday-aligned cells (3 weeks).

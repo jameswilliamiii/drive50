@@ -10,28 +10,21 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "creating and completing a drive broadcasts without error" do
     @user.update!(timezone: "America/Chicago")
     assert_nothing_raised do
-      d = @user.drive_sessions.create!(driver_name: "D", started_at: 2.hours.ago)
+      d = @user.drive_sessions.create!(started_at: 2.hours.ago)
       d.update!(ended_at: Time.current)
       d.destroy!
     end
   end
 
   # Validations
-  test "requires driver name" do
-    session = @user.drive_sessions.new(started_at: Time.current)
-    assert_not session.valid?
-    assert_includes session.errors[:driver_name], "can't be blank"
-  end
-
   test "requires started_at" do
-    session = @user.drive_sessions.new(driver_name: "Test Driver")
+    session = @user.drive_sessions.new
     assert_not session.valid?
     assert_includes session.errors[:started_at], "can't be blank"
   end
 
   test "requires ended_at to be after started_at" do
     session = @user.drive_sessions.new(
-      driver_name: "Test Driver",
       started_at: Time.current,
       ended_at: 1.hour.ago
     )
@@ -42,7 +35,6 @@ class DriveSessionTest < ActiveSupport::TestCase
   # Calculations
   test "calculates duration on save" do
     session = @user.drive_sessions.create!(
-      driver_name: "Test Driver",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )
@@ -60,7 +52,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     # 5pm drive in winter should be night (after sunset)
     night_session = @user.drive_sessions.create!(
-      driver_name: "Test Driver",
       started_at: tz.local(2024, 12, 15, 17, 0, 0),
       ended_at: tz.local(2024, 12, 15, 18, 0, 0)
     )
@@ -68,7 +59,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     # 2pm drive in winter should be day (before sunset)
     day_session = @user.drive_sessions.create!(
-      driver_name: "Test Driver",
       started_at: tz.local(2024, 12, 15, 14, 0, 0),
       ended_at: tz.local(2024, 12, 15, 15, 0, 0)
     )
@@ -89,7 +79,6 @@ class DriveSessionTest < ActiveSupport::TestCase
       tz = ActiveSupport::TimeZone.new(zone)
 
       noon = @user.drive_sessions.create!(
-        driver_name: "Test Driver",
         started_at: tz.local(2026, 7, 8, 12, 0, 0),
         ended_at: tz.local(2026, 7, 8, 13, 0, 0)
       )
@@ -101,7 +90,6 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
 
     night_session = @user.drive_sessions.create!(
-      driver_name: "Test Driver",
       started_at: Time.current.change(hour: 2),
       ended_at: Time.current.change(hour: 3)
     )
@@ -116,7 +104,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     # Should still work using timezone-based coordinates
     night_session = @user.drive_sessions.create!(
-      driver_name: "Test Driver",
       started_at: tz.local(2024, 12, 15, 21, 0, 0),
       ended_at: tz.local(2024, 12, 15, 22, 0, 0)
     )
@@ -129,7 +116,7 @@ class DriveSessionTest < ActiveSupport::TestCase
     # During polar summer, there may be no sunset
     # Should return false (not night) when sunrise/sunset are nil
     time = Time.zone.parse("2024-06-15 12:00:00")
-    session = @user.drive_sessions.new(driver_name: "Test")
+    session = @user.drive_sessions.new()
 
     # This should not raise an error
     assert_nothing_raised do
@@ -139,13 +126,12 @@ class DriveSessionTest < ActiveSupport::TestCase
   end
 
   test "duration_hours returns 0 for nil duration" do
-    session = @user.drive_sessions.new(driver_name: "Test", started_at: Time.current)
+    session = @user.drive_sessions.new(started_at: Time.current)
     assert_equal 0, session.duration_hours
   end
 
   test "duration_hours converts minutes to hours" do
     session = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 2.hours.ago,
       ended_at: Time.current
     )
@@ -155,12 +141,10 @@ class DriveSessionTest < ActiveSupport::TestCase
   # Scopes
   test "completed scope returns only completed sessions" do
     completed = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )
     in_progress = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: Time.current
     )
 
@@ -170,12 +154,10 @@ class DriveSessionTest < ActiveSupport::TestCase
 
   test "in_progress scope returns only in-progress sessions" do
     completed = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )
     in_progress = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: Time.current
     )
 
@@ -189,12 +171,10 @@ class DriveSessionTest < ActiveSupport::TestCase
     tz = ActiveSupport::TimeZone.new("America/Chicago")
 
     night = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: tz.local(2024, 12, 15, 21, 0, 0),
       ended_at: tz.local(2024, 12, 15, 22, 0, 0)
     )
     day = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: tz.local(2024, 12, 15, 14, 0, 0),
       ended_at: tz.local(2024, 12, 15, 15, 0, 0)
     )
@@ -206,12 +186,10 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "ordered scope returns sessions in reverse chronological order" do
     @user.drive_sessions.destroy_all
     first = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 3.hours.ago,
       ended_at: 2.hours.ago
     )
     second = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )
@@ -224,7 +202,6 @@ class DriveSessionTest < ActiveSupport::TestCase
   # Instance methods
   test "completed? returns true when ended_at is present" do
     session = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )
@@ -233,7 +210,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
   test "completed? returns false when ended_at is nil" do
     session = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: Time.current
     )
     assert_not session.completed?
@@ -241,7 +217,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
   test "in_progress? returns true when ended_at is nil" do
     session = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: Time.current
     )
     assert session.in_progress?
@@ -249,7 +224,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
   test "in_progress? returns false when ended_at is present" do
     session = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )
@@ -258,7 +232,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
   test "elapsed_time returns formatted time for in-progress session" do
     session = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 30.minutes.ago
     )
     assert_match(/\d+m/, session.elapsed_time)
@@ -266,7 +239,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
   test "elapsed_time returns nil for completed session" do
     session = @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )
@@ -277,12 +249,10 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "total_hours calculates total completed hours" do
     @user.drive_sessions.destroy_all
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 2.hours.ago,
       ended_at: 1.hour.ago
     )
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 3.hours.ago,
       ended_at: 2.hours.ago
     )
@@ -296,7 +266,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     tz = ActiveSupport::TimeZone.new("America/Chicago")
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: tz.local(2024, 12, 15, 21, 0, 0),
       ended_at: tz.local(2024, 12, 15, 22, 0, 0)
     )
@@ -308,7 +277,6 @@ class DriveSessionTest < ActiveSupport::TestCase
     # Create sessions totaling 45 hours
     @user.drive_sessions.destroy_all
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 45.hours.ago,
       ended_at: Time.current
     )
@@ -320,7 +288,6 @@ class DriveSessionTest < ActiveSupport::TestCase
     # Create sessions totaling more than 50 hours
     @user.drive_sessions.destroy_all
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 51.hours.ago,
       ended_at: Time.current
     )
@@ -332,7 +299,6 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.drive_sessions.destroy_all
     # Create a 5-hour night drive (9pm to 2am)
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: Time.current.change(hour: 21),
       ended_at: Time.current.tomorrow.change(hour: 2)
     )
@@ -346,7 +312,6 @@ class DriveSessionTest < ActiveSupport::TestCase
     # Started at 9pm yesterday, ended at 8am today (11 hours at night)
     yesterday = 1.day.ago
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: yesterday.change(hour: 21),
       ended_at: yesterday.tomorrow.change(hour: 8)
     )
@@ -358,7 +323,6 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "statistics_for returns all statistics" do
     @user.drive_sessions.destroy_all
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 10.hours.ago,
       ended_at: Time.current
     )
@@ -375,7 +339,7 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "statistics_for includes the new dashboard metrics" do
     @user.drive_sessions.destroy_all
     @user.update!(timezone: "America/Chicago")
-    @user.drive_sessions.create!(driver_name: "D", started_at: 2.hours.ago, ended_at: 1.hour.ago)
+    @user.drive_sessions.create!(started_at: 2.hours.ago, ended_at: 1.hour.ago)
     stats = DriveSession.statistics_for(@user, timezone: "America/Chicago")
     [ :day_hours, :drives_count, :this_week_hours, :last_week_hours,
       :active_days, :current_streak, :best_streak, :weekly_pace, :projected_finish ].each do |key|
@@ -395,7 +359,6 @@ class DriveSessionTest < ActiveSupport::TestCase
       # Create drives on specific dates in UTC
       3.times do
         @user.drive_sessions.create!(
-          driver_name: "Test",
           started_at: 2.days.ago.beginning_of_day + 10.hours,
           ended_at: 2.days.ago.beginning_of_day + 11.hours
         )
@@ -403,7 +366,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
       2.times do
         @user.drive_sessions.create!(
-          driver_name: "Test",
           started_at: 1.day.ago.beginning_of_day + 10.hours,
           ended_at: 1.day.ago.beginning_of_day + 11.hours
         )
@@ -424,7 +386,6 @@ class DriveSessionTest < ActiveSupport::TestCase
     # In Tokyo (UTC+9), this would be 8 AM the next day
     drive_time = 2.days.ago.beginning_of_day.utc + 23.hours
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: drive_time,
       ended_at: drive_time + 1.hour
     )
@@ -451,14 +412,12 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     # Completed drive
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: drive_started_at,
       ended_at: drive_ended_at
     )
 
     # In-progress drive
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: drive_started_at
     )
 
@@ -471,14 +430,12 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     # Drive within range (10 days ago)
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 10.days.ago,
       ended_at: 10.days.ago + 1.hour
     )
 
     # Drive outside range (40 days ago)
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 40.days.ago,
       ended_at: 40.days.ago + 1.hour
     )
@@ -490,7 +447,6 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "activity_by_date handles nil timezone gracefully" do
     @user.drive_sessions.destroy_all
     @user.drive_sessions.create!(
-      driver_name: "Test",
       started_at: 1.day.ago,
       ended_at: 1.day.ago + 1.hour
     )
@@ -518,7 +474,6 @@ class DriveSessionTest < ActiveSupport::TestCase
     date = 5.days.ago.beginning_of_day
     5.times do |i|
       @user.drive_sessions.create!(
-        driver_name: "Test",
         started_at: date + i.hours,
         ended_at: date + i.hours + 30.minutes
       )
@@ -539,7 +494,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     assert_enqueued_jobs 1, only: DriveSessionReminderJob do
       @user.drive_sessions.create!(
-        driver_name: "Test",
         started_at: Time.current
       )
     end
@@ -555,7 +509,6 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     assert_no_enqueued_jobs only: DriveSessionReminderJob do
       @user.drive_sessions.create!(
-        driver_name: "Test",
         started_at: 1.hour.ago,
         ended_at: Time.current
       )
@@ -565,7 +518,6 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "does not schedule reminder job when user has no push subscriptions" do
     assert_no_enqueued_jobs only: DriveSessionReminderJob do
       @user.drive_sessions.create!(
-        driver_name: "Test",
         started_at: Time.current
       )
     end
@@ -577,15 +529,15 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
     tz = ActiveSupport::TimeZone.new("America/Chicago")
     # is_night_drive is derived from the clock times below, not passed in.
-    @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 6, 14, 0, 0), ended_at: tz.local(2026, 7, 6, 15, 0, 0)) # day, 1h
-    @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 6, 21, 0, 0), ended_at: tz.local(2026, 7, 6, 22, 0, 0)) # night, 1h
+    @user.drive_sessions.create!(started_at: tz.local(2026, 7, 6, 14, 0, 0), ended_at: tz.local(2026, 7, 6, 15, 0, 0)) # day, 1h
+    @user.drive_sessions.create!(started_at: tz.local(2026, 7, 6, 21, 0, 0), ended_at: tz.local(2026, 7, 6, 22, 0, 0)) # night, 1h
     assert_in_delta 1.0, @user.drive_sessions.day_hours, 0.01
   end
 
   test "drives_count counts only completed drives" do
     @user.drive_sessions.destroy_all
-    @user.drive_sessions.create!(driver_name: "D", started_at: 2.hours.ago, ended_at: 1.hour.ago)
-    @user.drive_sessions.create!(driver_name: "D", started_at: 30.minutes.ago) # in progress
+    @user.drive_sessions.create!(started_at: 2.hours.ago, ended_at: 1.hour.ago)
+    @user.drive_sessions.create!(started_at: 30.minutes.ago) # in progress
     assert_equal 1, @user.drive_sessions.drives_count
   end
 
@@ -594,9 +546,9 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.update!(timezone: "America/Chicago")
     travel_to Time.zone.parse("2026-07-15 12:00 UTC") do # Wed 2026-07-15
       # this week (Sun 07-12 .. Sat 07-18): one 1h drive
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-13 15:00", ended_at: "2026-07-13 16:00")
+      @user.drive_sessions.create!(started_at: "2026-07-13 15:00", ended_at: "2026-07-13 16:00")
       # last week (Sun 07-05 .. Sat 07-11): one 2h drive
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-08 15:00", ended_at: "2026-07-08 17:00")
+      @user.drive_sessions.create!(started_at: "2026-07-08 15:00", ended_at: "2026-07-08 17:00")
       assert_in_delta 1.0, @user.drive_sessions.hours_in_week(0, timezone: "America/Chicago"), 0.01
       assert_in_delta 2.0, @user.drive_sessions.hours_in_week(1, timezone: "America/Chicago"), 0.01
     end
@@ -608,7 +560,7 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.update!(timezone: "America/Chicago")
     travel_to Time.zone.parse("2026-07-15 18:00 UTC") do # Wed 07-15
       [ "2026-07-13", "2026-07-14", "2026-07-15" ].each do |d|
-        @user.drive_sessions.create!(driver_name: "D", started_at: "#{d} 15:00", ended_at: "#{d} 16:00")
+        @user.drive_sessions.create!(started_at: "#{d} 15:00", ended_at: "#{d} 16:00")
       end
       assert_equal 3, @user.drive_sessions.current_streak(timezone: "America/Chicago")
     end
@@ -618,7 +570,7 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.drive_sessions.destroy_all
     @user.update!(timezone: "America/Chicago")
     travel_to Time.zone.parse("2026-07-15 18:00 UTC") do
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-10 15:00", ended_at: "2026-07-10 16:00")
+      @user.drive_sessions.create!(started_at: "2026-07-10 15:00", ended_at: "2026-07-10 16:00")
       assert_equal 0, @user.drive_sessions.current_streak(timezone: "America/Chicago")
     end
   end
@@ -627,7 +579,7 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.drive_sessions.destroy_all
     @user.update!(timezone: "America/Chicago")
     [ "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-10" ].each do |d|
-      @user.drive_sessions.create!(driver_name: "D", started_at: "#{d} 15:00", ended_at: "#{d} 16:00")
+      @user.drive_sessions.create!(started_at: "#{d} 15:00", ended_at: "#{d} 16:00")
     end
     assert_equal 3, @user.drive_sessions.best_streak(timezone: "America/Chicago")
   end
@@ -636,9 +588,9 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.drive_sessions.destroy_all
     @user.update!(timezone: "America/Chicago")
     travel_to Time.zone.parse("2026-07-21 18:00 UTC") do
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-20 15:00", ended_at: "2026-07-20 16:00")
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-20 20:00", ended_at: "2026-07-20 21:00") # same day
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-06-01 15:00", ended_at: "2026-06-01 16:00") # outside 21d
+      @user.drive_sessions.create!(started_at: "2026-07-20 15:00", ended_at: "2026-07-20 16:00")
+      @user.drive_sessions.create!(started_at: "2026-07-20 20:00", ended_at: "2026-07-20 21:00") # same day
+      @user.drive_sessions.create!(started_at: "2026-06-01 15:00", ended_at: "2026-06-01 16:00") # outside 21d
       assert_equal 1, @user.drive_sessions.active_day_count(days: 21, timezone: "America/Chicago")
     end
   end
@@ -649,8 +601,8 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.update!(timezone: "America/Chicago")
     travel_to Time.zone.parse("2026-07-15 18:00 UTC") do
       # 15 days of history -> round(15/7)=2 weeks; 6 total recent hours -> 3.0/wk
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-01 15:00", ended_at: "2026-07-01 18:00") # 3h
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-14 15:00", ended_at: "2026-07-14 18:00") # 3h
+      @user.drive_sessions.create!(started_at: "2026-07-01 15:00", ended_at: "2026-07-01 18:00") # 3h
+      @user.drive_sessions.create!(started_at: "2026-07-14 15:00", ended_at: "2026-07-14 18:00") # 3h
       assert_in_delta 3.0, @user.drive_sessions.weekly_pace(timezone: "America/Chicago"), 0.1
     end
   end
@@ -664,8 +616,8 @@ class DriveSessionTest < ActiveSupport::TestCase
     @user.drive_sessions.destroy_all
     @user.update!(timezone: "America/Chicago")
     travel_to Time.zone.parse("2026-07-15 18:00 UTC") do
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-01 15:00", ended_at: "2026-07-01 18:00")
-      @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-14 15:00", ended_at: "2026-07-14 18:00")
+      @user.drive_sessions.create!(started_at: "2026-07-01 15:00", ended_at: "2026-07-01 18:00")
+      @user.drive_sessions.create!(started_at: "2026-07-14 15:00", ended_at: "2026-07-14 18:00")
       label = @user.drive_sessions.projected_finish(timezone: "America/Chicago")
       assert_match(/\A(Early|Mid|Late) [A-Z][a-z]+\z/, label)
     end
@@ -679,7 +631,7 @@ class DriveSessionTest < ActiveSupport::TestCase
   test "projected_finish is 'Complete' when the goal is met" do
     @user.drive_sessions.destroy_all
     @user.update!(timezone: "America/Chicago")
-    @user.drive_sessions.create!(driver_name: "D", started_at: "2026-07-01 08:00", ended_at: "2026-07-03 10:00") # 50h
+    @user.drive_sessions.create!(started_at: "2026-07-01 08:00", ended_at: "2026-07-03 10:00") # 50h
     assert_equal "Complete", @user.drive_sessions.projected_finish(timezone: "America/Chicago")
   end
 
@@ -688,10 +640,10 @@ class DriveSessionTest < ActiveSupport::TestCase
     tz = ActiveSupport::TimeZone.new("America/Chicago")
     travel_to tz.local(2026, 7, 15, 18, 0, 0) do # Wed; grid window 06-28..07-18
       # is_night_drive is derived from the clock times, not passed in.
-      @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 14, 14, 0, 0), ended_at: tz.local(2026, 7, 14, 15, 0, 0)) # day only
-      @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 13, 21, 0, 0), ended_at: tz.local(2026, 7, 13, 22, 0, 0)) # night only
-      @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 12, 14, 0, 0), ended_at: tz.local(2026, 7, 12, 15, 0, 0)) # day part of "both"
-      @user.drive_sessions.create!(driver_name: "D", started_at: tz.local(2026, 7, 12, 21, 0, 0), ended_at: tz.local(2026, 7, 12, 22, 0, 0)) # night part of "both"
+      @user.drive_sessions.create!(started_at: tz.local(2026, 7, 14, 14, 0, 0), ended_at: tz.local(2026, 7, 14, 15, 0, 0)) # day only
+      @user.drive_sessions.create!(started_at: tz.local(2026, 7, 13, 21, 0, 0), ended_at: tz.local(2026, 7, 13, 22, 0, 0)) # night only
+      @user.drive_sessions.create!(started_at: tz.local(2026, 7, 12, 14, 0, 0), ended_at: tz.local(2026, 7, 12, 15, 0, 0)) # day part of "both"
+      @user.drive_sessions.create!(started_at: tz.local(2026, 7, 12, 21, 0, 0), ended_at: tz.local(2026, 7, 12, 22, 0, 0)) # night part of "both"
       states = @user.drive_sessions.activity_day_states(timezone: "America/Chicago")
       assert_equal :day,   states[Date.new(2026, 7, 14)]
       assert_equal :night, states[Date.new(2026, 7, 13)]

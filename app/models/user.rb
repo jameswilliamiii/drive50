@@ -5,10 +5,15 @@ class User < ApplicationRecord
   has_many :push_subscriptions, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
-  validates :name, presence: true
+  validates :first_name, presence: true
+  validates :last_name, presence: true
   validates :email_address, presence: true, uniqueness: true
   validates :latitude, numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }, allow_nil: true
   validates :longitude, numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }, allow_nil: true
+
+  def full_name
+    "#{first_name} #{last_name}".strip
+  end
 
   def password_reset_token
     signed_id(expires_in: 1.hour, purpose: :password_reset)

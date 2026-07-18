@@ -28,7 +28,7 @@ namespace :web_push do
       url: "/drive_sessions"
     )
 
-    puts "Test notification sent to #{user.name} (#{email})"
+    puts "Test notification sent to #{user.full_name} (#{email})"
     puts "Active subscriptions: #{user.push_subscriptions.count}"
   end
 
@@ -46,7 +46,7 @@ namespace :web_push do
 
     users_with_subscriptions.each do |user|
       subscription_count = user.push_subscriptions.count
-      puts "#{user.name} (#{user.email_address}): #{subscription_count} subscription(s)"
+      puts "#{user.full_name} (#{user.email_address}): #{subscription_count} subscription(s)"
     end
   end
 end

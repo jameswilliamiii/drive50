@@ -10,10 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_13_185029) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_18_173727) do
   create_table "drive_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "driver_name", null: false
     t.integer "duration_minutes"
     t.datetime "ended_at"
     t.boolean "is_night_drive", default: false, null: false
@@ -178,9 +177,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_185029) do
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
+    t.string "first_name"
+    t.string "last_name"
     t.decimal "latitude", precision: 10, scale: 6
     t.decimal "longitude", precision: 10, scale: 6
-    t.string "name"
     t.string "password_digest", null: false
     t.string "timezone", default: "UTC"
     t.datetime "updated_at", null: false

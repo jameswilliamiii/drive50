@@ -87,8 +87,13 @@
         <%= render "shared/error_messages", object: @user, object_name: "profile" %>
 
         <div class="field">
-          <%= f.label :name, "Name" %>
-          <%= f.text_field :name, required: true %>
+          <%= f.label :first_name, "Driver First Name" %>
+          <%= f.text_field :first_name, required: true %>
+        </div>
+
+        <div class="field">
+          <%= f.label :last_name, "Driver Last Name" %>
+          <%= f.text_field :last_name, required: true %>
         </div>
 
         <div class="field">
