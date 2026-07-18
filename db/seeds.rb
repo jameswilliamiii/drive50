@@ -4,7 +4,8 @@ User.destroy_all
 
 # Create sample user with Chicago timezone
 user = User.create!(
-  name: "Sarah Mitchell",
+  first_name: "Sarah",
+  last_name: "Mitchell",
   email_address: "test@example.com",
   password: "test1234",
   password_confirmation: "test1234",
@@ -24,7 +25,6 @@ Time.zone = "America/Chicago"
   end_time = start_time + duration.minutes
 
   user.drive_sessions.create!(
-    driver_name: user.name, # Automatically set to user's name
     started_at: start_time.utc, # Convert to UTC for storage
     ended_at: end_time.utc, # Convert to UTC for storage
     notes: [
@@ -37,7 +37,7 @@ Time.zone = "America/Chicago"
   )
 end
 
-puts "Created user: #{user.name} (#{user.email_address})"
+puts "Created user: #{user.full_name} (#{user.email_address})"
 puts "Created #{DriveSession.count} drive sessions"
 total_hours = user.drive_sessions.completed.sum(:duration_minutes) / 60.0
 night_hours = user.drive_sessions.night_drives.completed.sum(:duration_minutes) / 60.0

@@ -7,7 +7,6 @@ one:
   duration_minutes: 60
   is_night_drive: false
   notes: MyText
-  driver_name: MyString
 
 two:
   user: one
@@ -16,4 +15,3 @@ two:
   duration_minutes: 60
   is_night_drive: false
   notes: MyText
-  driver_name: MyString

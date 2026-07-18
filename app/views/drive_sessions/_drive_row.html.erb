@@ -6,7 +6,7 @@
      data-drive-ended-at="<%= session.ended_at&.iso8601 %>"
      data-drive-night="<%= session.is_night_drive %>"
      data-drive-duration="<%= format_duration(session.duration_hours) %>"
-     data-drive-driver="<%= session.driver_name %>"
+     data-drive-driver="<%= session.user.full_name %>"
      data-drive-notes="<%= session.notes %>">
   <div class="drive-row-badge is-<%= session.is_night_drive ? "night" : "day" %>">
     <%= session.is_night_drive ? icon_moon(size: 18) : icon_sun(size: 18) %>

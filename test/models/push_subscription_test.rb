@@ -6,7 +6,8 @@ class PushSubscriptionTest < ActiveSupport::TestCase
 
   def setup
     @user = User.create!(
-      name: "Test User",
+      first_name: "Test",
+      last_name: "User",
       email_address: "test@example.com",
       password: "password123"
     )
@@ -51,7 +52,8 @@ class PushSubscriptionTest < ActiveSupport::TestCase
     )
 
     user2 = User.create!(
-      name: "Test User 2",
+      first_name: "Test",
+      last_name: "User 2",
       email_address: "test2@example.com",
       password: "password123"
     )

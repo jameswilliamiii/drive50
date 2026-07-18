@@ -7,7 +7,6 @@ class DriveSessionReminderJobTest < ActiveJob::TestCase
 
   test "sends push notification for in-progress drive session" do
     drive_session = @user.drive_sessions.create!(
-      driver_name: "Test Driver",
       started_at: Time.current
     )
 
@@ -29,7 +28,6 @@ class DriveSessionReminderJobTest < ActiveJob::TestCase
 
   test "does not send notification if drive session has ended" do
     drive_session = @user.drive_sessions.create!(
-      driver_name: "Test Driver",
       started_at: 1.hour.ago,
       ended_at: Time.current
     )
