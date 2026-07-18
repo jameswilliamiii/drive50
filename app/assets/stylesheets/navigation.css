@@ -50,32 +50,52 @@
   transform: translateY(0);
 }
 
-.menu-item {
-  display: block;
-  padding: var(--spacing-md) var(--spacing-lg);
+/* Scoped to `header .menu` so these win over the base `button[type="submit"]`
+   (0,0,1,1) styles that also match the form-button menu items — otherwise the
+   layout/padding/reset here would only apply to the <a> items, not the buttons. */
+header .menu .menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
   color: var(--color-text);
   text-decoration: none;
   font-size: 0.9375rem;
   font-weight: 500;
+  line-height: 1.4;
   border-radius: var(--border-radius-sm);
   transition: var(--transition);
   width: 100%;
   text-align: left;
   border: none;
   background: none;
+  box-shadow: none;
+  min-height: auto;
   cursor: pointer;
 }
 
-.menu-item:hover {
+/* The icon's stroke is currentColor (icon() defaults color to currentColor).
+   At rest it shows a muted tint; the rules below re-couple it to the item's own
+   color on hover and for the primary-link item. */
+header .menu .menu-item-icon {
+  color: var(--color-text-secondary);
+}
+
+header .menu .menu-item:hover {
   background-color: var(--color-background);
   color: var(--color-primary);
 }
 
-button.menu-item-primary-link {
+header .menu .menu-item:hover .menu-item-icon,
+header .menu .menu-item-primary-link .menu-item-icon {
+  color: inherit;
+}
+
+header .menu button.menu-item-primary-link {
   color: var(--color-primary);
 }
 
-button.menu-item-primary-link:hover {
+header .menu button.menu-item-primary-link:hover {
   color: var(--color-primary-dark);
 }
 
