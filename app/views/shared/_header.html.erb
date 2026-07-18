@@ -14,20 +14,34 @@
             <%= icon_menu(size: 24, class: "menu-icon") %>
           </button>
           <nav class="menu" data-menu-target="menu">
-            <%= button_to "Start Drive Timer", drive_sessions_path,
+            <%= button_to drive_sessions_path,
                           method: :post,
                           class: "menu-item menu-item-primary-link",
-                          form: { style: "display: inline;" } %>
-            <%= link_to "Add Past Drive", new_drive_session_path, class: "menu-item" %>
+                          form: { style: "display: inline;" } do %>
+              <%= icon(:play, size: 20, class: "menu-item-icon") %>Start Drive Timer
+            <% end %>
+            <%= link_to new_drive_session_path, class: "menu-item" do %>
+              <%= icon(:plus, size: 20, class: "menu-item-icon") %>Add Past Drive
+            <% end %>
             <hr class="menu-divider">
-            <%= link_to "All Drives", all_drive_sessions_path, class: "menu-item" %>
-            <%= link_to "Export Drive Log",
-                        export_drive_sessions_path(format: :csv),
+            <%= link_to root_path, class: "menu-item" do %>
+              <%= icon(:home, size: 20, class: "menu-item-icon") %>Dashboard
+            <% end %>
+            <%= link_to all_drive_sessions_path, class: "menu-item" do %>
+              <%= icon(:list, size: 20, class: "menu-item-icon") %>All Drives
+            <% end %>
+            <%= link_to export_drive_sessions_path(format: :csv),
                         data: { turbo: false },
-                        class: "menu-item" %>
-            <%= link_to "Settings", edit_user_path, class: "menu-item" %>
+                        class: "menu-item" do %>
+              <%= icon(:export, size: 20, class: "menu-item-icon") %>Export Drive Log
+            <% end %>
+            <%= link_to edit_user_path, class: "menu-item" do %>
+              <%= icon(:settings, size: 20, class: "menu-item-icon") %>Settings
+            <% end %>
             <hr class="menu-divider">
-            <%= link_to "Sign Out", session_path, data: { turbo_method: :delete }, class: "menu-item" %>
+            <%= link_to session_path, data: { turbo_method: :delete }, class: "menu-item" do %>
+              <%= icon(:logout, size: 20, class: "menu-item-icon") %>Sign Out
+            <% end %>
           </nav>
         </div>
       <% end %>
