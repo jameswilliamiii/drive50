@@ -76,7 +76,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 
-  gem "minitest", "~> 5.27"
+  gem "minitest", "~> 6.0"
   # Mocking and stubbing [https://github.com/freerange/mocha]
   gem "mocha"
 end
