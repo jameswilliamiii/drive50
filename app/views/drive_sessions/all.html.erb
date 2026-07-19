@@ -13,15 +13,17 @@
         <%= render partial: "drive_row", collection: @sessions, as: :session %>
       </div>
 
-      <turbo-frame id="sessions-pagination" data-controller="infinite-scroll">
+      <turbo-frame id="sessions-pagination">
         <div id="pagination-container" class="pagination-wrapper">
           <% if @pagy.next %>
-            <%= link_to "Load More", @pagy.page_url(:next),
-                        class: "button button-primary",
+            <%= link_to @pagy.page_url(:next),
+                        class: "load-more",
                         data: {
                           turbo_frame: "sessions-pagination",
-                          infinite_scroll_target: "link"
-                        } %>
+                          turbo_prefetch: false
+                        } do %>
+              Load more<%= icon(:chevron_down, size: 16, class: "load-more-chevron") %>
+            <% end %>
           <% end %>
         </div>
       </turbo-frame>

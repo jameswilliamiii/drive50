@@ -143,6 +143,50 @@ table td.notes-column {
   padding: var(--spacing-lg) 0;
 }
 
+/* Quiet text-link pagination control — echoes the "View all →" link idiom, but
+   with a down-chevron since it reveals rows below rather than navigating away. */
+.load-more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.load-more:hover {
+  color: var(--color-primary-dark);
+  background-color: var(--color-border-light);
+}
+
+.load-more:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Signature nudge: the chevron dips on hover, hinting "more below". */
+.load-more-chevron {
+  transition: var(--transition-transform);
+}
+
+.load-more:hover .load-more-chevron {
+  transform: translateY(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .load-more-chevron {
+    transition: none;
+  }
+
+  .load-more:hover .load-more-chevron {
+    transform: none;
+  }
+}
+
 /* Desktop Table Styles */
 @media (min-width: 768px) {
   table th {

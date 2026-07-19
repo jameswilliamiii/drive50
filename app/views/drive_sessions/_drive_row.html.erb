@@ -2,6 +2,7 @@
      data-controller="drive-session card-menu"
      data-action="click->drive-modal#open keydown->drive-modal#openOnKey"
      tabindex="0" aria-haspopup="dialog"
+     aria-label="View drive details"
      data-drive-started-at="<%= session.started_at&.iso8601 %>"
      data-drive-ended-at="<%= session.ended_at&.iso8601 %>"
      data-drive-night="<%= session.is_night_drive %>"
@@ -10,6 +11,7 @@
      data-drive-notes="<%= session.notes %>">
   <div class="drive-row-badge is-<%= session.is_night_drive ? "night" : "day" %>">
     <%= session.is_night_drive ? icon_moon(size: 18) : icon_sun(size: 18) %>
+    <span class="visually-hidden"><%= session.is_night_drive ? "Night drive" : "Day drive" %></span>
   </div>
 
   <div class="drive-row-main">

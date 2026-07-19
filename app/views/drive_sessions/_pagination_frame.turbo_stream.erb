@@ -5,12 +5,14 @@
 <%= turbo_stream.update "sessions-pagination" do %>
   <div id="pagination-container" class="pagination-wrapper">
     <% if @pagy.next %>
-      <%= link_to "Load More", @pagy.page_url(:next),
-                  class: "button button-primary",
+      <%= link_to @pagy.page_url(:next),
+                  class: "load-more",
                   data: {
                     turbo_frame: "sessions-pagination",
-                    infinite_scroll_target: "link"
-                  } %>
+                    turbo_prefetch: false
+                  } do %>
+        Load more<%= icon(:chevron_down, size: 16, class: "load-more-chevron") %>
+      <% end %>
     <% end %>
   </div>
 <% end %>
