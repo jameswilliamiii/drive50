@@ -26,6 +26,8 @@ module IconHelper
     play: '<path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.971l-11.54 6.348a1.125 1.125 0 0 1-1.667-.985V5.653Z" stroke="%{color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
     # Heroicon arrow-right-on-rectangle (outline) — sign out
     logout: '<path d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" stroke="%{color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+    # Heroicon chevron-down (outline)
+    chevron_down: '<path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke="%{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     # Heroicon stop (outline)
     stop: '<path d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" stroke="%{color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
     # Heroicon arrow-down-tray style export (outline)
@@ -36,18 +38,25 @@ module IconHelper
 
   # Generic icon renderer
   # Usage: icon(:moon, size: 20, color: "blue", class: "my-class")
+  #
+  # Icons are decorative by default: they render aria-hidden so assistive tech
+  # skips them, relying on an adjacent text label (or aria-label on the control)
+  # for the accessible name. Pass aria_hidden: false only when the icon itself
+  # must be exposed to AT (rare — prefer a visually-hidden text label instead).
   def icon(name, **options)
     size = options[:size] || default_size_for(name)
     color = options[:color] || "currentColor"
     classes = options[:class] || ""
+    aria_hidden = options.fetch(:aria_hidden, true)
 
     svg_content = ICONS[name]
     raise ArgumentError, "Unknown icon: #{name}" unless svg_content
 
     formatted_content = svg_content % { color: color }
+    aria = aria_hidden ? %(aria-hidden="true" focusable="false") : %(focusable="false")
 
     raw(<<~SVG.squish)
-      <svg class="icon icon-#{name.to_s.dasherize} #{classes}" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="icon icon-#{name.to_s.dasherize} #{classes}" width="#{size}" height="#{size}" viewBox="0 0 24 24" fill="none" #{aria} xmlns="http://www.w3.org/2000/svg">
         #{formatted_content}
       </svg>
     SVG

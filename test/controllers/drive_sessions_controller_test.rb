@@ -153,6 +153,31 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "Load More link disables Turbo hover prefetch" do
+    # More than one page so the Load More link renders.
+    25.times do |i|
+      @user.drive_sessions.create!(started_at: (i + 2).hours.ago, ended_at: (i + 1).hours.ago)
+    end
+
+    get all_drive_sessions_url
+    assert_response :success
+    # Hovering must not prefetch the next page; the attribute is what disables it.
+    assert_select "a.load-more[data-turbo-frame='sessions-pagination'][data-turbo-prefetch='false']"
+  end
+
+  test "Load More frame request appends the next page as a turbo stream" do
+    25.times do |i|
+      @user.drive_sessions.create!(started_at: (i + 2).hours.ago, ended_at: (i + 1).hours.ago)
+    end
+
+    get all_drive_sessions_url(page: 2), headers: { "Turbo-Frame" => "sessions-pagination" }
+
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_match(/turbo-stream action="append" target="sessions-list"/, response.body)
+    assert_match(/turbo-stream action="update" target="sessions-pagination"/, response.body)
+  end
+
   test "should require authentication" do
     delete session_url
     get drive_sessions_url

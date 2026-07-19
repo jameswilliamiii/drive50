@@ -6,6 +6,7 @@
     <%= button_to complete_drive_session_path(in_progress),
                   method: :post,
                   class: "fab-new-drive fab-new-drive-stop",
+                  aria: { label: "Complete drive" },
                   form: { class: "fab-new-drive-form" } do %>
       <%= icon_stop(size: 24, class: "fab-new-drive-icon") %>
     <% end %>

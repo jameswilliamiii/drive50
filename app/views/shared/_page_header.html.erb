@@ -3,7 +3,7 @@
 %>
 <div class="page-header">
   <% if back_path %>
-    <%= link_to back_path, class: "page-header-back" do %>
+    <%= link_to back_path, class: "page-header-back", aria: { label: "Back" } do %>
       <%= icon_arrow_left(size: 24, class: "page-header-icon") %>
     <% end %>
   <% end %>

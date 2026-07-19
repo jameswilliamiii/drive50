@@ -111,7 +111,6 @@ Uses custom session-based authentication (not Devise):
 **Key Stimulus controllers:**
 - `timer_controller.js` - Live elapsed time for in-progress drives
 - `drive_session_controller.js` - Drive session form interactions
-- `infinite_scroll_controller.js` - Pagination on all drives page
 - `toast_controller.js` - Flash message notifications
 
 **LocalTime gem** - Converts UTC times to user's local timezone in browser
@@ -122,7 +121,9 @@ Uses Pagy v43 with offset pagination:
 ```ruby
 @pagy, @sessions = pagy(:offset, collection, limit: 20)
 ```
-Combined with infinite scroll for seamless loading.
+The all-drives page loads more via a manual "Load More" button that navigates
+the `sessions-pagination` Turbo frame (the controller renders a turbo-stream
+that appends the next page).
 
 ## File Organization
 
