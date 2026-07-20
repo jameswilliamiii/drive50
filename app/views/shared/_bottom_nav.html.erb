@@ -11,7 +11,7 @@
   <% end %>
 
   <%= link_to export_drive_sessions_path(format: :csv),
-              data: { turbo: false },
+              data: { turbo: false, controller: "export", action: "click->export#share" },
               class: "bottom-nav-item #{'active' if request.path == export_drive_sessions_path(format: :csv)}" do %>
     <%= bottom_nav_icon(:export, active: request.path == export_drive_sessions_path(format: :csv), size: 24, class: "bottom-nav-icon") %>
     <span class="bottom-nav-label">Export</span>

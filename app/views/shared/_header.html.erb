@@ -31,7 +31,7 @@
               <%= icon(:list, size: 20, class: "menu-item-icon") %>All Drives
             <% end %>
             <%= link_to export_drive_sessions_path(format: :csv),
-                        data: { turbo: false },
+                        data: { turbo: false, controller: "export", action: "click->export#share" },
                         class: "menu-item" do %>
               <%= icon(:export, size: 20, class: "menu-item-icon") %>Export Drive Log
             <% end %>

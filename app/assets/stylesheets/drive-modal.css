@@ -18,7 +18,7 @@
      margin:auto centering — restore it explicitly. */
   margin: auto;
   width: min(30rem, calc(100vw - 2 * var(--spacing-lg)));
-  max-height: calc(100vh - 2 * var(--spacing-2xl));
+  max-height: calc(100dvh - 2 * var(--spacing-2xl));
   padding: 0;
   border: none;
   border-radius: var(--border-radius-lg);

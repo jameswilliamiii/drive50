@@ -90,7 +90,7 @@
     z-index: 1000;
     transform: translateY(calc(100% + 1px));
     transition: var(--transition-transform);
-    max-height: calc(90vh - 80px - env(safe-area-inset-bottom));
+    max-height: calc(90dvh - 80px - env(safe-area-inset-bottom));
     overflow-y: auto;
     padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
