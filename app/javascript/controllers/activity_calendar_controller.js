@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { hasHover } from "helpers/device"
 
 // Connects to data-controller="activity-calendar"
 export default class extends Controller {
@@ -16,8 +17,7 @@ export default class extends Controller {
       none: "no drives"
     }[state] || "no drives"
 
-    const isMobile = !window.matchMedia("(hover: hover)").matches
-    if (isMobile) {
+    if (!hasHover()) {
       this.createToast(`${date}: ${label}`)
     }
   }

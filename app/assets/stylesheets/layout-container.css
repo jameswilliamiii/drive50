@@ -8,7 +8,7 @@
 }
 
 main {
-  min-height: calc(100vh - 200px);
+  min-height: calc(100svh - 200px);
   padding-bottom: var(--spacing-3xl);
 }
 

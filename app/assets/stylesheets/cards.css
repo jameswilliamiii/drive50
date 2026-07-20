@@ -260,11 +260,16 @@
 .activity-ministat-value small { font-size: .7rem; color: var(--color-text-light); font-weight: 600; }
 
 .activity-cal { width: 182px; flex-shrink: 0; }
-.activity-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-bottom: 7px; }
+/* minmax(0, 1fr), not the default 1fr (= minmax(auto, 1fr)): the `auto` floor
+   picks up the aspect-ratio cells' intrinsic width, which iOS leaves stale
+   after an orientation change — on rotate-back to portrait it inflates the
+   columns and pushes the 7th day off-screen. min-width:0 on the cell stops an
+   item from spilling its track for the same reason. */
+.activity-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; margin-bottom: 7px; }
 .activity-weekdays span { text-align: center; font-size: .6rem; color: var(--color-text-light); font-weight: 700; text-transform: uppercase; }
-.activity-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
+.activity-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; }
 .activity-cell {
-  aspect-ratio: 1; border-radius: 7px;
+  aspect-ratio: 1; border-radius: 7px; min-width: 0;
   background: var(--activity-empty-bg);
   border: 1px solid var(--activity-empty-border);
   cursor: pointer; transition: var(--transition);
