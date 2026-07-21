@@ -1,18 +1,14 @@
 <% content_for :title, "Forgot Password" %>
 
 <div class="authentication-form-container">
-  <div class="container">
-    <div class="page-header">
-      <h1 class="page-header-title">Forgot your password?</h1>
-    </div>
-  </div>
-
   <%= form_with url: passwords_path, class: "drive-form" do |form| %>
-    <h1 class="form-title">Forgot your password?</h1>
+    <%= render "shared/auth_header", title: "Reset your password",
+               subtitle: "We'll email you a link to set a new one." %>
 
     <div class="field">
       <%= form.label :email_address, "Email Address" %>
-      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username",
+                           value: params[:email_address] %>
     </div>
 
     <div class="actions">

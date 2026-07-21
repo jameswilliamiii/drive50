@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for?(:title) ? "#{content_for(:title)} - Drive50" : "Drive50 — Track your supervised driving hours to 50" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-title" content="Drive50" />
+    <% description = content_for?(:meta_description) ? content_for(:meta_description) : "Every practice hour, counted toward 50. Drive50 logs your supervised driving — day and night — and tracks how close you are to a license, automatically." %>
+    <meta name="description" content="<%= description %>">
+
+    <%# Open Graph (Facebook, LinkedIn, etc.) %>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<%= content_for?(:meta_title) ? content_for(:meta_title) : 'Drive50 — Every practice hour, counted toward 50' %>">
+    <meta property="og:description" content="<%= description %>">
+    <meta property="og:url" content="<%= request.base_url + request.fullpath %>">
+    <meta property="og:image" content="<%= "#{request.base_url}/images/social-card.png" %>">
+
+    <%# Twitter Card %>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= content_for?(:meta_title) ? content_for(:meta_title) : 'Drive50 — 50 hours, night drives and all' %>">
+    <meta name="twitter:description" content="<%= description %>">
+    <meta name="twitter:image" content="<%= "#{request.base_url}/images/social-card.png" %>">
+
+    <%= render "shared/favicon" %>
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <% turbo_refreshes_with method: :morph, scroll: :preserve %>
+
+    <link rel="manifest" href="/manifest.json">
+    <%= stylesheet_link_tag "00-variables", "01-reset", "fonts", "landing", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="landing-body">
+    <%= yield %>
+  </body>
+</html>
