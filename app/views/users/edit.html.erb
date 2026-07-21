@@ -101,15 +101,11 @@
           <%= f.email_field :email_address, required: true %>
         </div>
 
-        <div class="field">
-          <%= f.label :password, "New Password" %>
-          <%= f.password_field :password %>
-        </div>
+        <%= render "shared/password_field", form: f, field: :password, label: "New Password",
+                   autocomplete: "new-password", required: false %>
 
-        <div class="field">
-          <%= f.label :password_confirmation, "Confirm New Password" %>
-          <%= f.password_field :password_confirmation %>
-        </div>
+        <%= render "shared/password_field", form: f, field: :password_confirmation, label: "Confirm New Password",
+                   autocomplete: "new-password", required: false %>
 
         <div class="actions">
           <%= f.submit "Update Account", class: "button-primary" %>
