@@ -1,0 +1,168 @@
+<div class="landing">
+  <header class="landing-topbar">
+    <div class="landing-shell landing-topbar-inner">
+      <%= link_to root_path, class: "landing-wordmark", "aria-label": "Drive50 home" do %>Drive<span>50</span><% end %>
+      <nav class="landing-topbar-actions">
+        <%= link_to "Sign in", new_session_path, class: "landing-navlink" %>
+        <%= link_to "Get started", new_registration_path, class: "landing-btn landing-btn-primary landing-btn-sm" %>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="landing-hero">
+      <div class="landing-hero-glow" aria-hidden="true"></div>
+      <div class="landing-shell landing-hero-inner">
+        <div class="landing-hero-copy">
+          <p class="landing-eyebrow">Supervised driving log</p>
+          <h1 class="landing-hero-title">Every practice hour, counted toward&nbsp;50.</h1>
+          <p class="landing-hero-sub">
+            Drive50 logs your supervised driving — day and night — and shows exactly
+            how close you are to a license. Fifty hours, ten of them at night, tracked
+            automatically.
+          </p>
+          <div class="landing-cta-group">
+            <%= link_to new_registration_path, class: "landing-btn landing-btn-primary landing-btn-lg" do %>
+              Create your free account <%= icon(:arrow_right, size: 18, class: "landing-btn-icon") %>
+            <% end %>
+            <%= link_to "I already have an account", new_session_path, class: "landing-btn landing-btn-ghost landing-btn-lg" %>
+          </div>
+          <p class="landing-hero-note">Free to use · Works on any phone · No app store needed</p>
+        </div>
+
+        <div class="landing-hero-visual" aria-hidden="true">
+          <div class="landing-dial">
+            <div class="landing-dial-ring"></div>
+            <div class="landing-dial-center">
+              <span class="landing-dial-num">50</span>
+              <span class="landing-dial-label">hour goal</span>
+            </div>
+          </div>
+          <div class="landing-dial-legend">
+            <span class="landing-legend-item"><span class="landing-dot landing-dot-day"></span>40 day hours</span>
+            <span class="landing-legend-item"><span class="landing-dot landing-dot-night"></span>10 night hours</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section landing-features">
+      <div class="landing-shell">
+        <div class="landing-section-head landing-reveal">
+          <h2 class="landing-h2">Everything a driving log should do — and nothing it shouldn't.</h2>
+        </div>
+        <ul class="landing-feature-grid">
+          <li class="landing-feature landing-reveal">
+            <span class="landing-feature-icon landing-icon-dusk"><%= icon(:moon, size: 24, color: "#ffffff") %></span>
+            <h3 class="landing-feature-title">Day &amp; night, sorted for you</h3>
+            <p class="landing-feature-text">
+              Drive50 uses real sunrise and sunset times for where you drive, so night
+              hours count themselves — no clock-watching, no second-guessing.
+            </p>
+          </li>
+          <li class="landing-feature landing-reveal">
+            <span class="landing-feature-icon landing-icon-blue"><%= icon(:clock, size: 24, color: "#ffffff") %></span>
+            <h3 class="landing-feature-title">Start a drive in one tap</h3>
+            <p class="landing-feature-text">
+              Hit the timer as you pull out. Drive50 even reminds you if a drive is
+              still running, so nothing slips by unlogged.
+            </p>
+          </li>
+          <li class="landing-feature landing-reveal">
+            <span class="landing-feature-icon landing-icon-green"><%= icon(:trending_up, size: 24, color: "#ffffff") %></span>
+            <h3 class="landing-feature-title">See your momentum</h3>
+            <p class="landing-feature-text">
+              Streaks, weekly pace, and a projected finish date keep the goal in sight
+              every time you log a drive.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="landing-section landing-steps">
+      <div class="landing-shell">
+        <div class="landing-section-head landing-reveal">
+          <h2 class="landing-h2">From first drive to fully logged.</h2>
+          <p class="landing-section-sub">Three steps — then Drive50 does the counting.</p>
+        </div>
+        <ol class="landing-step-list">
+          <li class="landing-step landing-reveal">
+            <span class="landing-step-num">1</span>
+            <div class="landing-step-body">
+              <h3 class="landing-step-title">Start the timer</h3>
+              <p class="landing-step-text">Tap start as you begin a drive — or add a past drive in seconds if you forgot.</p>
+            </div>
+          </li>
+          <li class="landing-step landing-reveal">
+            <span class="landing-step-num">2</span>
+            <div class="landing-step-body">
+              <h3 class="landing-step-title">Drive50 does the math</h3>
+              <p class="landing-step-text">Duration, day versus night, running totals, and hours remaining — all calculated for you.</p>
+            </div>
+          </li>
+          <li class="landing-step landing-reveal">
+            <span class="landing-step-num">3</span>
+            <div class="landing-step-body">
+              <h3 class="landing-step-title">Reach 50 and export</h3>
+              <p class="landing-step-text">Watch day and night hours fill up, then export a clean log to hand in when you're done.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="landing-section landing-night">
+      <div class="landing-shell landing-night-inner">
+        <div class="landing-night-copy landing-reveal">
+          <p class="landing-eyebrow landing-eyebrow-light">The tricky ten</p>
+          <h2 class="landing-h2 landing-h2-light">Ten of your fifty must be night hours. Drive50 knows which is which.</h2>
+          <p class="landing-night-text">
+            Most logs make you guess when night begins. Drive50 checks the actual
+            sunset at your location, so an evening drive is counted the moment the sun
+            goes down.
+          </p>
+          <ul class="landing-check-list">
+            <li><%= icon(:check, size: 18, color: "#fbbf24") %>Sunrise &amp; sunset based — not a fixed clock window</li>
+            <li><%= icon(:check, size: 18, color: "#fbbf24") %>Uses your location, wherever you happen to drive</li>
+            <li><%= icon(:check, size: 18, color: "#fbbf24") %>Night hours tracked separately toward your ten</li>
+          </ul>
+        </div>
+        <div class="landing-night-visual landing-reveal" aria-hidden="true">
+          <div class="landing-horizon">
+            <span class="landing-horizon-sun"><%= icon(:sun, size: 28, color: "#f59e0b") %></span>
+            <span class="landing-horizon-moon"><%= icon(:moon, size: 26, color: "#c7d2fe") %></span>
+            <span class="landing-horizon-label landing-horizon-day">Day</span>
+            <span class="landing-horizon-label landing-horizon-night">Night</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section landing-final">
+      <div class="landing-shell landing-final-inner landing-reveal">
+        <h2 class="landing-final-title">Ready to hit 50?</h2>
+        <p class="landing-final-sub">It's free. Create an account and log your first drive tonight.</p>
+        <%= link_to new_registration_path, class: "landing-btn landing-btn-primary landing-btn-lg" do %>
+          Create your free account <%= icon(:arrow_right, size: 18, class: "landing-btn-icon") %>
+        <% end %>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <div class="landing-shell">
+      <div class="landing-footer-top">
+        <%= link_to root_path, class: "landing-wordmark landing-wordmark-sm", "aria-label": "Drive50 home" do %>Drive<span>50</span><% end %>
+        <nav class="landing-footer-links">
+          <%= link_to "Sign in", new_session_path %>
+          <%= link_to "Create account", new_registration_path %>
+        </nav>
+      </div>
+      <div class="landing-footer-bottom">
+        <p class="landing-footer-tag">Track supervised driving hours toward your license.</p>
+        <p class="landing-footer-credit">Built by Core Ascent LLC</p>
+      </div>
+    </div>
+  </footer>
+</div>

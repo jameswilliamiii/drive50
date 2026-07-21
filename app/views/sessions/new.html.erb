@@ -1,24 +1,17 @@
 <% content_for :title, "Sign In" %>
 
 <div class="authentication-form-container">
-  <div class="container">
-    <div class="page-header">
-      <h1 class="page-header-title">Sign In</h1>
-    </div>
-  </div>
-
   <%= form_with url: session_path, class: "drive-form" do |form| %>
-    <h1 class="form-title">Sign In</h1>
+    <%= render "shared/auth_header", title: "Welcome back", subtitle: "Sign in to keep logging your drives." %>
 
     <div class="field">
       <%= form.label :email_address, "Email Address" %>
-      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address] %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username",
+                           value: params[:email_address] %>
     </div>
 
-    <div class="field">
-      <%= form.label :password, "Password" %>
-      <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72 %>
-    </div>
+    <%= render "shared/password_field", form: form, field: :password, label: "Password",
+               autocomplete: "current-password" %>
 
     <div class="actions">
       <%= form.submit "Sign In", class: "button-primary" %>

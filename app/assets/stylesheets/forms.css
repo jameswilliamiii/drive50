@@ -39,6 +39,69 @@
   flex-direction: column;
 }
 
+/* Two fields on one row (e.g. first + last name); stacks on narrow screens. */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+}
+
+@media (min-width: 520px) {
+  .field-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Password input with an inline show/hide toggle. */
+.password-field {
+  position: relative;
+}
+
+/* Reserve room for the toggle. Uses three classes so it out-specifies the base
+   `.field input[type="password"]` padding shorthand, and stays type-agnostic so
+   the space is kept when the field is revealed (type="text"). */
+.field .password-field .password-input {
+  padding-right: 3.25rem;
+}
+
+/* Out-specifies the global `form button` base (0,0,0,2) so the toggle stays a
+   bare icon button instead of a full-size form button. */
+.password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3rem;
+  height: 100%;
+  min-height: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.password-toggle:hover {
+  background: none;
+  color: var(--color-primary);
+}
+
+.password-toggle .icon {
+  display: block;
+}
+
+/* Suppress the browser's own reveal/clear controls (Edge) so only our toggle
+   shows — otherwise password fields get two eyes. */
+.password-field input::-ms-reveal,
+.password-field input::-ms-clear {
+  display: none;
+}
+
 .field label {
   display: block;
   margin-bottom: calc(var(--spacing-unit) * 0.625);
@@ -167,6 +230,38 @@
   letter-spacing: -0.01em;
 }
 
+/* Branded auth header (sign-up/sign-in): dial mark + display heading. */
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.auth-mark {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--spacing-lg);
+  border-radius: 13px;
+  box-shadow: var(--shadow-md);
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.auth-subtitle {
+  margin-top: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 /* Desktop Form Styles */
 @media (min-width: 769px) {
   .authentication-form-container .drive-form {
@@ -177,6 +272,12 @@
     box-shadow: var(--shadow-md);
     max-width: 480px;
     width: 100%;
+  }
+
+  /* Forms with a two-up name row (sign-up) get more width so the paired fields
+     aren't cramped; single-column forms (sign-in) keep the narrower default. */
+  .authentication-form-container .drive-form:has(.field-row) {
+    max-width: 560px;
   }
 
   /* Hide separate page header on desktop, show title inside form */

@@ -1,0 +1,8 @@
+<%# locals: (title:, subtitle: nil) %>
+<div class="auth-header">
+  <%= image_tag "brand-mark.png", alt: "Drive50", class: "auth-mark", width: 56, height: 56 %>
+  <h1 class="auth-title"><%= title %></h1>
+  <% if subtitle %>
+    <p class="auth-subtitle"><%= subtitle %></p>
+  <% end %>
+</div>

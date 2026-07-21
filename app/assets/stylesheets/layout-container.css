@@ -18,7 +18,10 @@ body.has-bottom-nav main {
 }
 
 .authentication-form-container {
-  height: calc(100svh - 80px);
+  /* min-height (not height) so a tall form — e.g. sign-up's five fields — grows
+     downward and stays fully below the sticky header instead of overflowing
+     upward and clipping under it. Short forms still center in the viewport. */
+  min-height: calc(100svh - 80px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -47,7 +50,7 @@ body.has-bottom-nav main {
   }
 
   .authentication-form-container {
-    height: calc(100svh - 280px);
+    min-height: calc(100svh - 280px);
   }
 
   .authentication-form-container .container {

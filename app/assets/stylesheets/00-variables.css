@@ -72,6 +72,9 @@
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-transform: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* Display font (headings). Body stays on the system stack from 01-reset. */
+  --font-display: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
   /* Dashboard redesign — day/night dusk system */
   --hero-gradient: radial-gradient(135% 135% at 15% -10%, #4f46e5 0%, #362e8f 45%, #1c1b40 100%);
   --hero-horizon: radial-gradient(120% 100% at 50% 145%, rgba(251,191,36,.30) 0%, rgba(245,158,11,.10) 38%, transparent 68%);

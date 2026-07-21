@@ -1,5 +1,21 @@
 Rails.application.routes.draw do
-  root "drive_sessions#index"
+  # Signed-in visitors get their dashboard at "/"; everyone else sees the
+  # marketing page. The constraint reads the same signed session cookie the
+  # Authentication concern uses, so no nav links or post-auth redirects (which
+  # all point at root_path/root_url) need to change. Any failure falls through
+  # to the marketing page rather than erroring.
+  authenticated = ->(request) do
+    session_id = request.cookie_jar.signed[:session_id]
+    session_id.present? && Session.exists?(session_id)
+  rescue StandardError
+    false
+  end
+
+  constraints(authenticated) do
+    root "drive_sessions#index", as: :authenticated_root
+  end
+
+  root "pages#home"
 
   resources :passwords, param: :token
   resource :session
