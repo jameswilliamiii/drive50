@@ -5,10 +5,10 @@ A Rails 8.1 application for tracking supervised driving hours toward a driver's 
 ## Features
 
 - Track driving sessions with start/end times
-- Automatic night drive detection (8pm-6am in user's timezone)
+- Automatic night hours, split at real sunset and sunrise for the driver's location
 - Real-time progress tracking with live updates
 - Timezone-aware time handling
-- Export driving log to CSV
+- Export driving log to CSV (date, times, and duration split into day and night hours)
 - Mobile-responsive design with PWA support
 
 ## Prerequisites
@@ -151,7 +151,10 @@ The app automatically detects and stores each user's timezone:
 - **Storage**: User timezone is stored in the `users.timezone` column (defaults to "UTC")
 - **Display**: Times are displayed in user's timezone using the `local_time` gem
 - **Forms**: Datetime inputs are interpreted in the user's timezone (via `Time.zone` in ApplicationController) and converted to UTC for storage
-- **Night Drive**: Calculated based on start/end times in the user's timezone (8pm-6am)
+- **Night Drive**: Sunset and sunrise are computed for the drive's date at the user's
+  coordinates (falling back to representative coordinates for their timezone). A drive
+  that crosses either boundary is split, so it contributes to both the day and night
+  totals rather than counting wholly as one
 
 **Note**: The timezone is automatically saved to the user's profile when detected, so it persists across sessions.
 

@@ -7,7 +7,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "dialog", "badge", "date", "type",
-    "duration", "time", "driver", "driverRow", "notes", "notesSection"
+    "duration", "time", "split", "splitRow", "driver", "driverRow", "notes", "notesSection"
   ]
 
   open(event) {
@@ -17,17 +17,25 @@ export default class extends Controller {
 
     const d = event.currentTarget.dataset
     const night = d.driveNight === "true"
+    // Drives that cross sunset or sunrise count toward both totals, so name them
+    // as such and show where the split fell.
+    const mixed = d.driveMixed === "true"
     const start = d.driveStartedAt ? new Date(d.driveStartedAt) : null
     const end = d.driveEndedAt ? new Date(d.driveEndedAt) : null
 
     this.dateTarget.textContent = start
       ? start.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })
       : ""
-    this.typeTarget.textContent = night ? "Night drive" : "Day drive"
+    this.typeTarget.textContent = mixed ? "Day & night drive" : night ? "Night drive" : "Day drive"
     this.badgeTarget.classList.toggle("is-night", night)
     this.badgeTarget.classList.toggle("is-day", !night)
 
     this.durationTarget.textContent = d.driveDuration || "—"
+
+    this.splitRowTarget.hidden = !mixed
+    if (mixed) {
+      this.splitTarget.textContent = `${d.driveDayDuration} day · ${d.driveNightDuration} night`
+    }
 
     const fmt = (t) => t ? t.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }) : ""
     this.timeTarget.textContent = start && end ? `${fmt(start)} – ${fmt(end)}` : fmt(start)

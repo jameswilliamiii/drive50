@@ -1,4 +1,7 @@
-<%- headers = ["Date", "Start Time", "End Time", "Duration (hours)", "Night Drive", "Driver", "Notes"] -%>
+<%# Day and night are reported as hours rather than a yes/no flag: a drive that
+    crosses sunset earns credit in both columns. Day is derived from the rounded
+    Duration and Night so the three columns reconcile exactly. -%>
+<%- headers = ["Date", "Start Time", "End Time", "Duration (hours)", "Day (hours)", "Night (hours)", "Driver", "Notes"] -%>
 <%= raw CSV.generate_line(headers) -%>
 <%- @sessions.each do |session| -%>
 <%-
@@ -11,7 +14,8 @@
   session.started_at.strftime("%I:%M %p"),
   session.ended_at&.strftime("%I:%M %p"),
   session.duration_hours,
-  session.is_night_drive ? "Yes" : "No",
+  session.day_hours,
+  session.night_hours,
   session.user.full_name,
   notes
 ]) -%>

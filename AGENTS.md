@@ -66,29 +66,63 @@ bin/rails console --sandbox  # Rolls back all changes on exit
   `full_name` is the displayed driver name.
 - **`Session`** — authentication session with `ip_address` and `user_agent`.
 - **`DriveSession`** — one driving session. Columns: `started_at`, `ended_at`,
-  `duration_minutes`, `is_night_drive`, `notes`, `user_id`. State is derived, not
-  stored: **in-progress** (no `ended_at`) or **completed** (has `ended_at`).
-  `duration_minutes` and `is_night_drive` are computed in `before_save` callbacks.
+  `duration_minutes`, `night_minutes`, `is_night_drive`, `notes`, `user_id`. State
+  is derived, not stored: **in-progress** (no `ended_at`) or **completed** (has
+  `ended_at`). `duration_minutes`, `night_minutes`, and `is_night_drive` are all
+  computed in `before_save` callbacks. `night_minutes` is what statistics sum;
+  `is_night_drive` is a derived convenience flag meaning "contains any night".
 - **`PushSubscription`** — a browser Web Push endpoint (`endpoint`, `p256dh_key`,
   `auth_key`, `user_agent`) belonging to a user.
 
 **Key constants** (`DriveSession`):
 - `HOURS_NEEDED = 50`, `NIGHT_HOURS_NEEDED = 10`
-- `ACTIVITY_CALENDAR_DAYS = 28`, `REMINDER_DELAY = 45.minutes`
+- `REMINDER_DELAY = 45.minutes`, `MAX_DRIVE_DURATION = 7.days` (a validation ceiling —
+  `night_seconds` walks one date per day spanned, so an unbounded span is unbounded CPU)
 
 **Scopes:** `.completed` / `.in_progress`, `.night_drives`, `.ordered` (reverse
 chronological), `.with_user` (preloads the owner to avoid N+1 in views/CSV).
 
 ### Night-drive detection
 
-Night classification is **sunrise/sunset based, not a fixed clock window**.
+Night classification is **sunrise/sunset based, not a fixed clock window**, and a
+drive is credited **minute by minute rather than all-or-nothing**.
 `DriveSession#determine_night_drive` uses the `RubySunrise` gem
-(`SolarEventCalculator`) to compute civil sunrise/sunset for the drive's date at
+(`SolarEventCalculator`) to compute official sunrise/sunset for the drive's date at
 the user's coordinates — falling back to representative coordinates for the user's
-timezone via `TimezoneCoordinates` when lat/lon are absent. A drive counts as a
-night drive if **either** its start or end falls before civil sunrise or after
-civil sunset (local time). See the comment in `night_time?` for the UTC-offset
-handling that avoids a calendar-date bug across the Americas / DST boundaries.
+timezone via `TimezoneCoordinates` when lat/lon are absent.
+
+`night_seconds` cuts the drive at every solar event it spans and classifies each
+piece by its midpoint, so a drive that starts in daylight and ends after dark is
+split between the day and night totals instead of tipping wholly into one. That
+also makes overnight and multi-day drives correct without special cases.
+
+Things to preserve when touching this code — each has a regression test, and each
+was a real bug:
+- **Official, not civil, sunset.** Civil dusk is ~30 minutes later; using it left
+  post-sunset driving credited as day hours.
+- **`local_instant` rebuilds each event from its UTC time-of-day**, reading the
+  offset at local *noon*. RubySunrise stamps the event onto the date it was handed,
+  so its raw instant can land on the wrong UTC day (in the Americas sunset is after
+  00:00 UTC); reading the offset at midnight breaks both DST transition days.
+- **`night_time?` classifies the wrapped window** rather than discarding it. Near
+  the Arctic Circle the sun can set just after local midnight, putting sunset
+  *before* sunrise on the same date (Fairbanks: 46 days a year); night is then the
+  interval between them. Bailing out instead credited real night driving as day.
+- **`night_minutes` truncates and is capped at `duration_minutes`.** Duration floors,
+  so rounding here put night a minute over and made `day_hours` negative.
+- **Both derived columns share one callback guard.** Editing only `started_at` used
+  to recompute night against a stale duration.
+
+`is_night_drive` is retained but **no longer read anywhere** — it holds pre-split
+values so a rollback to the previous release reports the numbers users saw. Drop the
+column once this release is settled; read `night_minutes` instead.
+
+Known gap: when RubySunrise returns nil for both events it is impossible to tell
+midnight sun from polar night, and the code assumes daylight. Above the Arctic Circle
+that zeroes night credit for roughly two months of continuous darkness a year.
+
+Coordinates and UTC offset must agree — `TimezoneCoordinates` places unmapped zones
+on the meridian matching their offset for exactly this reason.
 
 ### Statistics
 

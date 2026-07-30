@@ -42,12 +42,261 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert_equal 60, session.duration_minutes
   end
 
+  # Chicago sunset/sunrise used by the split tests below (exact coords), as the
+  # model itself computes them:
+  #   Dec 15 — sunrise 07:11, sunset 16:20 CST   (Dec 16 sunrise 07:12)
+  #   Jul  1 — sunrise 05:18, sunset 20:29 CDT   (civil dusk 21:03)
+  # Dates are pinned, so the expected minute counts are exact — a loose tolerance
+  # here would swallow a systematic shift in the solar math.
+  test "splits a drive that crosses sunset into day and night minutes" do
+    session = chicago_drive(2024, 12, 15, from: "16:00", to: "17:00")
+
+    assert_equal 40, session.night_minutes, "only the post-sunset portion is night"
+    assert_equal 60, session.duration_minutes
+    assert session.is_night_drive, "a drive containing any night is flagged"
+  end
+
+  test "counts a drive between sunset and civil dusk as night" do
+    # Regression: night used to begin at civil dusk (~33 min after sunset), so a
+    # drive taken entirely in that window was credited as day hours.
+    session = chicago_drive(2026, 7, 1, from: "20:40", to: "21:00")
+
+    assert_equal 20, session.night_minutes
+    assert session.is_night_drive
+  end
+
+  test "splits a drive that crosses sunrise into day and night minutes" do
+    session = chicago_drive(2024, 12, 15, from: "06:00", to: "08:00")
+
+    assert_equal 71, session.night_minutes, "only the pre-sunrise portion is night"
+  end
+
+  test "an overnight drive stops earning night credit at the next morning's sunrise" do
+    # 22:00 → 09:00 next day. Sunrise on Dec 16 is 07:12, so 552 min dark, 108 light.
+    session = chicago_drive(2024, 12, 15, from: "22:00", to: "33:00")
+
+    assert_equal 660, session.duration_minutes
+    assert_equal 552, session.night_minutes
+  end
+
+  test "splits a multi-day drive at every sunrise and sunset it spans" do
+    # 48 hours starting mid-morning: two full nights plus the tail of day three.
+    session = chicago_drive(2024, 12, 15, from: "10:00", to: "58:00")
+
+    assert_equal 2880, session.duration_minutes
+    assert_equal 1785, session.night_minutes
+  end
+
+  test "night is the wrapped window where the sun sets after local midnight" do
+    # Above ~64°N in early summer the sun sets just after midnight and rises a few
+    # hours later, so sunset precedes sunrise on the same date. Bailing out of that
+    # window instead of classifying it erased real night driving.
+    @user.update!(timezone: "America/Anchorage", latitude: 64.8378, longitude: -147.7164) # Fairbanks
+    tz = ActiveSupport::TimeZone.new("America/Anchorage")
+
+    dark = @user.drive_sessions.create!(
+      started_at: tz.local(2026, 6, 1, 1, 0, 0),   # sunset was 00:06
+      ended_at: tz.local(2026, 6, 1, 3, 0, 0)      # sunrise is 03:31
+    )
+    assert_equal 120, dark.night_minutes, "01:00-03:00 in Fairbanks in June is dark"
+
+    noon = @user.drive_sessions.create!(
+      started_at: tz.local(2026, 6, 1, 12, 0, 0),
+      ended_at: tz.local(2026, 6, 1, 13, 0, 0)
+    )
+    assert_equal 0, noon.night_minutes, "midday on the same date is not night"
+  end
+
+  test "splits correctly across the day where an inverted window meets a normal one" do
+    # Fairbanks' wrapped window ends on 2026-07-14. Without local midnight as a cut
+    # point the segment from that day's sunrise to the next day's ran ~24h and was
+    # judged by a single midpoint, crediting the daylight half as night.
+    @user.update!(timezone: "America/Anchorage", latitude: 64.8378, longitude: -147.7164)
+    tz = ActiveSupport::TimeZone.new("America/Anchorage")
+
+    session = @user.drive_sessions.create!(
+      started_at: tz.local(2026, 7, 14, 23, 0, 0),
+      ended_at: tz.local(2026, 7, 15, 1, 0, 0)
+    )
+
+    assert_equal 120, session.duration_minutes
+    assert_equal 60, session.night_minutes, "was 120 — the whole drive credited as night"
+  end
+
+  test "an over-long drive that already exists stays editable" do
+    session = @user.drive_sessions.create!(started_at: 2.hours.ago, ended_at: 1.hour.ago)
+    session.update_columns(
+      started_at: 30.days.ago, ended_at: 20.days.ago, duration_minutes: 14_400
+    )
+
+    assert session.reload.update(notes: "logged late"), session.errors.full_messages.to_sentence
+  end
+
+  test "solar events use the offset in effect after a DST change" do
+    # Reading the offset at local midnight instead of noon shifts every event by an
+    # hour on transition days, which flips drives near sunrise for every US user.
+    # Reading it at midnight would put sunrise at 06:14 (0 night minutes here)...
+    spring = chicago_drive(2026, 3, 8, from: "06:30", to: "07:30") # sunrise 07:14 CDT
+    assert_equal 44, spring.night_minutes
+
+    # ...and sunset at 17:44, clipping this drive to 16 night minutes.
+    fall = chicago_drive(2026, 11, 1, from: "17:00", to: "18:00")  # sunset 16:44 CST
+    assert_equal 60, fall.night_minutes
+  end
+
+  test "a user with no timezone at all is judged in UTC" do
+    @user.update!(timezone: nil, latitude: nil, longitude: nil)
+
+    session = @user.drive_sessions.create!(
+      started_at: Time.utc(2026, 7, 1, 22, 0, 0),
+      ended_at: Time.utc(2026, 7, 1, 23, 0, 0)
+    )
+
+    assert_equal 60, session.night_minutes
+  end
+
+  test "an unresolvable timezone falls back instead of raising" do
+    # timezones#update writes whatever the browser posts, unvalidated.
+    @user.update_column(:timezone, "Not/AZone")
+    @user.reload
+
+    session = nil
+    assert_nothing_raised do
+      session = @user.drive_sessions.create!(
+        started_at: Time.utc(2026, 7, 1, 22, 0, 0),
+        ended_at: Time.utc(2026, 7, 1, 23, 0, 0)
+      )
+    end
+    assert_equal 60, session.night_minutes
+  end
+
+  test "day and night hours reconcile with duration when minutes divide unevenly" do
+    # The CSV's three columns are totalled by whoever receives the log, so they have
+    # to add up. Rounding each of the three independently leaves ~22% of pairs off
+    # by a cent — here 0.42 + 0.42 = 0.84 against a duration of 0.83.
+    session = @user.drive_sessions.new(duration_minutes: 50, night_minutes: 25)
+
+    assert_equal 0.83, session.duration_hours
+    assert_equal 0.42, session.night_hours
+    assert_equal 0.41, session.day_hours
+    assert_equal session.duration_hours, session.day_hours + session.night_hours
+  end
+
+  test "night minutes never exceed the recorded duration" do
+    # duration_minutes truncates; night_minutes used to round, which put a wholly
+    # dark drive with a seconds remainder one minute over and made day_hours negative.
+    session = chicago_drive(2024, 12, 15, from: "22:00", to: "23:00", end_seconds: 54)
+
+    assert_equal 60, session.duration_minutes
+    assert_equal 60, session.night_minutes
+    assert_equal 0.0, session.day_hours
+  end
+
+  test "night minutes are capped when recomputed against a duration nobody refreshed" do
+    # The backfill calls determine_night_drive directly, without calculate_duration,
+    # so it can meet a row whose stored duration predates an edit. The cap is what
+    # keeps day_hours from going negative on those rows.
+    session = chicago_drive(2024, 12, 15, from: "22:00", to: "23:00")
+    session.update_column(:duration_minutes, 20) # stale, as if an old edit left it
+
+    session.reload.send(:determine_night_drive)
+
+    assert_equal 20, session.night_minutes
+    assert_equal 0.0, session.day_hours
+  end
+
+  test "editing only the start time recomputes duration alongside night minutes" do
+    session = chicago_drive(2024, 12, 15, from: "16:00", to: "17:00")
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+
+    session.update!(started_at: tz.local(2024, 12, 15, 4, 0, 0))
+    session.reload
+
+    assert_equal 780, session.duration_minutes, "duration must follow the new span"
+    assert_operator session.day_hours, :>=, 0
+    assert_operator session.night_minutes, :<=, session.duration_minutes
+    assert_in_delta session.duration_hours, session.day_hours + session.night_hours, 0.001
+  end
+
+  test "rejects a drive longer than the maximum" do
+    session = @user.drive_sessions.new(
+      started_at: Time.current,
+      ended_at: Time.current + DriveSession::MAX_DRIVE_DURATION + 1.minute
+    )
+
+    assert_not session.valid?
+    assert_includes session.errors[:ended_at].join, "7 days"
+  end
+
+  test "credits a wholly-nighttime drive entirely to night" do
+    session = chicago_drive(2024, 12, 15, from: "22:00", to: "23:00")
+
+    assert_equal 60, session.night_minutes
+    assert session.is_night_drive
+  end
+
+  test "credits a wholly-daytime drive entirely to day" do
+    session = chicago_drive(2024, 12, 15, from: "12:00", to: "13:00")
+
+    assert_equal 0, session.night_minutes
+    assert_not session.is_night_drive
+  end
+
+  test "an in-progress drive has no night minutes until it ends" do
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+
+    session = @user.drive_sessions.create!(started_at: tz.local(2024, 12, 15, 22, 0, 0))
+    assert_equal 0, session.night_minutes
+    assert session.is_night_drive, "the flag still reflects starting after dark"
+
+    session.update!(ended_at: tz.local(2024, 12, 15, 23, 0, 0))
+    assert_equal 60, session.night_minutes
+  end
+
+  test "midday drives at high latitude are day drives" do
+    # Regression for the civil-dusk threshold: civil dusk falls after local midnight
+    # in Anchorage each summer, which inverted the window and flagged every daytime
+    # drive as night. Official sunset never inverts here — the wrapped-window branch
+    # itself is covered by the Fairbanks test above.
+    @user.update!(timezone: "America/Anchorage", latitude: 61.2181, longitude: -149.9003)
+    tz = ActiveSupport::TimeZone.new("America/Anchorage")
+
+    session = @user.drive_sessions.create!(
+      started_at: tz.local(2026, 6, 1, 12, 0, 0),
+      ended_at: tz.local(2026, 6, 1, 13, 0, 0)
+    )
+
+    assert_equal 0, session.night_minutes
+    assert_not session.is_night_drive, "noon in Anchorage in June is not night"
+  end
+
+  test "statistics credit only the night portion of a crossing drive" do
+    @user.drive_sessions.destroy_all
+    chicago_drive(2024, 12, 15, from: "16:00", to: "17:00")
+
+    stats = DriveSession.statistics_for(@user, timezone: "America/Chicago")
+
+    assert_in_delta 1.0, stats[:total_hours], 0.01
+    assert_in_delta 40 / 60.0, stats[:night_hours], 0.05
+    assert_in_delta 20 / 60.0, stats[:day_hours], 0.05
+  end
+
+  test "activity calendar marks a crossing drive as both day and night" do
+    @user.drive_sessions.destroy_all
+    # The calendar only covers the last three weeks, so sit inside that window.
+    travel_to ActiveSupport::TimeZone.new("America/Chicago").local(2024, 12, 15, 23, 0, 0) do
+      session = chicago_drive(2024, 12, 15, from: "16:00", to: "17:00")
+      states = @user.drive_sessions.activity_day_states(timezone: "America/Chicago")
+
+      assert_equal :both, states[session.started_at.in_time_zone("America/Chicago").to_date]
+    end
+  end
+
   test "determines night drive based on sunset/sunrise times in winter" do
     # Set user timezone and location (Chicago)
     @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
 
-    # Winter: sunset around 4:50pm
-    winter_date = Date.new(2024, 12, 15)
     tz = ActiveSupport::TimeZone.new("America/Chicago")
 
     # 5pm drive in winter should be night (after sunset)
@@ -110,19 +359,21 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert night_session.is_night_drive, "Should use timezone fallback coordinates"
   end
 
-  test "night_time? handles polar regions with no sunset" do
+  test "handles polar regions where the sun never sets" do
     @user.update!(timezone: "UTC", latitude: 89.0, longitude: 0.0) # Near North Pole
 
-    # During polar summer, there may be no sunset
-    # Should return false (not night) when sunrise/sunset are nil
-    time = Time.zone.parse("2024-06-15 12:00:00")
-    session = @user.drive_sessions.new()
-
-    # This should not raise an error
+    # With no sunrise/sunset to split on, the drive is credited as day rather
+    # than raising or guessing.
+    session = nil
     assert_nothing_raised do
-      result = session.send(:night_time?, time, 89.0, 0.0)
-      assert_equal false, result
+      session = @user.drive_sessions.create!(
+        started_at: Time.utc(2024, 6, 15, 12, 0, 0),
+        ended_at: Time.utc(2024, 6, 15, 13, 0, 0)
+      )
     end
+
+    assert_equal 0, session.night_minutes
+    assert_not session.is_night_drive
   end
 
   test "duration_hours returns 0 for nil duration" do
@@ -179,8 +430,18 @@ class DriveSessionTest < ActiveSupport::TestCase
       ended_at: tz.local(2024, 12, 15, 15, 0, 0)
     )
 
+    # A drive the retired civil-dusk rule flagged as night but which earns no night
+    # minutes. The backfill deliberately leaves those stale flags in place for
+    # rollback, so the scope has to read night_minutes, not is_night_drive.
+    legacy_flag_only = @user.drive_sessions.create!(
+      started_at: tz.local(2024, 12, 15, 10, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 11, 0, 0)
+    )
+    legacy_flag_only.update_column(:is_night_drive, true)
+
     assert_includes @user.drive_sessions.night_drives, night
     assert_not_includes @user.drive_sessions.night_drives, day
+    assert_not_includes @user.drive_sessions.night_drives, legacy_flag_only
   end
 
   test "ordered scope returns sessions in reverse chronological order" do
@@ -297,26 +558,28 @@ class DriveSessionTest < ActiveSupport::TestCase
 
   test "night_hours_needed returns remaining night hours" do
     @user.drive_sessions.destroy_all
-    # Create a 5-hour night drive (9pm to 2am)
-    @user.drive_sessions.create!(
-      started_at: Time.current.change(hour: 21),
-      ended_at: Time.current.tomorrow.change(hour: 2)
-    )
+    # 9pm to 2am in mid-December: dark end to end, so all 5 hours count.
+    chicago_drive(2024, 12, 15, from: "21:00", to: "26:00")
 
     assert_in_delta 5.0, @user.drive_sessions.night_hours_needed, 0.1
   end
 
   test "night_hours_needed returns 0 when requirement is met" do
     @user.drive_sessions.destroy_all
-    # Create a night drive that's at least 11 hours to meet requirement
-    # Started at 9pm yesterday, ended at 8am today (11 hours at night)
-    yesterday = 1.day.ago
-    @user.drive_sessions.create!(
-      started_at: yesterday.change(hour: 21),
-      ended_at: yesterday.tomorrow.change(hour: 8)
-    )
+    # 5pm to 7am spans sunset and stops just shy of sunrise (07:10): 14 hours,
+    # all of them dark, which clears the 10-hour requirement.
+    chicago_drive(2024, 12, 15, from: "17:00", to: "31:00")
 
     assert_equal 0, @user.drive_sessions.night_hours_needed
+  end
+
+  test "an overnight drive stops earning night credit at sunrise" do
+    @user.drive_sessions.destroy_all
+    # 5am to 9am on Dec 15: dark until sunrise at 07:10, daylight after.
+    chicago_drive(2024, 12, 15, from: "05:00", to: "09:00")
+
+    assert_in_delta 2.18, @user.drive_sessions.night_hours, 0.01
+    assert_in_delta 1.82, @user.drive_sessions.day_hours, 0.01
   end
 
   # Statistics
@@ -345,142 +608,6 @@ class DriveSessionTest < ActiveSupport::TestCase
       :active_days, :current_streak, :best_streak, :weekly_pace, :projected_finish ].each do |key|
       assert stats.key?(key), "expected statistics_for to include #{key}"
     end
-  end
-
-  # Activity Calendar
-  test "ACTIVITY_CALENDAR_DAYS constant is set" do
-    assert_equal 28, DriveSession::ACTIVITY_CALENDAR_DAYS
-  end
-
-  test "activity_by_date returns hash of dates to counts" do
-    travel_to Time.zone.local(2025, 1, 15, 12, 0, 0) do
-      @user.drive_sessions.destroy_all
-
-      # Create drives on specific dates in UTC
-      3.times do
-        @user.drive_sessions.create!(
-          started_at: 2.days.ago.beginning_of_day + 10.hours,
-          ended_at: 2.days.ago.beginning_of_day + 11.hours
-        )
-      end
-
-      2.times do
-        @user.drive_sessions.create!(
-          started_at: 1.day.ago.beginning_of_day + 10.hours,
-          ended_at: 1.day.ago.beginning_of_day + 11.hours
-        )
-      end
-
-      result = @user.drive_sessions.activity_by_date(days: 28, timezone: "UTC")
-
-      assert_equal 3, result[2.days.ago.to_date]
-      assert_equal 2, result[1.day.ago.to_date]
-      assert_nil result[Date.today]
-    end
-  end
-
-  test "activity_by_date respects timezone parameter" do
-    @user.drive_sessions.destroy_all
-
-    # Create a drive at 11 PM UTC on a specific date
-    # In Tokyo (UTC+9), this would be 8 AM the next day
-    drive_time = 2.days.ago.beginning_of_day.utc + 23.hours
-    @user.drive_sessions.create!(
-      started_at: drive_time,
-      ended_at: drive_time + 1.hour
-    )
-
-    utc_result = @user.drive_sessions.activity_by_date(days: 365, timezone: "UTC")
-    tokyo_result = @user.drive_sessions.activity_by_date(days: 365, timezone: "Asia/Tokyo")
-
-    # UTC should count it on the date at 11 PM UTC
-    utc_date = drive_time.in_time_zone("UTC").to_date
-    # Tokyo should count it on the next day (since 11 PM UTC = 8 AM next day in Tokyo)
-    tokyo_date = drive_time.in_time_zone("Asia/Tokyo").to_date
-
-    assert_equal 1, utc_result[utc_date]
-    assert_equal 1, tokyo_result[tokyo_date]
-  end
-
-  test "activity_by_date only includes completed drives" do
-    @user.drive_sessions.destroy_all
-
-    # Use UTC timezone consistently to avoid timezone mismatches
-    drive_date = 1.day.ago.utc
-    drive_started_at = drive_date
-    drive_ended_at = drive_date + 1.hour
-
-    # Completed drive
-    @user.drive_sessions.create!(
-      started_at: drive_started_at,
-      ended_at: drive_ended_at
-    )
-
-    # In-progress drive
-    @user.drive_sessions.create!(
-      started_at: drive_started_at
-    )
-
-    result = @user.drive_sessions.activity_by_date(days: 28, timezone: "UTC")
-    assert_equal 1, result[drive_started_at.to_date]
-  end
-
-  test "activity_by_date filters by date range" do
-    @user.drive_sessions.destroy_all
-
-    # Drive within range (10 days ago)
-    @user.drive_sessions.create!(
-      started_at: 10.days.ago,
-      ended_at: 10.days.ago + 1.hour
-    )
-
-    # Drive outside range (40 days ago)
-    @user.drive_sessions.create!(
-      started_at: 40.days.ago,
-      ended_at: 40.days.ago + 1.hour
-    )
-
-    result = @user.drive_sessions.activity_by_date(days: 28)
-    assert_equal 1, result.values.sum
-  end
-
-  test "activity_by_date handles nil timezone gracefully" do
-    @user.drive_sessions.destroy_all
-    @user.drive_sessions.create!(
-      started_at: 1.day.ago,
-      ended_at: 1.day.ago + 1.hour
-    )
-
-    # Should not raise error and should default to Time.zone or UTC
-    assert_nothing_raised do
-      result = @user.drive_sessions.activity_by_date(days: 28, timezone: nil)
-      assert_kind_of Hash, result
-      assert_equal 1, result.values.sum
-    end
-  end
-
-  test "activity_by_date handles empty results" do
-    @user.drive_sessions.destroy_all
-
-    result = @user.drive_sessions.activity_by_date(days: 28)
-    assert_equal({}, result)
-    assert_kind_of Hash, result
-  end
-
-  test "activity_by_date groups multiple drives on same date" do
-    @user.drive_sessions.destroy_all
-
-    # Create 5 drives on the same date
-    date = 5.days.ago.beginning_of_day
-    5.times do |i|
-      @user.drive_sessions.create!(
-        started_at: date + i.hours,
-        ended_at: date + i.hours + 30.minutes
-      )
-    end
-
-    result = @user.drive_sessions.activity_by_date(days: 28)
-    assert_equal 5, result[5.days.ago.to_date]
   end
 
   # Reminder Job
@@ -649,5 +776,21 @@ class DriveSessionTest < ActiveSupport::TestCase
       assert_equal :night, states[Date.new(2026, 7, 13)]
       assert_equal :both,  states[Date.new(2026, 7, 12)]
     end
+  end
+
+  private
+
+  # Hours past 24 roll into the next day so overnight drives read naturally:
+  # from "21:00" to "26:00" is 9pm to 2am.
+  def chicago_drive(year, month, day, from:, to:, end_seconds: 0)
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    at = ->(hhmm, seconds) do
+      hours, minutes = hhmm.split(":").map(&:to_i)
+      date = Date.new(year, month, day) + (hours / 24)
+      tz.local(date.year, date.month, date.day, hours % 24, minutes, seconds)
+    end
+
+    @user.drive_sessions.create!(started_at: at.call(from, 0), ended_at: at.call(to, end_seconds))
   end
 end

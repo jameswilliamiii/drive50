@@ -1,18 +1,21 @@
 module DriveSessionStatistics
   extend ActiveSupport::Concern
 
-  included do
-    # Make these methods available on the DriveSession class
-  end
-
   class_methods do
+    # timezones#update persists whatever the browser posts, so a name that does not
+    # resolve must degrade to UTC rather than take the dashboard (and every Turbo
+    # broadcast that recomputes it) down with a NoMethodError on nil.
+    def resolved_zone(timezone)
+      ActiveSupport::TimeZone[timezone.to_s] || ActiveSupport::TimeZone["UTC"]
+    end
+
     # Calculate all statistics for a user's drive sessions
     def statistics_for(user_or_relation, timezone: "UTC")
       relation = user_or_relation.is_a?(ActiveRecord::Relation) ? user_or_relation : user_or_relation.drive_sessions
       completed = relation.completed
 
       total_minutes = completed.sum(:duration_minutes)
-      night_minutes = completed.where(is_night_drive: true).sum(:duration_minutes)
+      night_minutes = completed.sum(:night_minutes)
       total_hours = total_minutes / 60.0
       night_hours = night_minutes / 60.0
 
@@ -38,7 +41,7 @@ module DriveSessionStatistics
     end
 
     def day_hours
-      completed.where(is_night_drive: false).sum(:duration_minutes) / 60.0
+      (completed.sum(:duration_minutes) - completed.sum(:night_minutes)) / 60.0
     end
 
     def drives_count
@@ -47,7 +50,7 @@ module DriveSessionStatistics
 
     # weeks_ago: 0 = current calendar week, 1 = previous, etc. Sunday-start, in the given tz.
     def hours_in_week(weeks_ago, timezone: "UTC")
-      tz = ActiveSupport::TimeZone[timezone || "UTC"]
+      tz = resolved_zone(timezone)
       today = Time.current.in_time_zone(tz).to_date
       start_date = today - today.wday - (weeks_ago * 7)
       start_dt = tz.local(start_date.year, start_date.month, start_date.day)
@@ -57,20 +60,20 @@ module DriveSessionStatistics
 
     # Distinct local dates (user tz) that have at least one completed drive, ascending.
     def active_dates(timezone: "UTC")
-      tz = ActiveSupport::TimeZone[timezone || "UTC"]
+      tz = resolved_zone(timezone)
       completed.pluck(:started_at).map { |t| t.in_time_zone(tz).to_date }.uniq.sort
     end
 
     def active_day_count(days: 21, timezone: "UTC", dates: nil)
       dates ||= active_dates(timezone: timezone)
-      tz = ActiveSupport::TimeZone[timezone || "UTC"]
+      tz = resolved_zone(timezone)
       today = Time.current.in_time_zone(tz).to_date
       cutoff = today - (days - 1)
       dates.count { |d| d >= cutoff && d <= today }
     end
 
     def current_streak(timezone: "UTC", dates: nil)
-      tz = ActiveSupport::TimeZone[timezone || "UTC"]
+      tz = resolved_zone(timezone)
       today = Time.current.in_time_zone(tz).to_date
       set = (dates || active_dates(timezone: timezone)).to_set
       return 0 if set.empty?
@@ -99,7 +102,7 @@ module DriveSessionStatistics
     end
 
     def weekly_pace(timezone: "UTC")
-      tz = ActiveSupport::TimeZone[timezone || "UTC"]
+      tz = resolved_zone(timezone)
       first = completed.minimum(:started_at)
       return 0.0 if first.nil?
 
