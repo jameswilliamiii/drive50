@@ -126,6 +126,87 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_nil stale.reload.ended_at
   end
 
+  test "momentum grid cells are buttons carrying their day's drive summary" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+
+    travel_to tz.local(2026, 7, 15, 18, 0, 0) do
+      @user.drive_sessions.create!( # 2pm-3pm, all daylight
+        started_at: tz.local(2026, 7, 14, 14, 0, 0), ended_at: tz.local(2026, 7, 14, 15, 0, 0)
+      )
+      @user.drive_sessions.create!( # 9pm-10pm, all dark
+        started_at: tz.local(2026, 7, 14, 21, 0, 0), ended_at: tz.local(2026, 7, 14, 22, 0, 0)
+      )
+      @user.drive_sessions.create!( # 7:30-9pm crosses sunset: the signature case
+        started_at: tz.local(2026, 7, 13, 19, 30, 0), ended_at: tz.local(2026, 7, 13, 21, 0, 0)
+      )
+
+      get drive_sessions_url
+    end
+
+    cell = css_select("button.activity-cell[data-action='day-modal#open']").find do |node|
+      JSON.parse(node["data-day-summary"])["count"].to_i == 2
+    end
+    assert cell, "expected a grid cell carrying the two-drive day"
+
+    summary = JSON.parse(cell["data-day-summary"])
+    assert_equal "Tuesday, July 14, 2026", summary["label"]
+    assert_equal "2 hrs", summary["total"]
+    assert_equal "1 hr", summary["day"]
+    assert_equal "1 hr", summary["night"]
+    assert_equal %w[day night], summary["drives"].map { |d| d["kind"] }
+    assert_equal "2:00 PM – 3:00 PM", summary["drives"].first["time"]
+    assert_equal "both", cell["class"][/state-(\w+)/, 1]
+    assert_equal "July 14, 2 drives, 2 hrs", cell["aria-label"]
+
+    # A single drive that straddles sunset is "mixed" on its own, and paints the
+    # day both colours without needing a second drive.
+    crossing = css_select("button.activity-cell").map { |n| JSON.parse(n["data-day-summary"]) }
+                                                 .find { |s| s["label"].start_with?("Monday, July 13") }
+    assert_equal [ "mixed" ], crossing["drives"].map { |d| d["kind"] }
+    assert crossing["day"], "a mixed day reports a day total"
+    assert crossing["night"], "a mixed day reports a night total"
+  end
+
+  test "a day with only daylight driving omits the night total instead of reporting zero" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+
+    travel_to tz.local(2026, 7, 15, 18, 0, 0) do
+      @user.drive_sessions.create!(
+        started_at: tz.local(2026, 7, 14, 14, 0, 0), ended_at: tz.local(2026, 7, 14, 15, 0, 0)
+      )
+      get drive_sessions_url
+    end
+
+    summary = css_select("button.activity-cell").map { |n| JSON.parse(n["data-day-summary"]) }
+                                                .find { |s| s["count"].to_i == 1 }
+    assert_equal "1 hr", summary["day"]
+    assert_nil summary["night"], "a zero night total must be omitted, not rendered as 0 hrs"
+  end
+
+  test "a day with no drives still opens, and future days are not clickable" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago")
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+
+    travel_to tz.local(2026, 7, 15, 18, 0, 0) do
+      get drive_sessions_url
+    end
+
+    empty = css_select("button.activity-cell").map { |n| JSON.parse(n["data-day-summary"]) }.first
+    assert_equal 0, empty["count"]
+    assert_empty empty["drives"]
+    assert_nil empty["day"], "a driveless day has no day total row"
+
+    # Future cells stay inert divs — nothing to summarise yet.
+    assert_select "div.activity-cell.is-future"
+    assert_select "div.activity-cell.is-future[data-day-summary]", false
+    assert_select "div.activity-cell.is-future[data-action]", false
+  end
+
   test "a drive that crosses sunset carries its split into the detail modal" do
     @user.drive_sessions.destroy_all
     @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)

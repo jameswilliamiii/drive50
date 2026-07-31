@@ -19,6 +19,10 @@ development:
 test:
   <<: *default
   database: storage/test.sqlite3
+  # System tests drive a Puma thread that writes (timezones#update fires on every
+  # page load) while the test thread writes its fixtures — on a slow CI box the
+  # default 5s is not enough for one to wait out the other.
+  timeout: 15000
 
 
 # Store production database in the storage/ directory, which by default

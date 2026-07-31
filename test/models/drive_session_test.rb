@@ -2,6 +2,7 @@ require "test_helper"
 
 class DriveSessionTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
+  include ActionCable::TestHelper
 
   setup do
     @user = users(:one)
@@ -282,14 +283,15 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert_in_delta 20 / 60.0, stats[:day_hours], 0.05
   end
 
-  test "activity calendar marks a crossing drive as both day and night" do
+  test "a crossing drive is grouped onto its local date" do
     @user.drive_sessions.destroy_all
     # The calendar only covers the last three weeks, so sit inside that window.
     travel_to ActiveSupport::TimeZone.new("America/Chicago").local(2024, 12, 15, 23, 0, 0) do
       session = chicago_drive(2024, 12, 15, from: "16:00", to: "17:00")
-      states = @user.drive_sessions.activity_day_states(timezone: "America/Chicago")
+      days = @user.drive_sessions.activity_days(timezone: "America/Chicago")
+      date = session.started_at.in_time_zone("America/Chicago").to_date
 
-      assert_equal :both, states[session.started_at.in_time_zone("America/Chicago").to_date]
+      assert_equal [ session ], days[date], "the crossing drive lands on its start date"
     end
   end
 
@@ -762,7 +764,59 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert_equal "Complete", @user.drive_sessions.projected_finish(timezone: "America/Chicago")
   end
 
-  test "activity_day_states maps each active day to :day, :night, or :both" do
+  test "the broadcast rebuilds a grid that still carries the day's drives" do
+    # The only broadcast coverage was assert_nothing_raised, which proves the
+    # stream does not throw — not that the grid it re-renders is correct. The
+    # grid could go blank on every live update and stay green.
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    @user.drive_sessions.destroy_all
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    today = Time.current.in_time_zone(tz).to_date
+
+    stream = Turbo::StreamsChannel.send(:stream_name_from, @user)
+    payloads = capture_broadcasts(stream) do
+      @user.drive_sessions.create!(
+        started_at: tz.local(today.year, today.month, today.day, 14),
+        ended_at: tz.local(today.year, today.month, today.day, 15)
+      )
+    end
+
+    grid = payloads.map(&:to_s).find { |html| html.include?("activity-cell") }
+    assert grid, "a broadcast should re-render the Momentum grid"
+
+    summaries = Nokogiri::HTML5.fragment(grid).css("button.activity-cell")
+                               .map { |node| JSON.parse(node["data-day-summary"]) }
+    assert summaries.any? { |s| s["count"] == 1 && s["total"] == "1 hr" },
+           "the rebuilt grid must carry the drive that triggered it"
+  end
+
+  test "activity_days spans exactly the 21 cells the grid renders" do
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    @user.drive_sessions.destroy_all
+
+    travel_to tz.local(2026, 7, 15, 18, 0, 0) do # Wed; window 06-28..07-18
+      first_cell = @user.drive_sessions.create!(
+        started_at: tz.local(2026, 6, 28, 0, 0, 0), ended_at: tz.local(2026, 6, 28, 1, 0, 0)
+      )
+      too_early = @user.drive_sessions.create!(
+        started_at: tz.local(2026, 6, 27, 23, 0, 0), ended_at: tz.local(2026, 6, 27, 23, 59, 59)
+      )
+      too_late = @user.drive_sessions.create!(
+        started_at: tz.local(2026, 7, 19, 0, 0, 0), ended_at: tz.local(2026, 7, 19, 1, 0, 0)
+      )
+
+      # Assert on the loaded set rather than a date key: what this pins is the
+      # query's bounds, not which cell the drive happens to land in.
+      loaded = @user.drive_sessions.activity_days(timezone: "America/Chicago").values.flatten
+
+      assert_includes loaded, first_cell, "midnight of the first cell is inside the window"
+      assert_not_includes loaded, too_early, "the day before the grid is outside"
+      assert_not_includes loaded, too_late, "the day after the grid is outside"
+    end
+  end
+
+  test "activity_days groups drives by their local date" do
     @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
     tz = ActiveSupport::TimeZone.new("America/Chicago")
     travel_to tz.local(2026, 7, 15, 18, 0, 0) do # Wed; grid window 06-28..07-18
@@ -771,10 +825,12 @@ class DriveSessionTest < ActiveSupport::TestCase
       @user.drive_sessions.create!(started_at: tz.local(2026, 7, 13, 21, 0, 0), ended_at: tz.local(2026, 7, 13, 22, 0, 0)) # night only
       @user.drive_sessions.create!(started_at: tz.local(2026, 7, 12, 14, 0, 0), ended_at: tz.local(2026, 7, 12, 15, 0, 0)) # day part of "both"
       @user.drive_sessions.create!(started_at: tz.local(2026, 7, 12, 21, 0, 0), ended_at: tz.local(2026, 7, 12, 22, 0, 0)) # night part of "both"
-      states = @user.drive_sessions.activity_day_states(timezone: "America/Chicago")
-      assert_equal :day,   states[Date.new(2026, 7, 14)]
-      assert_equal :night, states[Date.new(2026, 7, 13)]
-      assert_equal :both,  states[Date.new(2026, 7, 12)]
+      days = @user.drive_sessions.activity_days(timezone: "America/Chicago")
+
+      assert_equal 1, days[Date.new(2026, 7, 14)].size
+      assert_equal 1, days[Date.new(2026, 7, 13)].size
+      assert_equal 2, days[Date.new(2026, 7, 12)].size, "both drives land on the same local day"
+      assert_nil days[Date.new(2026, 7, 11)], "a day with no drives is absent"
     end
   end
 

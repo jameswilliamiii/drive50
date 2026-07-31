@@ -38,8 +38,13 @@ export default class extends Controller {
     // Start fade-out animation
     this.element.classList.add("fade-out")
 
-    // Wait for animation to complete, then submit
-    setTimeout(() => {
+    // Wait for animation to complete, then submit. The timer is owned so a Turbo
+    // Stream replacing the drives table mid-animation cannot leave it to fire
+    // against a detached form, where requestSubmit() silently does nothing and the
+    // delete the user just confirmed never happens.
+    this.deleteTimer = setTimeout(() => {
+      if (!this.element.isConnected) return
+
       // Hide row before submitting to prevent flash
       this.element.style.display = "none"
 
@@ -52,18 +57,13 @@ export default class extends Controller {
         delete button.dataset.turboConfirm
       }
 
-      // Ensure body scroll is restored before submitting (in case card menu is open)
-      document.body.style.overflow = ""
-
       // Submit form programmatically (confirmation already handled)
       form.requestSubmit()
     }, this.animationDurationValue)
   }
 
-  // Cleanup when element is removed from DOM
   disconnect() {
-    // Ensure scroll is restored if controller is disconnected
-    document.body.style.overflow = ""
+    clearTimeout(this.deleteTimer)
   }
 }
 

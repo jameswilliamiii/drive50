@@ -1,0 +1,46 @@
+<%# Day-summary modal for the Momentum grid. Shares the drive-modal styling and,
+    like it, is populated client-side from the clicked cell's data attributes. %>
+<dialog class="drive-modal day-modal"
+        data-day-modal-target="dialog"
+        data-action="click->day-modal#backdropClick cancel->day-modal#onClose close->day-modal#onClose"
+        aria-labelledby="day-modal-date">
+  <div class="drive-modal-card">
+    <div class="drive-modal-header">
+      <div class="drive-modal-heading">
+        <h2 class="drive-modal-date" id="day-modal-date" data-day-modal-target="date"></h2>
+        <p class="drive-modal-type" data-day-modal-target="summary"></p>
+      </div>
+      <button type="button" class="drive-modal-close" data-action="day-modal#close" aria-label="Close">
+        <%= icon_close(size: 20) %>
+      </button>
+    </div>
+
+    <div class="drive-modal-body">
+      <dl class="drive-modal-stats" data-day-modal-target="totals">
+        <div class="drive-modal-stat" data-day-modal-target="dayRow" hidden>
+          <dt class="drive-modal-stat-label">Day</dt>
+          <dd class="drive-modal-stat-value" data-day-modal-target="dayTotal"></dd>
+        </div>
+        <div class="drive-modal-stat" data-day-modal-target="nightRow" hidden>
+          <dt class="drive-modal-stat-label">Night</dt>
+          <dd class="drive-modal-stat-value" data-day-modal-target="nightTotal"></dd>
+        </div>
+      </dl>
+
+      <ul class="day-modal-drives" data-day-modal-target="list"></ul>
+
+      <p class="day-modal-empty" data-day-modal-target="empty" hidden>No drives logged this day.</p>
+
+      <template data-day-modal-target="rowTemplate">
+        <li class="day-modal-drive">
+          <span class="day-modal-drive-badge">
+            <span class="day-modal-icon-day"><%= icon_sun(size: 16) %></span>
+            <span class="day-modal-icon-night"><%= icon_moon(size: 16) %></span>
+          </span>
+          <span class="day-modal-drive-time"></span>
+          <span class="day-modal-drive-duration"></span>
+        </li>
+      </template>
+    </div>
+  </div>
+</dialog>

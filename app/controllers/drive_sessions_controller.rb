@@ -7,7 +7,7 @@ class DriveSessionsController < ApplicationController
 
     @recent_sessions = user_sessions.completed.ordered.with_user.limit(3)
     @stats = DriveSession.statistics_for(Current.user, timezone: tz)
-    @activity_states = user_sessions.activity_day_states(timezone: tz)
+    @activity_cells = ActivityDay.grid_for(user_sessions.activity_days(timezone: tz), timezone: tz)
   end
 
   def all

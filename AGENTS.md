@@ -82,6 +82,15 @@ bin/rails console --sandbox  # Rolls back all changes on exit
 **Scopes:** `.completed` / `.in_progress`, `.night_drives`, `.ordered` (reverse
 chronological), `.with_user` (preloads the owner to avoid N+1 in views/CSV).
 
+**Activity grid:** `DriveSession.activity_days(timezone:)` groups completed drives
+into `{ Date => [drives] }` across exactly the 21 cells the grid renders, and
+`ActivityDay.grid_for` expands that into the cells themselves — one `ActivityDay`
+per day, which owns its `state`, `aria_label` and `as_json` payload. One query feeds
+both the grid and the day-summary modal; don't add a second pass over the same
+window. Past cells render as `<button>` and open the modal from `data-day-summary`
+JSON, the same no-round-trip approach as the drive-detail modal; a future cell stays
+an inert `<div>` unless a drive was logged against it.
+
 ### Night-drive detection
 
 Night classification is **sunrise/sunset based, not a fixed clock window**, and a
@@ -180,8 +189,8 @@ ImportMaps (no build step). CSS is plain, componentized files under
 the user's browser timezone.
 
 **Stimulus controllers** (`app/javascript/controllers/`): `timer`,
-`drive_session`, `drive_modal`, `card_menu`, `menu`, `toast`, `export`,
-`activity_calendar`, `location`, `push_notifications`, `timezone`,
+`drive_session`, `drive_modal`, `day_modal`, `card_menu`, `menu`, `toast`, `export`,
+`location`, `push_notifications`, `timezone`,
 `timezone_detector`.
 
 ### PWA

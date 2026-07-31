@@ -54,30 +54,24 @@ class DriveSession < ApplicationRecord
     [ NIGHT_HOURS_NEEDED - night_hours, 0 ].max
   end
 
-  # Returns { Date => :day | :night | :both } for every day with a completed drive
-  # in the 3 Sunday-aligned weeks ending with the current week.
-  def self.activity_day_states(timezone: "UTC")
+  # Groups completed drives by their local date, across exactly the 21 cells the
+  # grid renders (3 Sunday-aligned weeks ending with the current week). Days with
+  # no drives are simply absent. The grid colours each cell from this and the
+  # day-summary modal lists it, so both read one query rather than each computing
+  # the same window. Bounded at both ends: an unbounded upper edge loaded rows the
+  # grid then silently discarded.
+  def self.activity_days(timezone: "UTC")
     tz = resolved_zone(timezone)
     today = Time.current.in_time_zone(tz).to_date
-    start_of_week = today - today.wday
-    range_start = start_of_week - 14
-    start_datetime = tz.local(range_start.year, range_start.month, range_start.day)
+    range_start = today - today.wday - 14
+    range_end = range_start + 21 # exclusive: midnight after the last cell
 
-    states = Hash.new { |h, k| h[k] = { day: false, night: false } }
-    completed.where("started_at >= ?", start_datetime).find_each do |session|
-      date = session.started_at.in_time_zone(tz).to_date
-      # A drive that crosses sunset paints the day both colors.
-      states[date][:night] = true if session.night_minutes.positive?
-      states[date][:day] = true if session.night_minutes < session.duration_minutes.to_i
-    end
+    from = tz.local(range_start.year, range_start.month, range_start.day)
+    to = tz.local(range_end.year, range_end.month, range_end.day)
 
-    states.transform_values do |v|
-      if v[:day] && v[:night] then :both
-      elsif v[:night] then :night
-      elsif v[:day] then :day
-      else :none
-      end
-    end
+    completed.where(started_at: from...to)
+             .order(:started_at)
+             .group_by { |session| session.started_at.in_time_zone(tz).to_date }
   end
 
   # Instance methods
@@ -104,9 +98,26 @@ class DriveSession < ApplicationRecord
     (duration_hours - night_hours).round(2)
   end
 
+  def any_night?
+    night_minutes.positive?
+  end
+
+  def any_day?
+    night_minutes < duration_minutes.to_i
+  end
+
   # A drive that crossed sunset or sunrise, so it earns both day and night credit.
   def day_and_night?
-    night_minutes.positive? && night_minutes < duration_minutes.to_i
+    any_night? && any_day?
+  end
+
+  # The three-way classification, as the day summary reports it. The drive row and
+  # the detail modal still derive their own from day_and_night? and the night flag;
+  # routing those through here too would be the obvious next consolidation.
+  def kind
+    return :mixed if day_and_night?
+
+    any_night? ? :night : :day
   end
 
   def elapsed_time
@@ -283,15 +294,13 @@ class DriveSession < ApplicationRecord
     tz = user.timezone || "UTC"
 
     statistics = DriveSession.statistics_for(relation, timezone: tz)
-    activity_days = ApplicationController.helpers.dashboard_activity_days(
-      relation.activity_day_states(timezone: tz), timezone: tz
-    )
+    activity_cells = ActivityDay.grid_for(relation.activity_days(timezone: tz), timezone: tz)
 
     broadcast_replace_to user,
                          target: "progress-summary",
                          html: ApplicationController.render(
                            partial: "drive_sessions/progress_summary",
-                           locals: { stats: statistics, activity_days: activity_days }
+                           locals: { stats: statistics, activity_cells: activity_cells }
                          )
 
     broadcast_update_to user,

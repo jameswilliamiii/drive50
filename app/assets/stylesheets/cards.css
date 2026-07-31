@@ -273,6 +273,9 @@
   background: var(--activity-empty-bg);
   border: 1px solid var(--activity-empty-border);
   cursor: pointer; transition: var(--transition);
+  /* Past days render as <button> so the grid is keyboard reachable; strip the
+     UA button chrome so they look identical to the future-day divs. */
+  padding: 0; margin: 0; appearance: none; font: inherit; color: inherit;
 }
 .activity-cell.state-day { background: var(--activity-day); border-color: transparent; box-shadow: 0 4px 12px -4px var(--activity-day); }
 .activity-cell.state-night { background: var(--activity-night); border-color: transparent; box-shadow: 0 4px 12px -4px var(--activity-night); }
