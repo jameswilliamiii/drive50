@@ -17,8 +17,8 @@ Rails.application.routes.draw do
 
   root "pages#home"
 
-  resources :passwords, param: :token
-  resource :session
+  resources :passwords, param: :token, only: [ :new, :create, :edit, :update ]
+  resource :session, only: [ :new, :create, :destroy ]
   resources :registrations, only: [ :new, :create ]
   resource :user, only: [ :edit, :update ]
 

@@ -28,13 +28,23 @@ module TimezoneCoordinates
     "America/Juneau" => { lat: 58.3019, lon: -134.4197 },
 
     # Hawaii Time
-    "Pacific/Honolulu" => { lat: 21.3099, lon: -157.8581 },
-
-    # Default fallback (New York)
-    "UTC" => { lat: 40.7128, lon: -74.0060 }
+    "Pacific/Honolulu" => { lat: 21.3099, lon: -157.8581 }
   }.freeze
 
+  # Mid-northern latitude for zones we have no city for. Longitude carries the
+  # seasonal signal; latitude only sets how extreme the swing is.
+  FALLBACK_LATITUDE = 40.0
+
   def self.coordinates_for_timezone(timezone)
-    TIMEZONE_COORDS[timezone] || TIMEZONE_COORDS["UTC"]
+    TIMEZONE_COORDS[timezone] || meridian_coordinates(timezone)
+  end
+
+  # Longitude and UTC offset have to agree or the sunrise/sunset window is
+  # nonsense: pairing a zero-offset zone with New York's -74° puts "sunset" after
+  # local midnight, which reads as an inverted window and flags whole days wrong.
+  # So for an unknown zone, place the driver on the meridian their clock is set to.
+  def self.meridian_coordinates(timezone)
+    zone = ActiveSupport::TimeZone[timezone.to_s]
+    { lat: FALLBACK_LATITUDE, lon: (zone ? zone.utc_offset / 3600.0 : 0) * 15.0 }
   end
 end

@@ -5,26 +5,32 @@ class DriveSession < ApplicationRecord
 
   HOURS_NEEDED = 50
   NIGHT_HOURS_NEEDED = 10
-  ACTIVITY_CALENDAR_DAYS = 28
   REMINDER_DELAY = 45.minutes
+  MAX_DRIVE_DURATION = 7.days
 
   belongs_to :user
 
   # Validations
   validates :started_at, presence: true
-  validate :ended_at_after_started_at, if: -> { ended_at.present? }
+  validate :ended_at_after_started_at, if: -> { started_at.present? && ended_at.present? }
+  # Only when the span itself is being set, so a pre-existing over-long row stays
+  # editable (its notes can still be corrected).
+  validate :duration_within_maximum, if: -> { ended_at.present? && (started_at_changed? || ended_at_changed?) }
 
   # Scopes
   scope :completed, -> { where.not(ended_at: nil) }
   scope :in_progress, -> { where(ended_at: nil) }
-  scope :night_drives, -> { where(is_night_drive: true) }
+  scope :night_drives, -> { where("night_minutes > 0") }
   scope :ordered, -> { order(started_at: :desc) }
   # Preload the owning user so views/CSV can render user.full_name without an
   # N+1. Use on any collection whose rows read through the user association.
   scope :with_user, -> { includes(:user) }
 
   # Callbacks
-  before_save :calculate_duration, if: -> { ended_at.present? && ended_at_changed? }
+  # Both derived columns must come from the same start/end pair. Guarding duration
+  # on ended_at alone let an edit to just the start time recompute night_minutes
+  # against a stale duration, which made day_hours negative.
+  before_save :calculate_duration, if: -> { ended_at.present? && (started_at_changed? || ended_at_changed?) }
   before_save :determine_night_drive, if: -> { started_at_changed? || ended_at_changed? }
   after_create_commit :broadcast_create
   after_create_commit :schedule_reminder, if: :in_progress?
@@ -37,7 +43,7 @@ class DriveSession < ApplicationRecord
   end
 
   def self.night_hours
-    night_drives.completed.sum(:duration_minutes) / 60.0
+    completed.sum(:night_minutes) / 60.0
   end
 
   def self.hours_needed
@@ -48,25 +54,10 @@ class DriveSession < ApplicationRecord
     [ NIGHT_HOURS_NEEDED - night_hours, 0 ].max
   end
 
-  def self.activity_by_date(days: ACTIVITY_CALENDAR_DAYS, timezone: "UTC")
-    # Calculate date range in user's timezone
-    tz = ActiveSupport::TimeZone[timezone || "UTC"]
-    end_date = Time.current.in_time_zone(tz).to_date
-    start_date = end_date - (days - 1).days
-
-    # Convert start_date to beginning of day in the user's timezone
-    start_datetime = tz.local(start_date.year, start_date.month, start_date.day)
-
-    completed
-      .where("started_at >= ?", start_datetime)
-      .group_by { |session| session.started_at.in_time_zone(tz).to_date }
-      .transform_values(&:count)
-  end
-
   # Returns { Date => :day | :night | :both } for every day with a completed drive
   # in the 3 Sunday-aligned weeks ending with the current week.
   def self.activity_day_states(timezone: "UTC")
-    tz = ActiveSupport::TimeZone[timezone || "UTC"]
+    tz = resolved_zone(timezone)
     today = Time.current.in_time_zone(tz).to_date
     start_of_week = today - today.wday
     range_start = start_of_week - 14
@@ -75,7 +66,9 @@ class DriveSession < ApplicationRecord
     states = Hash.new { |h, k| h[k] = { day: false, night: false } }
     completed.where("started_at >= ?", start_datetime).find_each do |session|
       date = session.started_at.in_time_zone(tz).to_date
-      session.is_night_drive ? states[date][:night] = true : states[date][:day] = true
+      # A drive that crosses sunset paints the day both colors.
+      states[date][:night] = true if session.night_minutes.positive?
+      states[date][:day] = true if session.night_minutes < session.duration_minutes.to_i
     end
 
     states.transform_values do |v|
@@ -101,6 +94,21 @@ class DriveSession < ApplicationRecord
     (duration_minutes / 60.0).round(2)
   end
 
+  def night_hours
+    (night_minutes / 60.0).round(2)
+  end
+
+  # Derived from the already-rounded pair so the three columns in the CSV always
+  # reconcile; rounding each independently left ~22% of them off by 0.01.
+  def day_hours
+    (duration_hours - night_hours).round(2)
+  end
+
+  # A drive that crossed sunset or sunrise, so it earns both day and night credit.
+  def day_and_night?
+    night_minutes.positive? && night_minutes < duration_minutes.to_i
+  end
+
   def elapsed_time
     return nil unless in_progress? && started_at
     elapsed_seconds = (Time.current - started_at).to_i
@@ -122,52 +130,117 @@ class DriveSession < ApplicationRecord
     end
   end
 
+  # night_seconds walks one date per calendar day spanned, so an unbounded span is
+  # unbounded CPU on a save (a 10-year span measured 1.3s).
+  def duration_within_maximum
+    if ended_at - started_at > MAX_DRIVE_DURATION
+      errors.add(:ended_at, "must be within #{MAX_DRIVE_DURATION.inspect} of the start time")
+    end
+  end
+
   def calculate_duration
     return unless started_at && ended_at
     self.duration_minutes = ((ended_at - started_at) / 60).to_i
   end
 
+  # Night is the span between sunset and sunrise, and a drive is credited minute
+  # by minute rather than as a whole: crossing sunset splits the drive instead of
+  # tipping all of it into the night column.
   def determine_night_drive
     return unless started_at
 
-    user_timezone = user.timezone || "UTC"
-    local_start = started_at.in_time_zone(user_timezone)
+    if ended_at.present?
+      # Truncate the same way duration_minutes does — rounding here while duration
+      # floors put night one minute over on any drive with a seconds remainder.
+      # On the save path calculate_duration has just run on the same span, so the
+      # cap is redundant there; it exists for callers that invoke this method
+      # directly (the backfill task) against a duration they did not recompute.
+      self.night_minutes = [ (night_seconds(started_at, ended_at) / 60).to_i, duration_minutes.to_i ].min
+      # Nothing reads this column any more — it is still written so that rolling
+      # back to the previous release finds sensible values. Drop it once this ships.
+      self.is_night_drive = night_minutes.positive?
+    else
+      self.night_minutes = 0
+      self.is_night_drive = night_time?(started_at)
+    end
+  end
 
-    coords = if user.latitude.present? && user.longitude.present?
+  # Seconds of [start_at, finish_at] that fall after sunset or before sunrise.
+  # Cutting the drive at every solar event it spans (and classifying each piece by
+  # its midpoint) keeps overnight and multi-day drives correct for free.
+  def night_seconds(start_at, finish_at)
+    from = start_at.in_time_zone(user_timezone)
+    to = finish_at.in_time_zone(user_timezone)
+
+    # Local midnight has to be a cut point alongside the solar events: night_time?
+    # resolves its reference date from the instant it is handed, so a segment that
+    # straddles midnight would be classified by a midpoint belonging to only one of
+    # the two dates. That goes wrong where an inverted day meets a normal one.
+    zone = ActiveSupport::TimeZone[user_timezone]
+    crossings = ((from.to_date - 1)..(to.to_date + 1)).flat_map do |date|
+      solar_events(date) << zone.local(date.year, date.month, date.day)
+    end
+    cuts = ([ from, to ] + crossings.compact.select { |event| event > from && event < to }).sort
+
+    cuts.each_cons(2).sum { |a, b| night_time?(a + (b - a) / 2) ? b - a : 0 }
+  end
+
+  def night_time?(time)
+    local = time.in_time_zone(user_timezone)
+    sunrise, sunset = solar_events(local.to_date)
+
+    # nil for both means the sun neither rose nor set, and the gem gives us no way
+    # to tell midnight sun from polar night — so we assume daylight. Known gap, and
+    # not a theoretical one: at Utqiagvik AK that silently zeroes night credit for
+    # ~63 days of continuous darkness a year (145 nil days in 2026, 63 in Nov-Feb).
+    return false if sunrise.nil? || sunset.nil?
+
+    # Near the Arctic Circle the window wraps: in early summer the sun sets just
+    # after local midnight and rises a few hours later, putting sunset *before*
+    # sunrise on the same date. Night is then the interval between the two rather
+    # than the two ends of the day. Fairbanks inverts on 46 days a year.
+    return local > sunset && local < sunrise if sunrise >= sunset
+
+    local < sunrise || local > sunset
+  end
+
+  # Sunrise and sunset for a local calendar date, as instants in the user's zone.
+  def solar_events(date)
+    calculator = SolarEventCalculator.new(date, coordinates[:lat], coordinates[:lon])
+
+    [ calculator.compute_utc_official_sunrise, calculator.compute_utc_official_sunset ].map do |event|
+      local_instant(date, event)
+    end
+  end
+
+  # RubySunrise returns the correct UTC clock time for each event but stamps it onto
+  # the date we passed in, so its raw instant can land on the wrong UTC day (in the
+  # Americas sunset is after 00:00 UTC). Rebuild the instant from the event's UTC
+  # time-of-day shifted into local time, which never depends on which calendar date
+  # the gem chose. The offset is read at local noon so it is the one in effect after
+  # any DST change that day, which is when sunrise and sunset both fall.
+  def local_instant(date, event)
+    return nil if event.nil?
+
+    zone = ActiveSupport::TimeZone[user_timezone]
+    offset = zone.local(date.year, date.month, date.day, 12).utc_offset
+    seconds = (event.hour * 3600 + event.min * 60 + event.sec + offset) % 86_400
+
+    zone.local(date.year, date.month, date.day, seconds / 3600, (seconds % 3600) / 60, seconds % 60)
+  end
+
+  # The name rather than the zone object, because TimezoneCoordinates keys its
+  # lookup table on the IANA identifier.
+  def user_timezone
+    self.class.resolved_zone(user.timezone).name
+  end
+
+  def coordinates
+    if user.latitude.present? && user.longitude.present?
       { lat: user.latitude.to_f, lon: user.longitude.to_f }
     else
       TimezoneCoordinates.coordinates_for_timezone(user_timezone)
     end
-
-    started_at_night = night_time?(local_start, coords[:lat], coords[:lon])
-
-    if ended_at.present?
-      local_end = ended_at.in_time_zone(user_timezone)
-      ended_at_night = night_time?(local_end, coords[:lat], coords[:lon])
-      self.is_night_drive = started_at_night || ended_at_night
-    else
-      self.is_night_drive = started_at_night
-    end
-  end
-
-  def night_time?(time, latitude, longitude)
-    solar_event = SolarEventCalculator.new(time.to_date, latitude, longitude)
-    sunrise_utc = solar_event.compute_utc_civil_sunrise
-    sunset_utc = solar_event.compute_utc_civil_sunset
-
-    return false if sunrise_utc.nil? || sunset_utc.nil?
-
-    # RubySunrise returns the correct UTC clock time for each event but stamps it onto
-    # the date we passed in, so its raw instant can land on the wrong UTC day (in the
-    # Americas sunset is after 00:00 UTC). Shift each event's UTC time-of-day by the
-    # drive's own offset to get a local time-of-day: this never depends on which
-    # calendar date the gem chose, and avoids reconverting through the shifted date's
-    # (possibly different, across a DST boundary) offset.
-    offset = time.utc_offset
-    event_seconds = ->(event) { (event.hour * 3600 + event.min * 60 + event.sec + offset) % 86_400 }
-
-    tod = time.seconds_since_midnight
-    tod < event_seconds.call(sunrise_utc) || tod > event_seconds.call(sunset_utc)
   end
 
   def broadcast_create

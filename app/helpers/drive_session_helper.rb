@@ -43,7 +43,7 @@ module DriveSessionHelper
   # Time-of-day greeting in the user's own timezone, personalized when we know
   # their name.
   def dashboard_greeting(user)
-    tz = ActiveSupport::TimeZone[user.timezone.presence || "UTC"]
+    tz = DriveSession.resolved_zone(user.timezone)
     part = case Time.current.in_time_zone(tz).hour
     when 5..11 then "Good morning"
     when 12..16 then "Good afternoon"
@@ -54,7 +54,7 @@ module DriveSessionHelper
 
   # Expands a { Date => state } hash into 21 Sunday-aligned cells (3 weeks).
   def dashboard_activity_days(states, timezone: "UTC")
-    tz = ActiveSupport::TimeZone[timezone || "UTC"]
+    tz = DriveSession.resolved_zone(timezone)
     today = Time.current.in_time_zone(tz).to_date
     start_of_week = today - today.wday
     range_start = start_of_week - 14

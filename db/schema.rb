@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_18_173727) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_031151) do
   create_table "drive_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "duration_minutes"
     t.datetime "ended_at"
     t.boolean "is_night_drive", default: false, null: false
+    t.integer "night_minutes", default: 0, null: false
     t.text "notes"
     t.datetime "started_at", null: false
     t.datetime "updated_at", null: false

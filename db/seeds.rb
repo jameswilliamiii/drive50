@@ -40,6 +40,6 @@ end
 puts "Created user: #{user.full_name} (#{user.email_address})"
 puts "Created #{DriveSession.count} drive sessions"
 total_hours = user.drive_sessions.completed.sum(:duration_minutes) / 60.0
-night_hours = user.drive_sessions.night_drives.completed.sum(:duration_minutes) / 60.0
+night_hours = user.drive_sessions.night_hours
 puts "Total hours: #{total_hours.round(1)}"
 puts "Night hours: #{night_hours.round(1)}"

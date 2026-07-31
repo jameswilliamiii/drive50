@@ -73,8 +73,16 @@ class DriveSessionsController < ApplicationController
   end
 
   def complete
-    @drive_session.update(ended_at: Time.current)
-    redirect_to drive_sessions_path
+    if @drive_session.update(ended_at: Time.current)
+      redirect_to drive_sessions_path
+    else
+      # A drive left running past MAX_DRIVE_DURATION cannot be closed at
+      # Time.current. Swallowing that stranded the user: the drive stayed in
+      # progress, which also blocks starting a new one. Send them somewhere they
+      # can actually fix the times.
+      redirect_to edit_drive_session_path(@drive_session),
+                  alert: "#{@drive_session.errors.full_messages.to_sentence}. Set the end time manually."
+    end
   end
 
   def destroy

@@ -112,6 +112,59 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_match @user.full_name, response.body
   end
 
+  test "completing a drive left running too long sends the user somewhere they can fix it" do
+    # Regression: the max-duration validation made this update fail, the controller
+    # discarded the result, and the Stop button silently did nothing — leaving the
+    # drive in progress, which also blocks starting a new one.
+    @user.drive_sessions.destroy_all
+    stale = @user.drive_sessions.create!(started_at: 8.days.ago)
+
+    post complete_drive_session_url(stale)
+
+    assert_redirected_to edit_drive_session_url(stale)
+    assert_match(/7 days/, flash[:alert])
+    assert_nil stale.reload.ended_at
+  end
+
+  test "a drive that crosses sunset carries its split into the detail modal" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    drive = @user.drive_sessions.create!(
+      started_at: tz.local(2024, 12, 15, 16, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 17, 0, 0)
+    )
+    assert drive.day_and_night?, "4pm-5pm on Dec 15 should straddle sunset"
+
+    get all_drive_sessions_url
+    row = css_select("#drive_session_#{drive.id}").first
+
+    assert_equal "true", row["data-drive-mixed"]
+    assert_equal "#{drive.night_minutes} mins", row["data-drive-night-duration"]
+    assert_equal "#{drive.duration_minutes - drive.night_minutes} mins", row["data-drive-day-duration"]
+    assert_select "[data-drive-modal-target=split]", 1
+  end
+
+  test "CSV export reports day and night hours that sum to the duration" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    # 4pm-5pm on Dec 15 crosses sunset at 16:20: ~0.33h day, ~0.67h night.
+    @user.drive_sessions.create!(
+      started_at: tz.local(2024, 12, 15, 16, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 17, 0, 0)
+    )
+
+    get export_drive_sessions_url(format: :csv)
+    rows = CSV.parse(response.body, headers: true)
+
+    assert_equal [ "Duration (hours)", "Day (hours)", "Night (hours)" ], rows.headers[3, 3]
+    assert_in_delta 0.33, rows.first["Day (hours)"].to_f, 0.05
+    assert_in_delta 0.67, rows.first["Night (hours)"].to_f, 0.05
+    assert_in_delta rows.first["Duration (hours)"].to_f,
+                    rows.first["Day (hours)"].to_f + rows.first["Night (hours)"].to_f, 0.01
+  end
+
   test "index displays statistics" do
     get drive_sessions_url
     assert_response :success

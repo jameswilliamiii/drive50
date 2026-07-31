@@ -6,7 +6,6 @@ module IconHelper
     check: '<path d="M20 6L9 17l-5-5" stroke="%{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     menu: '<path d="M3 12h18M3 6h18M3 18h18" stroke="%{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     close: '<path d="M18 6L6 18M6 6l12 12" stroke="%{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
-    info: '<circle cx="12" cy="12" r="10" stroke="%{color}" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke="%{color}" stroke-width="2" stroke-linecap="round"/>',
     dots: '<circle cx="12" cy="5" r="1.5" fill="%{color}"/><circle cx="12" cy="12" r="1.5" fill="%{color}"/><circle cx="12" cy="19" r="1.5" fill="%{color}"/>',
     # Heroicon home (outline)
     home: '<path stroke-linecap="round" stroke-linejoin="round" stroke="%{color}" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />',
@@ -81,10 +80,6 @@ module IconHelper
     icon(:sun, **options)
   end
 
-  def icon_check(options = {})
-    icon(:check, **options)
-  end
-
   def icon_menu(options = {})
     icon(:menu, **options)
   end
@@ -93,24 +88,8 @@ module IconHelper
     icon(:close, **options)
   end
 
-  def icon_info(options = {})
-    icon(:info, **options)
-  end
-
   def icon_dots(options = {})
     icon(:dots, **options)
-  end
-
-  def icon_home(options = {})
-    icon(:home, **options)
-  end
-
-  def icon_list(options = {})
-    icon(:list, **options)
-  end
-
-  def icon_settings(options = {})
-    icon(:settings, **options)
   end
 
   def icon_plus(options = {})
@@ -119,10 +98,6 @@ module IconHelper
 
   def icon_arrow_left(options = {})
     icon(:arrow_left, **options)
-  end
-
-  def icon_export(options = {})
-    icon(:export, **options)
   end
 
   def icon_stop(options = {})
@@ -139,7 +114,7 @@ module IconHelper
 
   def default_size_for(name)
     case name
-    when :check, :info then 16
+    when :check then 16
     when :dots then 20
     else 24
     end
