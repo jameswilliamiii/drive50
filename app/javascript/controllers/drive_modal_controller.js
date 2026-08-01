@@ -16,19 +16,19 @@ export default class extends ModalDialogController {
     if (event.target.closest(".drive-row-actions")) return
 
     const d = event.currentTarget.dataset
-    const night = d.driveNight === "true"
-    // Drives that cross sunset or sunrise count toward both totals, so name them
-    // as such and show where the split fell.
-    const mixed = d.driveMixed === "true"
+    // "day" | "night" | "mixed", classified once server-side; the label comes with
+    // it so the wording cannot drift from the row's.
+    const kind = d.driveKind
+    const mixed = kind === "mixed"
     const start = d.driveStartedAt ? new Date(d.driveStartedAt) : null
     const end = d.driveEndedAt ? new Date(d.driveEndedAt) : null
 
     this.dateTarget.textContent = start
       ? start.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })
       : ""
-    this.typeTarget.textContent = mixed ? "Day & night drive" : night ? "Night drive" : "Day drive"
-    this.badgeTarget.classList.toggle("is-night", night)
-    this.badgeTarget.classList.toggle("is-day", !night)
+    this.typeTarget.textContent = d.driveKindLabel
+    this.badgeTarget.classList.toggle("is-night", kind !== "day")
+    this.badgeTarget.classList.toggle("is-day", kind === "day")
 
     this.durationTarget.textContent = d.driveDuration || "—"
 

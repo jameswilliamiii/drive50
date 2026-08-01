@@ -28,31 +28,26 @@ class NightMinutesBackfillTest < ActiveSupport::TestCase
 
   test "recomputes the split for drives left at the column default" do
     drive = completed_drive_on_dec_15("16:00", "17:00")
-    drive.update_columns(night_minutes: 0, is_night_drive: true) # pre-backfill state
+    drive.update_column(:night_minutes, 0) # pre-backfill state
 
     run_task
 
     assert_equal 40, drive.reload.night_minutes
   end
 
-  test "leaves the legacy is_night_drive flag untouched so a rollback is clean" do
-    # A midday drive the old civil-dusk rule had flagged as night: night_minutes
-    # must drop to 0 while the flag keeps its old value, so rolling back to the
-    # previous release reproduces the pre-deploy totals rather than a third number.
+  test "clears the split on a drive that is no longer night at all" do
     drive = completed_drive_on_dec_15("12:00", "13:00")
-    drive.update_columns(night_minutes: 60, is_night_drive: true)
+    drive.update_column(:night_minutes, 60)
 
     run_task
 
-    drive.reload
-    assert_equal 0, drive.night_minutes
-    assert drive.is_night_drive, "the backfill must not rewrite the legacy flag"
+    assert_equal 0, drive.reload.night_minutes
   end
 
   test "a failing row does not truncate the run, and the task raises so it retries" do
     completed_drive_on_dec_15("16:00", "17:00")
     completed_drive_on_dec_15("22:00", "23:00")
-    DriveSession.any_instance.stubs(:determine_night_drive).raises(ArgumentError, "boom")
+    DriveSession.any_instance.stubs(:calculate_night_minutes).raises(ArgumentError, "boom")
 
     error = assert_raises(RuntimeError) { run_task }
 
@@ -73,7 +68,7 @@ class NightMinutesBackfillTest < ActiveSupport::TestCase
 
   test "is idempotent" do
     drive = completed_drive_on_dec_15("16:00", "17:00")
-    drive.update_columns(night_minutes: 0, is_night_drive: false)
+    drive.update_column(:night_minutes, 0)
 
     run_task
     first = drive.reload.night_minutes

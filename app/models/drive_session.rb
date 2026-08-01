@@ -20,7 +20,6 @@ class DriveSession < ApplicationRecord
   # Scopes
   scope :completed, -> { where.not(ended_at: nil) }
   scope :in_progress, -> { where(ended_at: nil) }
-  scope :night_drives, -> { where("night_minutes > 0") }
   scope :ordered, -> { order(started_at: :desc) }
   # Preload the owning user so views/CSV can render user.full_name without an
   # N+1. Use on any collection whose rows read through the user association.
@@ -31,29 +30,13 @@ class DriveSession < ApplicationRecord
   # on ended_at alone let an edit to just the start time recompute night_minutes
   # against a stale duration, which made day_hours negative.
   before_save :calculate_duration, if: -> { ended_at.present? && (started_at_changed? || ended_at_changed?) }
-  before_save :determine_night_drive, if: -> { started_at_changed? || ended_at_changed? }
+  before_save :calculate_night_minutes, if: -> { started_at_changed? || ended_at_changed? }
   after_create_commit :broadcast_create
   after_create_commit :schedule_reminder, if: :in_progress?
   after_update_commit :broadcast_update
   after_destroy_commit :broadcast_destroy
 
   # Class methods
-  def self.total_hours
-    completed.sum(:duration_minutes) / 60.0
-  end
-
-  def self.night_hours
-    completed.sum(:night_minutes) / 60.0
-  end
-
-  def self.hours_needed
-    [ HOURS_NEEDED - total_hours, 0 ].max
-  end
-
-  def self.night_hours_needed
-    [ NIGHT_HOURS_NEEDED - night_hours, 0 ].max
-  end
-
   # Groups completed drives by their local date, across exactly the 21 cells the
   # grid renders (3 Sunday-aligned weeks ending with the current week). Days with
   # no drives are simply absent. The grid colours each cell from this and the
@@ -154,10 +137,10 @@ class DriveSession < ApplicationRecord
     self.duration_minutes = ((ended_at - started_at) / 60).to_i
   end
 
-  # Night is the span between sunset and sunrise, and a drive is credited minute
-  # by minute rather than as a whole: crossing sunset splits the drive instead of
+  # Night is the span between sunset and sunrise, and a drive is credited minute by
+  # minute rather than as a whole: crossing sunset splits the drive instead of
   # tipping all of it into the night column.
-  def determine_night_drive
+  def calculate_night_minutes
     return unless started_at
 
     if ended_at.present?
@@ -167,12 +150,10 @@ class DriveSession < ApplicationRecord
       # cap is redundant there; it exists for callers that invoke this method
       # directly (the backfill task) against a duration they did not recompute.
       self.night_minutes = [ (night_seconds(started_at, ended_at) / 60).to_i, duration_minutes.to_i ].min
-      # Nothing reads this column any more — it is still written so that rolling
-      # back to the previous release finds sensible values. Drop it once this ships.
-      self.is_night_drive = night_minutes.positive?
     else
+      # An in-progress drive has no span to split yet; statistics only count
+      # completed ones.
       self.night_minutes = 0
-      self.is_night_drive = night_time?(started_at)
     end
   end
 

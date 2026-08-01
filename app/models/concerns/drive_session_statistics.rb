@@ -40,14 +40,6 @@ module DriveSessionStatistics
       }
     end
 
-    def day_hours
-      (completed.sum(:duration_minutes) - completed.sum(:night_minutes)) / 60.0
-    end
-
-    def drives_count
-      completed.count
-    end
-
     # weeks_ago: 0 = current calendar week, 1 = previous, etc. Sunday-start, in the given tz.
     def hours_in_week(weeks_ago, timezone: "UTC")
       tz = resolved_zone(timezone)
