@@ -1,12 +1,12 @@
-import { Controller } from "@hotwired/stimulus"
+import { ModalDialogController } from "helpers/modal_dialog"
 
 // Lives on <body>; every drive row triggers it via click->drive-modal#open.
 // The dialog is populated from the clicked row's data attributes so no server
 // round-trip is needed. Times are stored as ISO (UTC) and formatted in the
 // browser's timezone, matching how the LocalTime-rendered rows behave.
-export default class extends Controller {
+export default class extends ModalDialogController {
   static targets = [
-    "dialog", "badge", "date", "type",
+    "badge", "date", "type",
     "duration", "time", "split", "splitRow", "driver", "driverRow", "notes", "notesSection"
   ]
 
@@ -54,11 +54,7 @@ export default class extends Controller {
       this.notesSectionTarget.hidden = true
     }
 
-    if (this.dialogTarget.open) return
-    // Native showModal() does not stop the page behind the backdrop from
-    // scrolling, so lock the body ourselves; onClose restores it.
-    document.body.style.overflow = "hidden"
-    this.dialogTarget.showModal()
+    this.showDialog()
   }
 
   openOnKey(event) {
@@ -67,28 +63,5 @@ export default class extends Controller {
       event.preventDefault()
       this.open(event)
     }
-  }
-
-  // Button and backdrop paths: release the lock synchronously here rather than
-  // leaning on the dialog's `close` event, which doesn't fire reliably.
-  close() {
-    document.body.style.overflow = ""
-    this.dialogTarget.close()
-  }
-
-  // Escape closes the dialog natively (firing cancel/close); this releases the
-  // lock for that path.
-  onClose() {
-    document.body.style.overflow = ""
-  }
-
-  disconnect() {
-    document.body.style.overflow = ""
-  }
-
-  // Native <dialog> click lands on the dialog element itself when the backdrop
-  // (outside the card) is clicked.
-  backdropClick(event) {
-    if (event.target === this.dialogTarget) this.close()
   }
 }

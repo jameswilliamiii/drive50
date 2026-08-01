@@ -16,18 +16,29 @@
         </div>
       </div>
 
-      <div class="activity-cal" data-controller="activity-calendar">
+      <div class="activity-cal">
       <div class="activity-weekdays">
         <% %w[S M T W T F S].each do |label| %><span><%= label %></span><% end %>
       </div>
       <div class="activity-grid">
-        <% days.each do |day| %>
-          <div class="activity-cell state-<%= day[:state] %><%= " is-today" if day[:today] %><%= " is-future" if day[:future] %>"
-               title="<%= day[:date].strftime("%B %d, %Y") %>"
-               data-activity-calendar-target="day"
-               data-date="<%= day[:date].strftime("%B %d, %Y") %>"
-               data-state="<%= day[:state] %>"
-               data-action="click->activity-calendar#showDayInfo"></div>
+        <% cells.each do |cell| %>
+          <% if cell.future? && !cell.any_drives? %>
+            <div class="activity-cell state-none is-future"
+                 title="<%= cell.date.strftime("%B %d, %Y") %>"></div>
+          <% else %>
+            <%# A real button rather than a div: the grid becomes keyboard
+                reachable and Enter/Space activate it for free, so this needs no
+                keydown handler of its own (unlike the drive rows). A future day
+                still gets one if a drive was logged against it, otherwise the
+                cell would be coloured but impossible to inspect. %>
+            <button type="button"
+                    class="activity-cell state-<%= cell.state %><%= " is-today" if cell.today? %><%= " is-future" if cell.future? %>"
+                    title="<%= cell.date.strftime("%B %d, %Y") %>"
+                    aria-label="<%= cell.aria_label %>"
+                    aria-haspopup="dialog"
+                    data-day-summary="<%= cell.to_json %>"
+                    data-action="day-modal#open"></button>
+          <% end %>
         <% end %>
       </div>
       <div class="activity-legend">

@@ -35,7 +35,7 @@
   </head>
 
   <body class="<%= 'has-bottom-nav' if authenticated? %>"
-        data-controller="timezone-detector drive-modal"
+        data-controller="timezone-detector drive-modal day-modal"
         data-timezone-detector-current-value="<%= Current.user&.timezone || session[:timezone] || 'UTC' %>">
     <%= render "shared/header" %>
 
@@ -58,6 +58,7 @@
 
     <% if authenticated? %>
       <%= render "shared/drive_modal" %>
+      <%= render "shared/day_summary_modal" %>
     <% end %>
 
     <main>

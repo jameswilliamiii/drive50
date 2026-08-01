@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { lockScroll, unlockScroll } from "helpers/scroll_lock"
 
 // Connects to data-controller="card-menu"
 export default class extends Controller {
@@ -34,11 +35,18 @@ export default class extends Controller {
     if (isOpen) {
       this.close()
     } else {
-      // Close any other open menus first
+      // Close any other open menus through their own controllers. Stripping the
+      // class by hand skips their close(), which is where they hand back their
+      // claim on the shared scroll lock — an orphaned claim keeps the page
+      // unscrollable with nothing on screen, since the lock is reference counted.
       document.querySelectorAll(".card-menu-open").forEach(menu => {
-        if (menu !== this.menuTarget) {
-          menu.classList.remove("card-menu-open")
-        }
+        if (menu === this.menuTarget) return
+
+        const element = menu.closest("[data-controller~='card-menu']")
+        const controller = element &&
+          this.application.getControllerForElementAndIdentifier(element, "card-menu")
+
+        controller ? controller.close() : menu.classList.remove("card-menu-open")
       })
       document.querySelectorAll(".card-menu-backdrop").forEach(backdrop => {
         if (backdrop !== this.backdropTarget) {
@@ -55,7 +63,7 @@ export default class extends Controller {
     // Lock body scroll only for the mobile bottom-sheet; the desktop dropdown is
     // a small anchored popover and must not freeze the page behind it.
     if (window.matchMedia("(max-width: 768px)").matches) {
-      document.body.style.overflow = "hidden"
+      lockScroll(this)
     }
     this.backdropTarget.classList.add("card-menu-backdrop-visible")
     this.menuTarget.classList.add("card-menu-open")
@@ -63,9 +71,14 @@ export default class extends Controller {
   }
 
   close() {
+    // Unconditionally, before the open check: toggle() strips .card-menu-open off
+    // other menus directly, so those instances reach close() already looking shut
+    // and would never release the claim they took — leaving the page locked with
+    // nothing on screen. Releasing a claim you never took is a no-op by design.
+    unlockScroll(this)
+
     // Only close if this menu is actually open
     if (this.hasMenuTarget && this.menuTarget.classList.contains("card-menu-open")) {
-      document.body.style.overflow = ""
       if (this.hasBackdropTarget) {
         this.backdropTarget.classList.remove("card-menu-backdrop-visible")
       }
@@ -88,7 +101,14 @@ export default class extends Controller {
 
   // Close all card menus on the page
   closeAllMenus() {
+    // Release every holder, not just this one: see toggle().
+    unlockScroll(this)
     document.querySelectorAll(".card-menu-open").forEach(menu => {
+      const element = menu.closest("[data-controller~='card-menu']")
+      const controller = element &&
+        this.application.getControllerForElementAndIdentifier(element, "card-menu")
+      if (controller && controller !== this) controller.close()
+
       menu.classList.remove("card-menu-open")
       menu.classList.add("hidden")
     })
@@ -98,7 +118,7 @@ export default class extends Controller {
     document.querySelectorAll("[data-card-menu-target='button'][aria-expanded='true']").forEach(button => {
       button.setAttribute("aria-expanded", "false")
     })
-    document.body.style.overflow = ""
+    unlockScroll(this)
   }
 
   // Handle backdrop click

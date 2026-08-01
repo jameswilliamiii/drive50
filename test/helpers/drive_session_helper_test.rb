@@ -63,18 +63,12 @@ class DriveSessionHelperTest < ActionView::TestCase
     assert_includes result, "0"
   end
 
-  # dashboard_activity_days tests
-  test "dashboard_activity_days returns 21 Sunday-aligned cells with today and future flags" do
-    travel_to Time.zone.parse("2026-07-15 18:00 UTC") do # Wed
-      states = { Date.new(2026, 7, 14) => :day }
-      days = dashboard_activity_days(states, timezone: "America/Chicago")
-      assert_equal 21, days.length
-      assert_equal 0, days.first[:date].wday # first cell is a Sunday
-      assert(days.any? { |d| d[:today] })
-      today_cell = days.find { |d| d[:today] }
-      assert_equal Date.new(2026, 7, 15), today_cell[:date]
-      assert_equal :day, days.find { |d| d[:date] == Date.new(2026, 7, 14) }[:state]
-      assert(days.any? { |d| d[:future] }) # Thu-Sat of current week
-    end
+  test "format_duration pluralizes both units" do
+    # The unstyled branch used to hardcode "hrs"/"mins", so a 1h45m day summary
+    # read "1 hrs 45 mins".
+    assert_equal "1 hr 45 mins", format_duration(1.75)
+    assert_equal "2 hrs 1 min", format_duration(2 + 1 / 60.0)
+    assert_equal "1 min", format_duration(1 / 60.0)
+    assert_equal "1 hr", format_duration(1.0)
   end
 end
