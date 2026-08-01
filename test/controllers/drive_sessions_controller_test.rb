@@ -220,7 +220,8 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     get all_drive_sessions_url
     row = css_select("#drive_session_#{drive.id}").first
 
-    assert_equal "true", row["data-drive-mixed"]
+    assert_equal "mixed", row["data-drive-kind"]
+    assert_equal "Day & night drive", row["data-drive-kind-label"]
     assert_equal "#{drive.night_minutes} mins", row["data-drive-night-duration"]
     assert_equal "#{drive.duration_minutes - drive.night_minutes} mins", row["data-drive-day-duration"]
     assert_select "[data-drive-modal-target=split]", 1

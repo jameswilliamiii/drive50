@@ -9,12 +9,6 @@ namespace :unforgettable do
     # the best signal available but means a drive logged before the user set
     # their location is judged against a different spot than it was originally.
     #
-    # Only night_minutes is written. is_night_drive is left holding its old
-    # civil-dusk values so that rolling the code back to the previous release
-    # reproduces the numbers that were on screen before this deploy — rewriting it
-    # here would make a rollback report a third, higher figure. Everything on this
-    # release reads night_minutes instead.
-    #
     # Safe to re-run: the value is derived, not accumulated.
     scope = DriveSession.completed.includes(:user)
     total = scope.count
@@ -26,7 +20,7 @@ namespace :unforgettable do
 
     scope.find_each.with_index do |session, i|
       begin
-        session.send(:determine_night_drive)
+        session.send(:calculate_night_minutes)
         # update_columns persists just the derived value, skipping validations and
         # the Turbo Stream broadcasts a mass reclassification would otherwise fire.
         if session.night_minutes_changed?

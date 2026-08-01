@@ -66,11 +66,11 @@ bin/rails console --sandbox  # Rolls back all changes on exit
   `full_name` is the displayed driver name.
 - **`Session`** — authentication session with `ip_address` and `user_agent`.
 - **`DriveSession`** — one driving session. Columns: `started_at`, `ended_at`,
-  `duration_minutes`, `night_minutes`, `is_night_drive`, `notes`, `user_id`. State
+  `duration_minutes`, `night_minutes`, `notes`, `user_id`. State
   is derived, not stored: **in-progress** (no `ended_at`) or **completed** (has
-  `ended_at`). `duration_minutes`, `night_minutes`, and `is_night_drive` are all
-  computed in `before_save` callbacks. `night_minutes` is what statistics sum;
-  `is_night_drive` is a derived convenience flag meaning "contains any night".
+  `ended_at`). `duration_minutes` and `night_minutes` are both computed in
+  `before_save` callbacks, from the same start/end pair; `night_minutes` is what
+  statistics sum. `#kind` names the drive `:day`, `:night` or `:mixed`.
 - **`PushSubscription`** — a browser Web Push endpoint (`endpoint`, `p256dh_key`,
   `auth_key`, `user_agent`) belonging to a user.
 
@@ -122,9 +122,12 @@ was a real bug:
 - **Both derived columns share one callback guard.** Editing only `started_at` used
   to recompute night against a stale duration.
 
-`is_night_drive` is retained but **no longer read anywhere** — it holds pre-split
-values so a rollback to the previous release reports the numbers users saw. Drop the
-column once this release is settled; read `night_minutes` instead.
+`DriveSession#kind` is the one place a drive is classified `:day`, `:night` or
+`:mixed`, and `drive_kind_label` is the one place that wording lives — the drive
+row's screen-reader label and the detail modal's heading both render from it, and
+travel to the client as `data-drive-kind` / `data-drive-kind-label`. Don't
+re-derive either at a call site; they had already drifted once ("Day and night
+drive" against "Day & night drive").
 
 Known gap: when RubySunrise returns nil for both events it is impossible to tell
 midnight sun from polar night, and the code assumes daylight. Above the Arctic Circle
