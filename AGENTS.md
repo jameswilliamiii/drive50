@@ -79,8 +79,12 @@ bin/rails console --sandbox  # Rolls back all changes on exit
 - `REMINDER_DELAY = 45.minutes`, `MAX_DRIVE_DURATION = 7.days` (a validation ceiling —
   `night_seconds` walks one date per day spanned, so an unbounded span is unbounded CPU)
 
-**Scopes:** `.completed` / `.in_progress`, `.night_drives`, `.ordered` (reverse
-chronological), `.with_user` (preloads the owner to avoid N+1 in views/CSV).
+**Scopes:** `.completed` / `.in_progress`, `.ordered` (reverse chronological),
+`.with_user` (preloads the owner to avoid N+1 in views/CSV), and the drive log's
+filters `.with_day` / `.with_night` / `.matching_kind(filter)`. The first two are
+the SQL counterparts of `any_day?` / `any_night?`, so a drive that crossed sunset
+matches **both** — it credited hours to both dashboard tiles, which is where the
+filters are reached from. `KIND_FILTERS` lists the values the controller accepts.
 
 **Activity grid:** `DriveSession.activity_days(timezone:)` groups completed drives
 into `{ Date => [drives] }` across exactly the 21 cells the grid renders, and
@@ -123,11 +127,14 @@ was a real bug:
   to recompute night against a stale duration.
 
 `DriveSession#kind` is the one place a drive is classified `:day`, `:night` or
-`:mixed`, and `drive_kind_label` is the one place that wording lives — the drive
-row's screen-reader label and the detail modal's heading both render from it, and
+`:mixed`. `drive_kind_label` is the one place that wording lives and
+`drive_kind_icon` the one place the glyph does — the drive row's badge and
+screen-reader label and the detail modal's heading all render from them, and they
 travel to the client as `data-drive-kind` / `data-drive-kind-label`. Don't
-re-derive either at a call site; they had already drifted once ("Day and night
-drive" against "Day & night drive").
+re-derive any of them at a call site; the wording had already drifted once ("Day
+and night drive" against "Day & night drive"), and the badge used to fall back to
+the night icon for a mixed drive, making it indistinguishable from a pure night
+one.
 
 Known gap: when RubySunrise returns nil for both events it is impossible to tell
 midnight sun from polar night, and the code assumes daylight. Above the Arctic Circle

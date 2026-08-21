@@ -3,6 +3,7 @@ module IconHelper
   ICONS = {
     moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="%{color}" stroke="%{color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
     sun: '<circle cx="12" cy="12" r="5" fill="%{color}" stroke="%{color}" stroke-width="1.5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="%{color}" stroke-width="1.5" stroke-linecap="round"/>',
+    sunset: '<path d="M7 16A5 5 0 0 1 17 16Z" fill="%{color}"/><path d="M12 6.5v2M5.28 9.28l1.42 1.42M18.72 9.28l-1.42 1.42M2.5 16h19M6.5 20h11" stroke="%{color}" stroke-width="1.6" stroke-linecap="round"/>',
     check: '<path d="M20 6L9 17l-5-5" stroke="%{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     menu: '<path d="M3 12h18M3 6h18M3 18h18" stroke="%{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
     close: '<path d="M18 6L6 18M6 6l12 12" stroke="%{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',

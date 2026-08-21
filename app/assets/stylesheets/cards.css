@@ -190,6 +190,17 @@
   padding: 11px 13px;
   backdrop-filter: blur(8px);
 }
+a.dash-hero-chip {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+@media (hover: hover) {
+  a.dash-hero-chip:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.32); }
+}
+a.dash-hero-chip:active { background: rgba(255,255,255,.22); }
 .dash-hero-chip-key { display: block; font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: rgba(255,255,255,.62); }
 .dash-hero-chip-value { display: block; font-size: 1.3rem; font-weight: 800; margin-top: 4px; }
 .dash-hero-chip-value small { font-size: .72rem; color: rgba(255,255,255,.6); font-weight: 600; }
@@ -280,18 +291,20 @@
      UA button chrome so they look identical to the future-day divs. */
   padding: 0; margin: 0; appearance: none; font: inherit; color: inherit;
 }
-.activity-cell.state-day { background: var(--activity-day); border-color: transparent; box-shadow: 0 4px 12px -4px var(--activity-day); }
-.activity-cell.state-night { background: var(--activity-night); border-color: transparent; box-shadow: 0 4px 12px -4px var(--activity-night); }
-.activity-cell.state-both { background: var(--activity-both); border-color: transparent; box-shadow: 0 4px 12px -4px rgba(99,102,241,.6); }
+.activity-cell.state-day { background: var(--activity-day-fill); border-color: var(--recent-badge-day-fg); }
+.activity-cell.state-night { background: var(--activity-night-fill); border-color: var(--recent-badge-night-fg); }
+/* Night edge, not the sun: the gradient already opens amber, and an amber edge
+   made this read as a plain day cell. */
+.activity-cell.state-both { background: var(--activity-both-fill); border-color: var(--recent-badge-night-fg); }
 .activity-cell.is-today { outline: 2px solid var(--activity-today-ring); outline-offset: 2px; }
 .activity-cell.is-future { opacity: .5; cursor: default; }
 
 .activity-legend { display: flex; gap: 13px; justify-content: center; margin-top: var(--spacing-md); font-size: .7rem; color: var(--color-text-light); font-weight: 700; }
 .activity-legend span { display: inline-flex; align-items: center; gap: 5px; }
-.activity-swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
-.activity-swatch.is-day { background: var(--activity-day); }
-.activity-swatch.is-night { background: var(--activity-night); }
-.activity-swatch.is-both { background: var(--activity-both); }
+.activity-swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; border: 1px solid transparent; }
+.activity-swatch.is-day { background: var(--activity-day-fill); border-color: var(--recent-badge-day-fg); }
+.activity-swatch.is-night { background: var(--activity-night-fill); border-color: var(--recent-badge-night-fg); }
+.activity-swatch.is-both { background: var(--activity-both-fill); border-color: var(--recent-badge-night-fg); }
 
 @media (hover: hover) {
   .activity-cell:not(.is-future):hover { transform: scale(1.08); box-shadow: var(--shadow-md); }
@@ -303,6 +316,48 @@
   .activity-streak { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); }
   .activity-streak-meta .activity-streak-label { margin-top: 0; }
   .activity-sentence { text-align: center; }
+}
+
+/* ---- Drive log kind filter ---- */
+.kind-filter {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-xs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+.kind-filter-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 var(--spacing-lg);
+  border-radius: var(--border-radius-sm);
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+@media (hover: hover) {
+  .kind-filter-tab:hover { background: var(--color-border-light); color: var(--color-text); }
+}
+.kind-filter-tab.is-all.is-active { color: var(--color-white); background: var(--color-primary); }
+.kind-filter-tab.is-day.is-active { background: var(--recent-badge-day-bg); color: var(--recent-badge-day-fg); }
+.kind-filter-tab.is-night.is-active { background: var(--recent-badge-night-bg); color: var(--recent-badge-night-fg); }
+.kind-filter-icon { display: block; }
+
+/* Full width on mobile is the thumb target; on desktop, size to the labels. */
+@media (min-width: 769px) {
+  .kind-filter { display: inline-flex; }
+  .kind-filter-tab { flex: 0 0 auto; }
 }
 
 /* ---- Drive rows (shared: dashboard recent drives + full drive log) ---- */
@@ -325,6 +380,7 @@
 .drive-row-badge { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .drive-row-badge.is-day { background: var(--recent-badge-day-bg); color: var(--recent-badge-day-fg); }
 .drive-row-badge.is-night { background: var(--recent-badge-night-bg); color: var(--recent-badge-night-fg); }
+.drive-row-badge.is-mixed { background: var(--recent-badge-mixed-bg); color: var(--recent-badge-mixed-fg); }
 
 .drive-row-main { flex: 1; min-width: 0; }
 .drive-row-date { font-weight: 700; font-size: .92rem; color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

@@ -11,14 +11,10 @@ class DriveSessionsController < ApplicationController
   end
 
   def all
-    user_sessions = Current.user.drive_sessions
-    @pagy, @sessions = pagy(:offset, user_sessions.completed.ordered.with_user, limit: 20)
+    @kind_filter = DriveSession::KIND_FILTERS.include?(params[:kind]) ? params[:kind] : "all"
 
-    stats = DriveSession.statistics_for(Current.user)
-    @total_hours = stats[:total_hours]
-    @night_hours = stats[:night_hours]
-    @hours_needed = stats[:hours_needed]
-    @night_hours_needed = stats[:night_hours_needed]
+    drives = Current.user.drive_sessions.completed.matching_kind(@kind_filter).ordered.with_user
+    @pagy, @sessions = pagy(:offset, drives, limit: 20)
 
     if turbo_frame_request?
       render partial: "pagination_frame", formats: :turbo_stream and return

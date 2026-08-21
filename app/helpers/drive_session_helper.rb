@@ -10,8 +10,25 @@ module DriveSessionHelper
     mixed: "Day & night drive"
   }.freeze
 
+  DRIVE_KIND_ICONS = {
+    day: :sun,
+    night: :moon,
+    mixed: :sunset
+  }.freeze
+
   def drive_kind_label(drive)
     DRIVE_KIND_LABELS.fetch(drive.kind)
+  end
+
+  def drive_kind_icon(drive)
+    DRIVE_KIND_ICONS.fetch(drive.kind)
+  end
+
+  # "all" has no kind of its own, so it comes back without a glyph.
+  def kind_filter_options
+    DriveSession::KIND_FILTERS.map do |value|
+      [ value, value.capitalize, DRIVE_KIND_ICONS[value.to_sym] ]
+    end
   end
 
   # Time-of-day greeting in the user's own timezone, personalized when we know

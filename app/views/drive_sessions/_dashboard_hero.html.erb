@@ -17,21 +17,24 @@
   </div>
 
   <div class="dash-hero-chips">
-    <div class="dash-hero-chip is-day">
+    <%= link_to all_drive_sessions_path(kind: "day"), class: "dash-hero-chip is-day",
+                aria: { label: "Day #{stats[:day_hours].round(1)} hours — show drives with daytime hours" } do %>
       <span class="dash-hero-chip-key">Day</span>
       <span class="dash-hero-chip-value"><%= stats[:day_hours].round(1) %></span>
-    </div>
-    <div class="dash-hero-chip is-night">
+    <% end %>
+    <%= link_to all_drive_sessions_path(kind: "night"), class: "dash-hero-chip is-night",
+                aria: { label: "Night #{stats[:night_hours].round(1)} of #{DriveSession::NIGHT_HOURS_NEEDED} hours — show drives with night hours" } do %>
       <span class="dash-hero-chip-key">Night</span>
       <span class="dash-hero-chip-value"><%= stats[:night_hours].round(1) %> <small>/ <%= DriveSession::NIGHT_HOURS_NEEDED %></small></span>
-    </div>
+    <% end %>
     <div class="dash-hero-chip">
       <span class="dash-hero-chip-key">Pace</span>
       <span class="dash-hero-chip-value"><%= stats[:weekly_pace] %> <small>h/wk</small></span>
     </div>
-    <div class="dash-hero-chip">
+    <%= link_to all_drive_sessions_path, class: "dash-hero-chip",
+                aria: { label: "Drives #{stats[:drives_count]} — show every drive" } do %>
       <span class="dash-hero-chip-key">Drives</span>
       <span class="dash-hero-chip-value"><%= stats[:drives_count] %></span>
-    </div>
+    <% end %>
   </div>
 </div>

@@ -27,8 +27,9 @@ export default class extends ModalDialogController {
       ? start.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })
       : ""
     this.typeTarget.textContent = d.driveKindLabel
-    this.badgeTarget.classList.toggle("is-night", kind !== "day")
     this.badgeTarget.classList.toggle("is-day", kind === "day")
+    this.badgeTarget.classList.toggle("is-night", kind === "night")
+    this.badgeTarget.classList.toggle("is-mixed", mixed)
 
     this.durationTarget.textContent = d.driveDuration || "—"
 

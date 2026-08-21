@@ -7,6 +7,7 @@ class DriveSession < ApplicationRecord
   NIGHT_HOURS_NEEDED = 10
   REMINDER_DELAY = 45.minutes
   MAX_DRIVE_DURATION = 7.days
+  KIND_FILTERS = %w[all day night].freeze
 
   belongs_to :user
 
@@ -24,6 +25,19 @@ class DriveSession < ApplicationRecord
   # Preload the owning user so views/CSV can render user.full_name without an
   # N+1. Use on any collection whose rows read through the user association.
   scope :with_user, -> { includes(:user) }
+
+  # The SQL counterparts of any_night?/any_day?, so a drive that crossed sunset
+  # matches both. `night_minutes = 0` keeps a zero-minute drive here, the way
+  # #kind still calls it a day drive; `0 < 0` alone dropped it from both filters.
+  scope :with_night, -> { where("night_minutes > 0") }
+  scope :with_day, -> { where("night_minutes = 0 OR night_minutes < duration_minutes") }
+  scope :matching_kind, ->(filter) {
+    case filter
+    when "day" then with_day
+    when "night" then with_night
+    else all
+    end
+  }
 
   # Callbacks
   # Both derived columns must come from the same start/end pair. Guarding duration
@@ -94,9 +108,6 @@ class DriveSession < ApplicationRecord
     any_night? && any_day?
   end
 
-  # The three-way classification, as the day summary reports it. The drive row and
-  # the detail modal still derive their own from day_and_night? and the night flag;
-  # routing those through here too would be the obvious next consolidation.
   def kind
     return :mixed if day_and_night?
 

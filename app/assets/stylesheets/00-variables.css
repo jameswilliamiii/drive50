@@ -78,20 +78,24 @@
   --hero-border: transparent;
   --hero-shadow: 0 12px 32px -14px rgba(30,27,75,.55);
 
-  --activity-day: #f59e0b;
-  --activity-night: #6366f1;
-  --activity-both: linear-gradient(135deg, #f59e0b 0 50%, #6366f1 50% 100%);
   --activity-empty-bg: #f1f5f9;
   --activity-empty-border: #e2e8f0;
+  /* A step deeper than the badge tints: a 20px cell has to stay distinct from
+     the empty cell beside it. */
+  --activity-day-fill: #fde68a;
+  --activity-night-fill: #c7d2fe;
+  --activity-both-fill: linear-gradient(180deg, #fde68a 0%, #c7d2fe 100%);
   --activity-today-ring: #2563eb;
   --activity-tint: radial-gradient(120% 90% at 92% -12%, rgba(99,102,241,.10) 0%, rgba(99,102,241,.03) 40%, transparent 70%);
   --activity-tint-border: rgba(99,102,241,.18);
-  --streak-color: #2563eb;
+  --streak-color: #6366f1;
 
   --recent-badge-day-bg: #fef3c7;
   --recent-badge-day-fg: #f59e0b;
   --recent-badge-night-bg: #eef2ff;
   --recent-badge-night-fg: #6366f1;
+  --recent-badge-mixed-bg: linear-gradient(180deg, #fef3c7 0%, #e0e7ff 100%);
+  --recent-badge-mixed-fg: var(--recent-badge-day-fg);
 }
 
 :root[data-theme="dark"],
@@ -129,19 +133,21 @@ body[data-theme="dark"] {
   --hero-border: rgba(129,140,248,.16);
   --hero-shadow: 0 10px 30px -18px rgba(0,0,0,.8);
 
-  --activity-day: #fbbf24;
-  --activity-night: #a5b4fc;
-  --activity-both: linear-gradient(135deg, #fbbf24 0 50%, #a5b4fc 50% 100%);
   --activity-empty-bg: #1e293b;
   --activity-empty-border: #334155;
+  --activity-day-fill: #9a4a0d;
+  --activity-night-fill: #4338ca;
+  --activity-both-fill: linear-gradient(180deg, #9a4a0d 0%, #4338ca 100%);
   --activity-today-ring: #60a5fa;
   --activity-tint: radial-gradient(120% 90% at 92% -12%, rgba(129,140,248,.18) 0%, rgba(129,140,248,.05) 42%, transparent 72%);
   --activity-tint-border: rgba(129,140,248,.20);
+  --streak-color: #a5b4fc;
 
   --recent-badge-day-bg: #78350f;
   --recent-badge-day-fg: #fbbf24;
   --recent-badge-night-bg: #312e81;
   --recent-badge-night-fg: #a5b4fc;
+  --recent-badge-mixed-bg: linear-gradient(180deg, #78350f 0%, #312e81 100%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -161,20 +167,21 @@ body[data-theme="dark"] {
     --hero-border: rgba(129,140,248,.16);
     --hero-shadow: 0 10px 30px -18px rgba(0,0,0,.8);
 
-    --activity-day: #fbbf24;
-    --activity-night: #a5b4fc;
-    --activity-both: linear-gradient(135deg, #fbbf24 0 50%, #a5b4fc 50% 100%);
     --activity-empty-bg: #1e293b;
     --activity-empty-border: #334155;
+    --activity-day-fill: #9a4a0d;
+    --activity-night-fill: #4338ca;
+    --activity-both-fill: linear-gradient(180deg, #9a4a0d 0%, #4338ca 100%);
     --activity-today-ring: #60a5fa;
     --activity-tint: radial-gradient(120% 90% at 92% -12%, rgba(129,140,248,.18) 0%, rgba(129,140,248,.05) 42%, transparent 72%);
     --activity-tint-border: rgba(129,140,248,.20);
-    --streak-color: #60a5fa;
+    --streak-color: #a5b4fc;
 
     --recent-badge-day-bg: #78350f;
     --recent-badge-day-fg: #fbbf24;
     --recent-badge-night-bg: #312e81;
     --recent-badge-night-fg: #a5b4fc;
+    --recent-badge-mixed-bg: linear-gradient(180deg, #78350f 0%, #312e81 100%);
   }
 }
 
