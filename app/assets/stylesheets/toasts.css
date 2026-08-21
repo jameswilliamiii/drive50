@@ -28,8 +28,8 @@
   align-items: flex-start;
   gap: var(--spacing-md);
   opacity: 0;
-  transform: translateY(-20px);
-  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  transform: translateY(-100%);
+  transition: opacity var(--duration-base) ease-out, transform var(--duration-base) ease-out;
   position: relative;
 }
 
@@ -40,7 +40,14 @@
 
 .toast.toast-hide {
   opacity: 0;
-  transform: translateY(-20px);
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.toast-hide {
+    transform: none;
+  }
 }
 
 .toast-success {
@@ -75,12 +82,14 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--duration-base) ease;
   font-family: inherit;
 }
 
-.toast-close:hover {
-  opacity: 1;
+@media (hover: hover) {
+  .toast-close:hover {
+    opacity: 1;
+  }
 }
 
 .toast-close::before {

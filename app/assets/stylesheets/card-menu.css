@@ -31,7 +31,7 @@
   z-index: 999;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease-out, visibility 0.3s;
+  transition: opacity var(--duration-drawer) var(--ease-drawer), visibility var(--duration-drawer);
   backdrop-filter: blur(2px);
 }
 
@@ -64,14 +64,20 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--border-radius-sm);
-    transition: var(--transition);
+    transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
     -webkit-tap-highlight-color: transparent;
   }
 
-  .card-menu-button:hover,
   .card-menu-button:active {
     background-color: var(--color-background);
     color: var(--color-text);
+  }
+
+  @media (hover: hover) {
+    .card-menu-button:hover {
+      background-color: var(--color-background);
+      color: var(--color-text);
+    }
   }
 
   .card-menu-icon {
@@ -89,7 +95,7 @@
     box-shadow: none;
     z-index: 1000;
     transform: translateY(calc(100% + 1px));
-    transition: var(--transition-transform);
+    transition: transform var(--duration-drawer) var(--ease-drawer);
     max-height: calc(90dvh - 80px - env(safe-area-inset-bottom));
     overflow-y: auto;
     padding-bottom: calc(80px + env(safe-area-inset-bottom));
@@ -263,11 +269,13 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--border-radius-sm);
-    transition: var(--transition);
+    transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
-  .drive-row-actions .card-menu-button:hover {
-    background-color: var(--color-background);
-    color: var(--color-text);
+  @media (hover: hover) {
+    .drive-row-actions .card-menu-button:hover {
+      background-color: var(--color-background);
+      color: var(--color-text);
+    }
   }
 
   /* Transparent full-viewport backdrop: catches the click-away without dimming. */
@@ -314,8 +322,14 @@
     box-shadow: none;
     min-height: auto;
   }
-  .drive-row-actions .card-menu-item:hover {
+  .drive-row-actions .card-menu-item:active {
     background-color: var(--color-background);
+  }
+
+  @media (hover: hover) {
+    .drive-row-actions .card-menu-item:hover {
+      background-color: var(--color-background);
+    }
   }
   .drive-row-actions .card-menu-item-danger,
   .drive-row-actions button.card-menu-item-danger {

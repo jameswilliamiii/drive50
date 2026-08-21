@@ -345,6 +345,14 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".empty-state", false, "the day filter has a drive to show"
   end
 
+  test "the log renders its list even when empty, so a live drive has somewhere to land" do
+    @user.drive_sessions.destroy_all
+
+    get all_drive_sessions_url(kind: "night")
+    assert_select "#sessions-list-night"
+    assert_select ".empty-state", text: /No drives with night hours/
+  end
+
   test "all ignores an unrecognized kind rather than returning nothing" do
     get all_drive_sessions_url(kind: "'; DROP TABLE drive_sessions; --")
 
@@ -392,7 +400,7 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal "text/vnd.turbo-stream.html", response.media_type
-    assert_match(/turbo-stream action="append" target="sessions-list"/, response.body)
+    assert_match(/turbo-stream action="append" target="sessions-list-all"/, response.body)
     assert_match(/turbo-stream action="update" target="sessions-pagination"/, response.body)
   end
 

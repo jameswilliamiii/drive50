@@ -15,26 +15,29 @@
 </nav>
 
 <div class="drive-history">
-  <% if @sessions.any? %>
-    <div id="sessions-list" class="drive-list">
-      <%= render partial: "drive_row", collection: @sessions, as: :session %>
-    </div>
+  <%# The list and the frame render even when empty so a drive completed on
+      another device has a target to arrive in. The list is keyed by filter so
+      only the broadcast for the open one lands. %>
+  <div id="sessions-list-<%= @kind_filter %>" class="drive-list">
+    <%= render partial: "drive_row", collection: @sessions, as: :session %>
+  </div>
 
-    <turbo-frame id="sessions-pagination">
-      <div id="pagination-container" class="pagination-wrapper">
-        <% if @pagy.next %>
-          <%= link_to @pagy.page_url(:next),
-                      class: "load-more",
-                      data: {
-                        turbo_frame: "sessions-pagination",
-                        turbo_prefetch: false
-                      } do %>
-            Load more<%= icon(:chevron_down, size: 16, class: "load-more-chevron") %>
-          <% end %>
+  <turbo-frame id="sessions-pagination">
+    <div id="pagination-container" class="pagination-wrapper">
+      <% if @pagy.next %>
+        <%= link_to @pagy.page_url(:next),
+                    class: "load-more",
+                    data: {
+                      turbo_frame: "sessions-pagination",
+                      turbo_prefetch: false
+                    } do %>
+          Load more<%= icon(:chevron_down, size: 16, class: "load-more-chevron") %>
         <% end %>
-      </div>
-    </turbo-frame>
-  <% else %>
+      <% end %>
+    </div>
+  </turbo-frame>
+
+  <% if @sessions.empty? %>
     <p class="empty-state">
       <% case @kind_filter %>
       <% when "day" %>

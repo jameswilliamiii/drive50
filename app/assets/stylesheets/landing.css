@@ -92,10 +92,12 @@
   font-weight: 600;
   font-size: 0.95rem;
   opacity: 0.85;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--duration-base) ease;
 }
-.landing-navlink:hover {
-  opacity: 1;
+@media (hover: hover) {
+  .landing-navlink:hover {
+    opacity: 1;
+  }
 }
 
 /* ============================================
@@ -115,7 +117,8 @@
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  transition: transform var(--duration-fast) ease, box-shadow var(--duration-base) ease,
+              background var(--duration-base) ease, border-color var(--duration-base) ease;
   -webkit-tap-highlight-color: transparent;
 }
 .landing-btn-sm {
@@ -127,10 +130,12 @@
   font-size: 1.05rem;
 }
 .landing-btn-icon {
-  transition: transform 0.2s ease;
+  transition: transform var(--duration-base) ease;
 }
-.landing-btn:hover .landing-btn-icon {
-  transform: translateX(3px);
+@media (hover: hover) {
+  .landing-btn:hover .landing-btn-icon {
+    transform: translateX(3px);
+  }
 }
 
 .landing-btn-primary {
@@ -138,12 +143,15 @@
   color: #fff;
   box-shadow: 0 10px 24px -10px rgba(37, 99, 235, 0.7);
 }
-.landing-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 30px -12px rgba(37, 99, 235, 0.8);
+@media (hover: hover) {
+  .landing-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgba(37, 99, 235, 0.8);
+  }
 }
 .landing-btn-primary:active {
-  transform: translateY(0);
+  transform: scale(0.98);
+  transition-duration: var(--duration-press);
 }
 
 /* On the dark dusk bands (hero + top bar) a blue button blends into the indigo
@@ -155,10 +163,12 @@
   color: var(--color-primary-dark);
   box-shadow: 0 12px 28px -12px rgba(2, 6, 23, 0.7);
 }
-.landing-hero .landing-btn-primary:hover,
-.landing-topbar .landing-btn-primary:hover {
-  background: #fff;
-  box-shadow: 0 18px 34px -14px rgba(2, 6, 23, 0.8);
+@media (hover: hover) {
+  .landing-hero .landing-btn-primary:hover,
+  .landing-topbar .landing-btn-primary:hover {
+    background: #fff;
+    box-shadow: 0 18px 34px -14px rgba(2, 6, 23, 0.8);
+  }
 }
 
 .landing-btn-ghost {
@@ -166,9 +176,11 @@
   border-color: rgba(255, 255, 255, 0.28);
   color: var(--dusk-ink);
 }
-.landing-btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.55);
+@media (hover: hover) {
+  .landing-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.55);
+  }
 }
 
 /* ============================================
@@ -597,8 +609,10 @@
   font-weight: 600;
   font-size: 0.9rem;
 }
-.landing-footer-links a:hover {
-  color: var(--color-primary);
+@media (hover: hover) {
+  .landing-footer-links a:hover {
+    color: var(--color-primary);
+  }
 }
 
 .landing-footer-bottom {

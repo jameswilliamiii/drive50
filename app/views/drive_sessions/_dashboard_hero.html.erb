@@ -11,7 +11,7 @@
   </div>
 
   <% goal = DriveSession::HOURS_NEEDED.to_f %>
-  <div class="dash-hero-progress">
+  <div class="<%= class_names("dash-hero-progress", "is-revealing" => local_assigns[:reveal]) %>">
     <div class="dash-hero-bar dash-hero-bar-day" style="width: <%= [ stats[:day_hours] / goal * 100, 100 ].min %>%"></div>
     <div class="dash-hero-bar dash-hero-bar-night" style="width: <%= [ stats[:night_hours] / goal * 100, 100 ].min %>%"></div>
   </div>

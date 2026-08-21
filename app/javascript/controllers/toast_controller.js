@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { motionDuration } from "helpers/motion"
 
 // Connects to data-controller="toast"
 export default class extends Controller {
@@ -38,7 +39,7 @@ export default class extends Controller {
     // Remove from DOM after animation
     setTimeout(() => {
       this.element.remove()
-    }, 300)
+    }, motionDuration("--duration-base", 200))
   }
 
   close(event) {
