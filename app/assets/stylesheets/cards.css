@@ -116,8 +116,10 @@
    Dashboard redesign — layout
    ============================================ */
 .dashboard-greeting { margin-bottom: var(--spacing-xl); }
-.dashboard-greeting-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; color: var(--color-text); margin: 0; }
-.dashboard-greeting-date { font-size: .9rem; color: var(--color-text-light); font-weight: 600; margin: 4px 0 0; }
+.dashboard-greeting-title,
+.page-header-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; color: var(--color-text); margin: 0; }
+.dashboard-greeting-date,
+.page-header-subtitle { font-size: .9rem; color: var(--color-text-light); font-weight: 600; margin: 4px 0 0; }
 
 .dashboard-summary {
   display: grid;
@@ -161,7 +163,7 @@
   align-items: flex-start;
   gap: var(--spacing-lg);
 }
-.dash-hero-number { font-size: 4.4rem; font-weight: 820; line-height: .82; letter-spacing: -.02em; }
+.dash-hero-number { font-family: var(--font-display); font-size: 4.4rem; font-weight: 800; line-height: .82; letter-spacing: -.02em; }
 .dash-hero-caption { font-size: .82rem; color: rgba(255,255,255,.72); font-weight: 600; margin-top: 10px; }
 
 .dash-hero-finish { text-align: right; flex-shrink: 0; }
@@ -237,7 +239,8 @@
 .activity-top { flex: 1; display: flex; gap: calc(var(--spacing-unit) * 1.75); align-items: center; }
 .activity-statement { flex: 1; min-width: 0; }
 .activity-streak-number {
-  font-size: 5.5rem; font-weight: 820; line-height: .72; letter-spacing: -.02em;
+  font-family: var(--font-display);
+  font-size: 5.5rem; font-weight: 800; line-height: .72; letter-spacing: -.02em;
   color: var(--streak-color);
 }
 .activity-streak-label { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-text-light); font-weight: 800; margin-top: 8px; }

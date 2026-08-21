@@ -312,14 +312,28 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--spacing-2xl);
+  }
+
+  /* Full-width sections on desktop (the Account form has too many fields to
+     pair with anything; Location and Push Notifications are short enough to
+     share a row). */
+  .settings-section-full {
+    grid-column: 1 / -1;
+  }
+
+  /* Match the page header's width to the content it sits above, so the
+     title's left edge lines up with the cards/form instead of the wider
+     .container it would otherwise stretch to. */
+  .settings-page {
     max-width: 700px;
     margin-left: auto;
     margin-right: auto;
   }
 
-  /* Full-width sections on desktop */
-  .settings-section:has(.drive-form) {
-    grid-column: 1 / -1;
+  .drive-form-page {
+    max-width: var(--form-max-width);
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 

@@ -1,9 +1,7 @@
 <% content_for :title, "Settings" %>
 
-<div class="dashboard">
-  <div class="page-header">
-    <h1 class="page-header-title">Settings</h1>
-  </div>
+<div class="settings-page">
+  <%= render "shared/page_header", title: "Settings", subtitle: "Manage your location, notifications, and account." %>
 
   <div class="settings-container">
     <!-- Location section for night drive detection -->
@@ -81,7 +79,7 @@
     </section>
 
     <!-- Account information section -->
-    <section class="settings-section">
+    <section class="settings-section settings-section-full">
       <h2 class="settings-section-title">Account</h2>
       <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
         <%= render "shared/error_messages", object: @user, object_name: "profile" %>
