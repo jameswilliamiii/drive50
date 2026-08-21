@@ -7,7 +7,8 @@ import { ModalDialogController } from "helpers/modal_dialog"
 export default class extends ModalDialogController {
   static targets = [
     "badge", "date", "type",
-    "duration", "time", "split", "splitRow", "driver", "driverRow", "notes", "notesSection"
+    "duration", "dayRow", "dayTotal", "nightRow", "nightTotal",
+    "startTime", "endTime", "driver", "driverRow", "notes", "notesSection"
   ]
 
   open(event) {
@@ -31,15 +32,20 @@ export default class extends ModalDialogController {
     this.badgeTarget.classList.toggle("is-night", kind === "night")
     this.badgeTarget.classList.toggle("is-mixed", mixed)
 
-    this.durationTarget.textContent = d.driveDuration || "—"
+    this.durationTarget.textContent = d.driveDuration
 
-    this.splitRowTarget.hidden = !mixed
+    // Only a mixed drive gets the split; on a pure day or night one both rows
+    // would just restate the duration above them.
+    this.dayRowTarget.hidden = !mixed
+    this.nightRowTarget.hidden = !mixed
     if (mixed) {
-      this.splitTarget.textContent = `${d.driveDayDuration} day · ${d.driveNightDuration} night`
+      this.dayTotalTarget.textContent = d.driveDayDuration
+      this.nightTotalTarget.textContent = d.driveNightDuration
     }
 
     const fmt = (t) => t ? t.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }) : ""
-    this.timeTarget.textContent = start && end ? `${fmt(start)} – ${fmt(end)}` : fmt(start)
+    this.startTimeTarget.textContent = fmt(start)
+    this.endTimeTarget.textContent = fmt(end)
 
     if (d.driveDriver && d.driveDriver.trim()) {
       this.driverTarget.textContent = d.driveDriver

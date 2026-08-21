@@ -64,7 +64,7 @@ class ActivityDay
     label = date.strftime("%B %-d")
     return "#{label}, no drives" unless any_drives?
 
-    "#{label}, #{pluralize(drives.size, 'drive')}, #{total}"
+    "#{label}, #{pluralize(drives.size, 'drive')}, #{format_duration_spoken(total_minutes / 60.0)}"
   end
 
   # Everything the day-summary modal renders. Clock times are formatted here, in
@@ -85,25 +85,25 @@ class ActivityDay
   private
 
   def total
-    format_duration(total_minutes / 60.0)
+    format_duration_short(total_minutes / 60.0)
   end
 
   def total_minutes
-    drives.sum { |drive| drive.duration_minutes.to_i }
+    @total_minutes ||= drives.sum { |drive| drive.duration_minutes.to_i }
   end
 
   def night_minutes
-    drives.sum(&:night_minutes)
+    @night_minutes ||= drives.sum(&:night_minutes)
   end
 
   def duration_or_nil(minutes)
-    format_duration(minutes / 60.0) if minutes.positive?
+    format_duration_short(minutes / 60.0) if minutes.positive?
   end
 
   def drive_json(drive)
     {
       time: "#{clock(drive.started_at)} – #{clock(drive.ended_at)}",
-      duration: format_duration(drive.duration_hours),
+      duration: format_duration_short(drive.duration_hours),
       kind: drive.kind
     }
   end

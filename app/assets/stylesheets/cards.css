@@ -418,15 +418,16 @@ a.dash-hero-chip:active {
 }
 .drive-row {
   display: flex; align-items: center; gap: 13px; padding: 11px 12px; border-radius: var(--border-radius-sm);
+  background: var(--drive-row-bg, transparent);
   transition: background-color var(--duration-fast) ease, opacity var(--duration-base) ease-out, transform var(--duration-base) ease-out;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 .drive-row + .drive-row { border-top: 1px solid var(--color-border-light); }
-@media (hover: hover) { .drive-row:hover { background: var(--color-background); } }
+@media (hover: hover) { .drive-row:hover { background: var(--drive-row-bg-hover, var(--color-background)); } }
 /* Without the suppression the browser paints its own tap highlight in the gap
    before the modal opens; the :active tint is what replaces it. */
-.drive-row:active { background: var(--color-border-light); transition-duration: var(--duration-press); }
+.drive-row:active { background: var(--drive-row-bg-active, var(--color-border-light)); transition-duration: var(--duration-press); }
 
 /* drive_session_controller holds the submit for this long before deleting. */
 .drive-row.fade-out {
@@ -472,6 +473,33 @@ a.dash-hero-chip:active {
 }
 
 .drive-row-actions { position: relative; display: flex; align-items: center; flex-shrink: 0; }
+
+/* 350px is measured: below it "September 30, 2026" ellipsizes against the row's
+   own content. auto-fill, not auto-fit, so two drives keep a card's width. */
+@media (min-width: 900px) {
+  .drive-list.drive-list-grid:has(> .drive-row) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--spacing-md);
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+    /* Inherited rather than set on the row, so the row's own :hover and :active
+       still win without being restated at this selector's specificity. A card
+       hovering toward the page colour would read as the card dissolving. */
+    --drive-row-bg: var(--color-surface);
+    --drive-row-bg-hover: var(--card-hover);
+    --drive-row-bg-active: var(--card-active);
+  }
+
+  .drive-list.drive-list-grid > .drive-row {
+    padding: var(--spacing-lg) var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+  }
+}
 
 @media (max-width: 768px) {
   .drive-row-duration-label { display: none; }

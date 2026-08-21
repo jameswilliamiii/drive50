@@ -49,6 +49,15 @@ body.has-bottom-nav main {
     padding-bottom: var(--spacing-3xl);
   }
 
+  /* Pages that read rather than fill: the header's left edge lines up with the
+     content below it instead of the wider .container. */
+  .settings-page,
+  .drive-log-page {
+    max-width: var(--content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .authentication-form-container {
     min-height: calc(100svh - 280px);
   }
