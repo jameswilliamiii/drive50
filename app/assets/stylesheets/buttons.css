@@ -47,6 +47,7 @@ button[type="submit"]:active,
 input[type="submit"]:active {
   background-color: var(--color-background);
   transform: scale(0.98);
+  transition-duration: 80ms;
 }
 
 /* Primary Button */
@@ -72,6 +73,7 @@ form button.button-primary {
   background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
   color: #ffffff !important;
   transform: scale(0.98);
+  transition-duration: 80ms;
 }
 
 /* Pagination button override */
@@ -81,9 +83,11 @@ form button.button-primary {
   border-color: transparent;
 }
 
-.button.button-primary:hover {
-  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
-  color: #ffffff !important;
+@media (hover: hover) {
+  .button.button-primary:hover {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    color: #ffffff !important;
+  }
 }
 
 /* Disabled Button */
