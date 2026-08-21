@@ -193,14 +193,19 @@
 a.dash-hero-chip {
   color: inherit;
   text-decoration: none;
-  transition: var(--transition);
+  transition: background-color 150ms ease, border-color 150ms ease, transform 160ms cubic-bezier(.23,1,.32,1);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 @media (hover: hover) {
   a.dash-hero-chip:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.32); }
 }
-a.dash-hero-chip:active { background: rgba(255,255,255,.22); }
+/* Press feedback has to land inside a tap, so it snaps in and eases back out. */
+a.dash-hero-chip:active {
+  background: rgba(255,255,255,.22);
+  transform: scale(.98);
+  transition-duration: 80ms;
+}
 .dash-hero-chip-key { display: block; font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: rgba(255,255,255,.62); }
 .dash-hero-chip-value { display: block; font-size: 1.3rem; font-weight: 800; margin-top: 4px; }
 .dash-hero-chip-value small { font-size: .72rem; color: rgba(255,255,255,.6); font-weight: 600; }
@@ -286,7 +291,7 @@ a.dash-hero-chip:active { background: rgba(255,255,255,.22); }
   aspect-ratio: 1; border-radius: 7px; min-width: 0;
   background: var(--activity-empty-bg);
   border: 1px solid var(--activity-empty-border);
-  cursor: pointer; transition: var(--transition);
+  cursor: pointer; transition: transform 160ms cubic-bezier(.23,1,.32,1), box-shadow 160ms ease, filter 160ms ease;
   /* Past days render as <button> so the grid is keyboard reachable; strip the
      UA button chrome so they look identical to the future-day divs. */
   padding: 0; margin: 0; appearance: none; font: inherit; color: inherit;
@@ -307,7 +312,17 @@ a.dash-hero-chip:active { background: rgba(255,255,255,.22); }
 .activity-swatch.is-both { background: var(--activity-both-fill); border-color: var(--recent-badge-night-fg); }
 
 @media (hover: hover) {
-  .activity-cell:not(.is-future):hover { transform: scale(1.08); box-shadow: var(--shadow-md); }
+  /* The shadow only reads on a light surface, so the lift is what marks the cell
+     in dark mode and under reduced motion. */
+  .activity-cell:not(.is-future):hover {
+    transform: scale(1.12);
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activity-cell:not(.is-future):hover { transform: none; }
 }
 @media (max-width: 768px) {
   .activity-top { flex-direction: column; align-items: stretch; gap: var(--spacing-lg); }
@@ -342,13 +357,16 @@ a.dash-hero-chip:active { background: rgba(255,255,255,.22); }
   font-weight: 700;
   color: var(--color-text-secondary);
   text-decoration: none;
-  transition: var(--transition);
+  transition: background-color 150ms ease, color 150ms ease, transform 160ms cubic-bezier(.23,1,.32,1);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 @media (hover: hover) {
   .kind-filter-tab:hover { background: var(--color-border-light); color: var(--color-text); }
 }
+/* Stands in for the tap highlight suppressed above: on touch :hover never fires,
+   so without this the tab has no press feedback at all. */
+.kind-filter-tab:active { background: var(--color-border-light); transform: scale(.97); transition-duration: 80ms; }
 .kind-filter-tab.is-all.is-active { color: var(--color-white); background: var(--color-primary); }
 .kind-filter-tab.is-day.is-active { background: var(--recent-badge-day-bg); color: var(--recent-badge-day-fg); }
 .kind-filter-tab.is-night.is-active { background: var(--recent-badge-night-bg); color: var(--recent-badge-night-fg); }
@@ -373,9 +391,17 @@ a.dash-hero-chip:active { background: rgba(255,255,255,.22); }
   padding: var(--spacing-xs) var(--spacing-sm);
   font-feature-settings: "tnum" 1;
 }
-.drive-row { display: flex; align-items: center; gap: 13px; padding: 11px 12px; border-radius: var(--border-radius-sm); }
+.drive-row {
+  display: flex; align-items: center; gap: 13px; padding: 11px 12px; border-radius: var(--border-radius-sm);
+  transition: background-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
 .drive-row + .drive-row { border-top: 1px solid var(--color-border-light); }
 @media (hover: hover) { .drive-row:hover { background: var(--color-background); } }
+/* Without the suppression the browser paints its own tap highlight in the gap
+   before the modal opens; the :active tint is what replaces it. */
+.drive-row:active { background: var(--color-border-light); transition-duration: 80ms; }
 
 .drive-row-badge { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .drive-row-badge.is-day { background: var(--recent-badge-day-bg); color: var(--recent-badge-day-fg); }

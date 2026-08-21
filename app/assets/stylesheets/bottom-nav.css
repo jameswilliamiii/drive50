@@ -61,12 +61,19 @@
 .bottom-nav-item form button:active .bottom-nav-icon,
 .bottom-nav-form button:active .bottom-nav-icon {
   transform: scale(0.9);
+  transition-duration: 80ms;
 }
 
-.bottom-nav-item.active,
-.bottom-nav-item:hover {
+.bottom-nav-item.active {
   color: var(--color-white);
   opacity: 0.8;
+}
+
+@media (hover: hover) {
+  .bottom-nav-item:hover {
+    color: var(--color-white);
+    opacity: 0.8;
+  }
 }
 
 /* Floating New Drive button (mobile only) */
