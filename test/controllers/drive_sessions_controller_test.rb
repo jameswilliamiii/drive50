@@ -17,6 +17,13 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "the dashboard day and night tiles open the drive log filtered to match" do
+    get drive_sessions_url
+
+    assert_select "a.dash-hero-chip.is-day[href=?]", all_drive_sessions_path(kind: "day")
+    assert_select "a.dash-hero-chip.is-night[href=?]", all_drive_sessions_path(kind: "night")
+  end
+
   test "should get new" do
     # Complete any in-progress sessions first
     @user.drive_sessions.in_progress.destroy_all
@@ -222,6 +229,8 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal "mixed", row["data-drive-kind"]
     assert_equal "Day & night drive", row["data-drive-kind-label"]
+    assert_select "##{dom_id(drive)} .drive-row-badge.is-mixed .icon-sunset"
+    assert_select "dialog.drive-modal .drive-modal-badge-mixed .icon-sunset"
     assert_equal "#{drive.night_minutes} mins", row["data-drive-night-duration"]
     assert_equal "#{drive.duration_minutes - drive.night_minutes} mins", row["data-drive-day-duration"]
     assert_select "[data-drive-modal-target=split]", 1
@@ -286,6 +295,80 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
 
     get all_drive_sessions_url
     assert_response :success
+  end
+
+  test "all filters by kind, keeping a sunset-crossing drive under both" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    build = ->(from, to) do
+      @user.drive_sessions.create!(
+        started_at: tz.local(2024, 12, 15, from, 0, 0),
+        ended_at: tz.local(2024, 12, 15, to, 0, 0)
+      )
+    end
+    day = build.call(12, 13)
+    night = build.call(18, 19)
+    mixed = build.call(16, 17) # crosses sunset at 16:20
+
+    get all_drive_sessions_url
+    assert_select ".drive-row", 3
+
+    get all_drive_sessions_url(kind: "day")
+    assert_select "##{dom_id(day)}"
+    assert_select "##{dom_id(mixed)}"
+    assert_select "##{dom_id(night)}", false, "a pure night drive has no daytime hours"
+    assert_select ".kind-filter-tab.is-day.is-active[aria-current=?]", "page"
+    assert_select "##{dom_id(day)} .drive-row-badge.is-day .icon-sun"
+    assert_select "##{dom_id(night)} .drive-row-badge.is-night .icon-moon", false
+
+    get all_drive_sessions_url(kind: "night")
+    assert_select "##{dom_id(night)}"
+    assert_select "##{dom_id(mixed)}"
+    assert_select "##{dom_id(day)}", false, "a pure day drive has no night hours"
+    assert_select "##{dom_id(night)} .drive-row-badge.is-night .icon-moon"
+  end
+
+  test "an empty filter says which filter came up empty" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    @user.drive_sessions.create!(
+      started_at: tz.local(2024, 12, 15, 12, 0, 0),
+      ended_at: tz.local(2024, 12, 15, 13, 0, 0)
+    )
+
+    get all_drive_sessions_url(kind: "night")
+    assert_select ".empty-state", text: /No drives with night hours/
+
+    get all_drive_sessions_url(kind: "day")
+    assert_select ".empty-state", false, "the day filter has a drive to show"
+  end
+
+  test "all ignores an unrecognized kind rather than returning nothing" do
+    get all_drive_sessions_url(kind: "'; DROP TABLE drive_sessions; --")
+
+    assert_response :success
+    assert_select ".kind-filter-tab.is-all.is-active"
+    assert_select "##{dom_id(@drive_session)}"
+  end
+
+  test "the active filter survives Load More" do
+    @user.drive_sessions.destroy_all
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    # Pinned to midday so all 25 are day drives and the filter still pages.
+    25.times do |i|
+      date = Date.new(2024, 12, 1) + i
+      @user.drive_sessions.create!(
+        started_at: tz.local(date.year, date.month, date.day, 12, 0, 0),
+        ended_at: tz.local(date.year, date.month, date.day, 13, 0, 0)
+      )
+    end
+
+    get all_drive_sessions_url(kind: "day")
+    assert_response :success
+    assert_select "a.load-more[href*=?]", "kind=day"
   end
 
   test "Load More link disables Turbo hover prefetch" do

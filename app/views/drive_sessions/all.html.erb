@@ -4,6 +4,16 @@
 
 <%= render "shared/page_header", title: "Drive Log", subtitle: "Every drive you've logged, newest first." %>
 
+<nav class="kind-filter" aria-label="Filter drives">
+  <% kind_filter_options.each do |value, label, glyph| %>
+    <%= link_to all_drive_sessions_path(value == "all" ? {} : { kind: value }),
+                class: "kind-filter-tab is-#{value} #{'is-active' if @kind_filter == value}",
+                aria: { current: ("page" if @kind_filter == value) } do %>
+      <%= icon(glyph, size: 15, class: "kind-filter-icon") if glyph %><%= label %>
+    <% end %>
+  <% end %>
+</nav>
+
 <div class="drive-history">
   <% if @sessions.any? %>
     <div id="sessions-list" class="drive-list">
@@ -25,6 +35,15 @@
       </div>
     </turbo-frame>
   <% else %>
-    <p class="empty-state">No drives recorded yet. Start your first drive!</p>
+    <p class="empty-state">
+      <% case @kind_filter %>
+      <% when "day" %>
+        No drives with daytime hours yet.
+      <% when "night" %>
+        No drives with night hours yet.
+      <% else %>
+        No drives recorded yet. Start your first drive!
+      <% end %>
+    </p>
   <% end %>
 </div>

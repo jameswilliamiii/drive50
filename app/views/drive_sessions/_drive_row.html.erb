@@ -13,10 +13,8 @@
      data-drive-duration="<%= format_duration(session.duration_hours) %>"
      data-drive-driver="<%= session.user.full_name %>"
      data-drive-notes="<%= session.notes %>">
-  <%# The badge stays binary — a moon means "contains night driving" — while the
-      label carries the full three-way wording. %>
-  <div class="drive-row-badge is-<%= kind == :day ? "day" : "night" %>">
-    <%= kind == :day ? icon_sun(size: 18) : icon_moon(size: 18) %>
+  <div class="drive-row-badge is-<%= kind %>">
+    <%= icon(drive_kind_icon(session), size: 18) %>
     <span class="visually-hidden"><%= drive_kind_label(session) %></span>
   </div>
 

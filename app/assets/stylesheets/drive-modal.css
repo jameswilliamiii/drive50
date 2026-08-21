@@ -93,14 +93,21 @@
   color: var(--recent-badge-night-fg);
 }
 
+.drive-modal-badge.is-mixed {
+  background: var(--recent-badge-mixed-bg);
+  color: var(--recent-badge-mixed-fg);
+}
+
 /* Only the icon matching the drive type is shown. */
 .drive-modal-badge-day,
-.drive-modal-badge-night {
+.drive-modal-badge-night,
+.drive-modal-badge-mixed {
   display: none;
 }
 
 .drive-modal-badge.is-day .drive-modal-badge-day,
-.drive-modal-badge.is-night .drive-modal-badge-night {
+.drive-modal-badge.is-night .drive-modal-badge-night,
+.drive-modal-badge.is-mixed .drive-modal-badge-mixed {
   display: flex;
 }
 

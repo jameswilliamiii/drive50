@@ -418,6 +418,30 @@ class DriveSessionTest < ActiveSupport::TestCase
   end
 
 
+  test "with_day and with_night both return a drive that crossed sunset" do
+    @user.drive_sessions.destroy_all
+    day = chicago_drive(2024, 12, 15, from: "12:00", to: "13:00")
+    night = chicago_drive(2024, 12, 15, from: "18:00", to: "19:00")
+    mixed = chicago_drive(2024, 12, 15, from: "16:00", to: "17:00")
+    assert_equal [ :day, :night, :mixed ], [ day.kind, night.kind, mixed.kind ]
+
+    assert_equal [ day, mixed ].sort, @user.drive_sessions.with_day.sort
+    assert_equal [ night, mixed ].sort, @user.drive_sessions.with_night.sort
+  end
+
+  test "matching_kind falls back to the full relation for anything but day or night" do
+    @user.drive_sessions.destroy_all
+    day = chicago_drive(2024, 12, 15, from: "12:00", to: "13:00")
+    night = chicago_drive(2024, 12, 15, from: "18:00", to: "19:00")
+    all = [ day, night ].sort
+
+    assert_equal [ day ], @user.drive_sessions.matching_kind("day")
+    assert_equal [ night ], @user.drive_sessions.matching_kind("night")
+    assert_equal all, @user.drive_sessions.matching_kind("all").sort
+    assert_equal all, @user.drive_sessions.matching_kind(nil).sort
+    assert_equal all, @user.drive_sessions.matching_kind("bogus").sort
+  end
+
   test "ordered scope returns sessions in reverse chronological order" do
     @user.drive_sessions.destroy_all
     first = @user.drive_sessions.create!(
