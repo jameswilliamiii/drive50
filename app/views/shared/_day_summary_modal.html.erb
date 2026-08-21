@@ -33,9 +33,15 @@
 
       <template data-day-modal-target="rowTemplate">
         <li class="day-modal-drive">
+          <%# From the helper, not restated here: the row badge and this one
+              drifted apart once already. %>
           <span class="day-modal-drive-badge">
-            <span class="day-modal-icon-day"><%= icon_sun(size: 16) %></span>
-            <span class="day-modal-icon-night"><%= icon_moon(size: 16) %></span>
+            <% drive_kind_glyphs.each do |kind, glyph, label| %>
+              <span class="day-modal-icon-<%= kind %>">
+                <%= icon(glyph, size: 16) %>
+                <span class="visually-hidden"><%= label %></span>
+              </span>
+            <% end %>
           </span>
           <span class="day-modal-drive-time"></span>
           <span class="day-modal-drive-duration"></span>

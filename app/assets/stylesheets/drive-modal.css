@@ -329,28 +329,29 @@
 .day-modal-drive-badge {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
   flex-shrink: 0;
 }
 
-/* Only the icons matching the drive's kind are shown; a drive that crossed
-   sunset shows both, matching the "both" swatch in the grid legend. */
+/* One glyph per kind, the same three the drive row's badge and the detail modal
+   show. A sun beside a moon read as two drives rather than one that crossed
+   sunset. */
 .day-modal-icon-day,
-.day-modal-icon-night {
+.day-modal-icon-night,
+.day-modal-icon-mixed {
   display: none;
 }
 
 .day-modal-drive.is-day .day-modal-icon-day,
 .day-modal-drive.is-night .day-modal-icon-night,
-.day-modal-drive.is-mixed .day-modal-icon-day,
-.day-modal-drive.is-mixed .day-modal-icon-night {
+.day-modal-drive.is-mixed .day-modal-icon-mixed {
   display: inline-flex;
 }
 
 .day-modal-drive.is-day .day-modal-icon-day { color: var(--recent-badge-day-fg); }
-.day-modal-drive.is-night .day-modal-icon-night,
-.day-modal-drive.is-mixed .day-modal-icon-night { color: var(--recent-badge-night-fg); }
-.day-modal-drive.is-mixed .day-modal-icon-day { color: var(--recent-badge-day-fg); }
+.day-modal-drive.is-night .day-modal-icon-night { color: var(--recent-badge-night-fg); }
+/* Night, not the sun: in the row badge the mixed gradient carries the day half,
+   but this badge has no background, so amber would just read as a day drive. */
+.day-modal-drive.is-mixed .day-modal-icon-mixed { color: var(--recent-badge-night-fg); }
 
 .day-modal-drive-time {
   flex: 1;

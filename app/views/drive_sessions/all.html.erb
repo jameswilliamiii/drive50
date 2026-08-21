@@ -2,51 +2,53 @@
 
 <%= turbo_stream_from Current.user %>
 
-<%= render "shared/page_header", title: "Drive Log", subtitle: "Every drive you've logged, newest first." %>
+<div class="drive-log-page">
+  <%= render "shared/page_header", title: "Drive Log", subtitle: "Every drive you've logged, newest first." %>
 
-<nav class="kind-filter" aria-label="Filter drives">
-  <% kind_filter_options.each do |value, label, glyph| %>
-    <%= link_to all_drive_sessions_path(value == "all" ? {} : { kind: value }),
-                class: "kind-filter-tab is-#{value} #{'is-active' if @kind_filter == value}",
-                aria: { current: ("page" if @kind_filter == value) } do %>
-      <%= icon(glyph, size: 15, class: "kind-filter-icon") if glyph %><%= label %>
+  <nav class="kind-filter" aria-label="Filter drives">
+    <% kind_filter_options.each do |value, label, glyph| %>
+      <%= link_to all_drive_sessions_path(value == "all" ? {} : { kind: value }),
+                  class: "kind-filter-tab is-#{value} #{'is-active' if @kind_filter == value}",
+                  aria: { current: ("page" if @kind_filter == value) } do %>
+        <%= icon(glyph, size: 15, class: "kind-filter-icon") if glyph %><%= label %>
+      <% end %>
     <% end %>
-  <% end %>
-</nav>
+  </nav>
 
-<div class="drive-history">
-  <%# The list and the frame render even when empty so a drive completed on
-      another device has a target to arrive in. The list is keyed by filter so
-      only the broadcast for the open one lands. %>
-  <div id="sessions-list-<%= @kind_filter %>" class="drive-list">
-    <%= render partial: "drive_row", collection: @sessions, as: :session %>
-  </div>
-
-  <turbo-frame id="sessions-pagination">
-    <div id="pagination-container" class="pagination-wrapper">
-      <% if @pagy.next %>
-        <%= link_to @pagy.page_url(:next),
-                    class: "load-more",
-                    data: {
-                      turbo_frame: "sessions-pagination",
-                      turbo_prefetch: false
-                    } do %>
-          Load more<%= icon(:chevron_down, size: 16, class: "load-more-chevron") %>
-        <% end %>
-      <% end %>
+  <div class="drive-history">
+    <%# The list and the frame render even when empty so a drive completed on
+        another device has a target to arrive in. The list is keyed by filter so
+        only the broadcast for the open one lands. %>
+    <div id="sessions-list-<%= @kind_filter %>" class="drive-list">
+      <%= render partial: "drive_row", collection: @sessions, as: :session %>
     </div>
-  </turbo-frame>
 
-  <% if @sessions.empty? %>
-    <p class="empty-state">
-      <% case @kind_filter %>
-      <% when "day" %>
-        No drives with daytime hours yet.
-      <% when "night" %>
-        No drives with night hours yet.
-      <% else %>
-        No drives recorded yet. Start your first drive!
-      <% end %>
-    </p>
-  <% end %>
+    <turbo-frame id="sessions-pagination">
+      <div id="pagination-container" class="pagination-wrapper">
+        <% if @pagy.next %>
+          <%= link_to @pagy.page_url(:next),
+                      class: "load-more",
+                      data: {
+                        turbo_frame: "sessions-pagination",
+                        turbo_prefetch: false
+                      } do %>
+            Load more<%= icon(:chevron_down, size: 16, class: "load-more-chevron") %>
+          <% end %>
+        <% end %>
+      </div>
+    </turbo-frame>
+
+    <% if @sessions.empty? %>
+      <p class="empty-state">
+        <% case @kind_filter %>
+        <% when "day" %>
+          No drives with daytime hours yet.
+        <% when "night" %>
+          No drives with night hours yet.
+        <% else %>
+          No drives recorded yet. Start your first drive!
+        <% end %>
+      </p>
+    <% end %>
+  </div>
 </div>

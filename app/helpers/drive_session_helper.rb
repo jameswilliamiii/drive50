@@ -24,6 +24,12 @@ module DriveSessionHelper
     DRIVE_KIND_ICONS.fetch(drive.kind)
   end
 
+  # A badge that renders every kind at once and lets CSS pick needs all three
+  # together, so they come from here rather than each caller reading the maps.
+  def drive_kind_glyphs
+    DRIVE_KIND_ICONS.map { |kind, glyph| [ kind, glyph, DRIVE_KIND_LABELS.fetch(kind) ] }
+  end
+
   # "all" has no kind of its own, so it comes back without a glyph.
   def kind_filter_options
     DriveSession::KIND_FILTERS.map do |value|

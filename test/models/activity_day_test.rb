@@ -62,8 +62,8 @@ class ActivityDayTest < ActiveSupport::TestCase
       two = drive("2026-07-14 21:00", "2026-07-14 22:00")
 
       assert_equal "July 14, no drives", cell_for(Date.new(2026, 7, 14), []).aria_label
-      assert_equal "July 14, 1 drive, 1 hr", cell_for(Date.new(2026, 7, 14), [ one ]).aria_label
-      assert_equal "July 14, 2 drives, 2 hrs", cell_for(Date.new(2026, 7, 14), [ one, two ]).aria_label
+      assert_equal "July 14, 1 drive, 1 hour", cell_for(Date.new(2026, 7, 14), [ one ]).aria_label
+      assert_equal "July 14, 2 drives, 2 hours", cell_for(Date.new(2026, 7, 14), [ one, two ]).aria_label
     end
   end
 
@@ -74,7 +74,7 @@ class ActivityDayTest < ActiveSupport::TestCase
 
       assert_equal "Tuesday, July 14, 2026", payload[:label]
       assert_equal 1, payload[:count]
-      assert_equal "1 hr 30 mins", payload[:total]
+      assert_equal "1h 30m", payload[:total]
       assert payload[:day], "a crossing drive contributes to both totals"
       assert payload[:night]
       assert_equal "mixed", payload[:drives].first[:kind].to_s
@@ -88,7 +88,7 @@ class ActivityDayTest < ActiveSupport::TestCase
     travel_to @tz.local(2026, 7, 15, 18, 0, 0) do
       payload = cell_for(Date.new(2026, 7, 14), [ drive("2026-07-14 14:00", "2026-07-14 15:00") ]).as_json
 
-      assert_equal "1 hr", payload[:day]
+      assert_equal "1h", payload[:day]
       assert_nil payload[:night]
     end
   end

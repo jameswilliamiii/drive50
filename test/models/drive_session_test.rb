@@ -784,7 +784,7 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     summaries = Nokogiri::HTML5.fragment(grid).css("button.activity-cell")
                                .map { |node| JSON.parse(node["data-day-summary"]) }
-    assert summaries.any? { |s| s["count"] == 1 && s["total"] == "1 hr" },
+    assert summaries.any? { |s| s["count"] == 1 && s["total"] == "1h" },
            "the rebuilt grid must carry the drive that triggered it"
   end
 

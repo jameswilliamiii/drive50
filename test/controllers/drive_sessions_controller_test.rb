@@ -159,13 +159,13 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
 
     summary = JSON.parse(cell["data-day-summary"])
     assert_equal "Tuesday, July 14, 2026", summary["label"]
-    assert_equal "2 hrs", summary["total"]
-    assert_equal "1 hr", summary["day"]
-    assert_equal "1 hr", summary["night"]
+    assert_equal "2h", summary["total"]
+    assert_equal "1h", summary["day"]
+    assert_equal "1h", summary["night"]
     assert_equal %w[day night], summary["drives"].map { |d| d["kind"] }
     assert_equal "2:00 PM – 3:00 PM", summary["drives"].first["time"]
     assert_equal "both", cell["class"][/state-(\w+)/, 1]
-    assert_equal "July 14, 2 drives, 2 hrs", cell["aria-label"]
+    assert_equal "July 14, 2 drives, 2 hours", cell["aria-label"]
 
     # A single drive that straddles sunset is "mixed" on its own, and paints the
     # day both colours without needing a second drive.
@@ -190,8 +190,8 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
 
     summary = css_select("button.activity-cell").map { |n| JSON.parse(n["data-day-summary"]) }
                                                 .find { |s| s["count"].to_i == 1 }
-    assert_equal "1 hr", summary["day"]
-    assert_nil summary["night"], "a zero night total must be omitted, not rendered as 0 hrs"
+    assert_equal "1h", summary["day"]
+    assert_nil summary["night"], "a zero night total must be omitted, not rendered as 0h"
   end
 
   test "a day with no drives still opens, and future days are not clickable" do
@@ -231,9 +231,20 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Day & night drive", row["data-drive-kind-label"]
     assert_select "##{dom_id(drive)} .drive-row-badge.is-mixed .icon-sunset"
     assert_select "dialog.drive-modal .drive-modal-badge-mixed .icon-sunset"
-    assert_equal "#{drive.night_minutes} mins", row["data-drive-night-duration"]
-    assert_equal "#{drive.duration_minutes - drive.night_minutes} mins", row["data-drive-day-duration"]
-    assert_select "[data-drive-modal-target=split]", 1
+    assert_equal "#{drive.night_minutes}m", row["data-drive-night-duration"]
+    assert_equal "#{drive.duration_minutes - drive.night_minutes}m", row["data-drive-day-duration"]
+    assert_select "[data-drive-modal-target=dayTotal]", 1
+    assert_select "[data-drive-modal-target=nightTotal]", 1
+  end
+
+  test "the day summary offers a glyph and a spoken label for every drive kind" do
+    get drive_sessions_url
+
+    ApplicationController.helpers.drive_kind_glyphs.each do |kind, glyph, label|
+      assert_select "dialog.day-modal .day-modal-icon-#{kind} .icon-#{glyph.to_s.dasherize}", { count: 1 },
+                    "the day summary is missing the #{kind} glyph"
+      assert_select "dialog.day-modal .day-modal-icon-#{kind} .visually-hidden", text: label
+    end
   end
 
   test "CSV export reports day and night hours that sum to the duration" do
@@ -351,6 +362,15 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     get all_drive_sessions_url(kind: "night")
     assert_select "#sessions-list-night"
     assert_select ".empty-state", text: /No drives with night hours/
+  end
+
+  test "the dashboard's recent drives lay out as cards; the drive log stays a list" do
+    get drive_sessions_url
+    assert_select "#recent-drives-table.drive-list.drive-list-grid"
+
+    get all_drive_sessions_url
+    assert_select ".drive-list.drive-list-grid", false,
+                  "the log's rows have a reading width and do not need the card grid"
   end
 
   test "all ignores an unrecognized kind rather than returning nothing" do

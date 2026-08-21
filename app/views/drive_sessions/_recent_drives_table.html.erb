@@ -1,4 +1,4 @@
-<div id="recent-drives-table" class="drive-list">
+<div id="recent-drives-table" class="drive-list drive-list-grid">
   <% if recent_sessions.any? %>
     <%= render partial: "drive_sessions/drive_row", collection: recent_sessions, as: :session %>
   <% else %>

@@ -8,9 +8,9 @@
      data-drive-ended-at="<%= session.ended_at&.iso8601 %>"
      data-drive-kind="<%= kind %>"
      data-drive-kind-label="<%= drive_kind_label(session) %>"
-     data-drive-day-duration="<%= format_duration(session.day_hours) %>"
-     data-drive-night-duration="<%= format_duration(session.night_hours) %>"
-     data-drive-duration="<%= format_duration(session.duration_hours) %>"
+     data-drive-day-duration="<%= format_duration_short(session.day_hours) %>"
+     data-drive-night-duration="<%= format_duration_short(session.night_hours) %>"
+     data-drive-duration="<%= format_duration_short(session.duration_hours) %>"
      data-drive-driver="<%= session.user.full_name %>"
      data-drive-notes="<%= session.notes %>">
   <div class="drive-row-badge is-<%= kind %>">
@@ -30,7 +30,7 @@
 
   <div class="drive-row-duration">
     <div class="drive-row-duration-label">Duration</div>
-    <div class="drive-row-duration-value"><%= format_duration(session.duration_hours, style_units: true) %></div>
+    <div class="drive-row-duration-value"><%= format_duration_short(session.duration_hours, style_units: true) %></div>
   </div>
 
   <div class="drive-row-actions">

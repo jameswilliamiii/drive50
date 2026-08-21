@@ -35,6 +35,8 @@
   --color-surface: #ffffff;
   --color-border: #e2e8f0;
   --color-border-light: #f1f5f9;
+  --card-hover: #f1f5f9;
+  --card-active: #e2e8f0;
   --color-text: #0f172a;
   --color-text-secondary: #475569;
   --color-text-light: #94a3b8;
@@ -58,6 +60,7 @@
   /* Layout */
   --max-width: 1200px;
   --form-max-width: 600px;
+  --content-max-width: 700px;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -109,6 +112,8 @@ body[data-theme="dark"] {
   --color-surface: #0f172a;
   --color-border: #1e293b;
   --color-border-light: #0b1120;
+  --card-hover: #1e293b;
+  --card-active: #334155;
   --color-text: #e2e8f0;
   --color-text-secondary: #94a3b8;
   --color-text-light: #64748b;
@@ -161,6 +166,8 @@ body[data-theme="dark"] {
     --color-surface: #0f172a;
     --color-border: #1e293b;
     --color-border-light: #0b1120;
+  --card-hover: #1e293b;
+  --card-active: #334155;
     --color-text: #e2e8f0;
     --color-text-secondary: #94a3b8;
     --color-text-light: #64748b;

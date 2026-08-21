@@ -4,44 +4,50 @@
 # includes this and *that* helper is auto-mixed into views — Rails only auto-mixes
 # files named *_helper.rb, so the include below is load-bearing, not redundant.
 module DurationFormatting
-  def format_duration(hours_decimal, style_units: false)
-    return style_units ? "0 <span class='unit'>hrs</span>".html_safe : "0 hrs" if hours_decimal.nil? || hours_decimal.zero?
-
-    total_minutes = (hours_decimal * 60).round
-    hours = total_minutes / 60
-    minutes = total_minutes % 60
-
-    if style_units
-      if hours > 0 && minutes > 0
-        "#{hours} <span class='unit'>#{'hr'.pluralize(hours)}</span> #{minutes} <span class='unit'>#{'min'.pluralize(minutes)}</span>".html_safe
-      elsif hours > 0
-        "#{hours} <span class='unit'>#{'hr'.pluralize(hours)}</span>".html_safe
-      else
-        "#{minutes} <span class='unit'>#{'min'.pluralize(minutes)}</span>".html_safe
-      end
-    else
-      if hours > 0 && minutes > 0
-        "#{hours} #{'hr'.pluralize(hours)} #{minutes} #{'min'.pluralize(minutes)}"
-      elsif hours > 0
-        "#{hours} #{'hr'.pluralize(hours)}"
-      else
-        "#{minutes} #{'min'.pluralize(minutes)}"
-      end
-    end
+  def format_duration(hours_decimal)
+    spelled(hours_decimal, hour: "hr", minute: "min")
   end
 
-  # Compact "4h 55m" duration for tight stat chips, mirroring the hero's terse
-  # chip values.
-  def format_duration_short(hours_decimal)
-    return "0h" if hours_decimal.nil? || hours_decimal.zero?
+  # Compact "4h 55m": what the app shows wherever a duration is read as a value.
+  # The long form is for prose.
+  def format_duration_short(hours_decimal, style_units: false)
+    hours, minutes = split_duration(hours_decimal)
 
-    hours, minutes = (hours_decimal * 60).round.divmod(60)
-    if hours.positive? && minutes.positive?
-      "#{hours}h #{minutes}m"
-    elsif hours.positive?
-      "#{hours}h"
-    else
-      "#{minutes}m"
-    end
+    parts = []
+    parts << unit_pair(hours, "h", style_units) if hours.positive? || minutes.zero?
+    parts << unit_pair(minutes, "m", style_units) if minutes.positive?
+    joined = parts.join(" ")
+    style_units ? joined.html_safe : joined
+  end
+
+  # For text that exists only to be announced, never shown — an aria label can
+  # spell the units out at no cost to the layout. Visible durations are announced
+  # as written, abbreviations and all; that is the trade the compact form makes.
+  def format_duration_spoken(hours_decimal)
+    spelled(hours_decimal, hour: "hour", minute: "minute")
+  end
+
+  private
+
+  def spelled(hours_decimal, hour:, minute:)
+    hours, minutes = split_duration(hours_decimal)
+    return "0 #{hour.pluralize(0)}" if hours.zero? && minutes.zero?
+
+    parts = []
+    parts << "#{hours} #{hour.pluralize(hours)}" if hours.positive?
+    parts << "#{minutes} #{minute.pluralize(minutes)}" if minutes.positive?
+    parts.join(" ")
+  end
+
+  # Clamped, so every caller gets a duration back: divmod on a negative splits into
+  # a negative hour and a *positive* minute, and -0.5 would render "30m". This is
+  # the backstop, not the check — night_minutes <= duration_minutes is what keeps
+  # day_hours non-negative in the first place.
+  def split_duration(hours_decimal)
+    [ (hours_decimal.to_f * 60).round, 0 ].max.divmod(60)
+  end
+
+  def unit_pair(value, unit, style_units)
+    style_units ? "#{value}<span class='unit'>#{unit}</span>" : "#{value}#{unit}"
   end
 end
