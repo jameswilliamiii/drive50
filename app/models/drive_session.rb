@@ -249,7 +249,7 @@ class DriveSession < ApplicationRecord
   def broadcast_create
     if completed?
       broadcast_recent_drives_table
-      broadcast_append_to user, target: "sessions-list", html: ApplicationController.render(partial: "drive_sessions/drive_row", locals: { session: self })
+      broadcast_drive_row
     end
     broadcast_progress_summary
   end
@@ -259,7 +259,7 @@ class DriveSession < ApplicationRecord
       was_in_progress = saved_change_to_ended_at? && ended_at.present? && ended_at_before_last_save.nil?
 
       if was_in_progress
-        broadcast_append_to user, target: "sessions-list", html: ApplicationController.render(partial: "drive_sessions/drive_row", locals: { session: self })
+        broadcast_drive_row
       else
         broadcast_replace_to user, target: ActionView::RecordIdentifier.dom_id(self), html: ApplicationController.render(partial: "drive_sessions/drive_row", locals: { session: self })
       end
@@ -273,6 +273,39 @@ class DriveSession < ApplicationRecord
     broadcast_remove_to user, target: ActionView::RecordIdentifier.dom_id(self)
     broadcast_recent_drives_table
     broadcast_progress_summary
+  end
+
+  # The log is newest-first, so the only position a stream insert can name
+  # correctly is the top. A backdated drive belongs mid-list, which prepend and
+  # append both get wrong, so leave that one to the next load.
+  def broadcast_drive_row
+    return unless newest_completed?
+
+    html = ApplicationController.render(
+      partial: "drive_sessions/drive_row",
+      locals: { session: self, entering: true }
+    )
+
+    # A broadcast cannot see which filter the page is on, so it addresses every
+    # list the drive belongs in; only one of them is on the viewer's page and the
+    # rest find no target. Keeps the day/night rule here rather than restating it
+    # in CSS.
+    matching_kind_filters.each do |filter|
+      broadcast_prepend_to user, target: "sessions-list-#{filter}", html: html
+    end
+  end
+
+  def matching_kind_filters
+    [ "all", ("day" if any_day?), ("night" if any_night?) ].compact
+  end
+
+  # `>=` excluding self, not `>`: two drives sharing a start time would both look
+  # newest, and the one that prepended second would sit above the order a reload
+  # renders.
+  def newest_completed?
+    DriveSession.where(user_id: user_id).completed
+                .where.not(id: id)
+                .where("started_at >= ?", started_at).none?
   end
 
   def broadcast_recent_drives_table

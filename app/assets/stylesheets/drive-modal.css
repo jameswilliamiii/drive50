@@ -26,6 +26,31 @@
   color: var(--color-text);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  /* display and overlay have to transition discretely, or the dialog leaves the
+     top layer on the first frame of the close and the exit is never seen. */
+  transition: opacity var(--duration-base) ease-out,
+              transform var(--duration-base) ease-out;
+}
+
+/* Entry needs only @starting-style. The exit needs the dialog held in the top
+   layer, which is what `overlay` does — hold `display` without it and the dialog
+   reflows into the document and fades out there. */
+@supports (overlay: auto) {
+  .drive-modal {
+    transition: opacity var(--duration-base) ease-out,
+                transform var(--duration-base) ease-out,
+                overlay var(--duration-base) ease-out allow-discrete,
+                display var(--duration-base) ease-out allow-discrete;
+  }
+}
+
+/* Still painted on top for the length of the exit, so it would otherwise eat the
+   tap that lands where the modal used to be. */
+.drive-modal:not([open]),
+.drive-modal:not([open])::backdrop {
+  pointer-events: none;
 }
 
 /* Flex layout only while open — applying display:flex unconditionally overrides
@@ -33,6 +58,21 @@
 .drive-modal[open] {
   display: flex;
   flex-direction: column;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* The open rule already matches on the frame the dialog enters the top layer,
+   so the entry values can only come from here. */
+@starting-style {
+  .drive-modal[open] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.drive-modal.is-restoring {
+  transition: none;
 }
 
 /* The card fills the dialog and lets the body scroll when the notes are long,
@@ -47,20 +87,25 @@
 .drive-modal::backdrop {
   background: rgba(2, 6, 23, 0.55);
   backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity var(--duration-base) ease-out;
 }
 
-.drive-modal[open] {
-  animation: driveModalIn 0.18s ease-out;
-}
-
-@keyframes driveModalIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
+@supports (overlay: auto) {
+  .drive-modal::backdrop {
+    transition: opacity var(--duration-base) ease-out,
+                overlay var(--duration-base) ease-out allow-discrete,
+                display var(--duration-base) ease-out allow-discrete;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+}
+
+.drive-modal[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .drive-modal[open]::backdrop {
+    opacity: 0;
   }
 }
 
@@ -145,12 +190,14 @@
   color: var(--color-text-secondary);
   box-shadow: none;
   cursor: pointer;
-  transition: var(--transition);
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 
-.drive-modal-close:hover {
-  background: var(--color-border);
-  color: var(--color-text);
+@media (hover: hover) {
+  .drive-modal-close:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+  }
 }
 
 .drive-modal-body {
@@ -238,16 +285,22 @@
     padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom));
   }
 
-  .drive-modal[open] {
-    animation: driveModalUp 0.22s ease-out;
+  /* The sheet travels its own height rather than fading, on the drawer curve. */
+  .drive-modal {
+    opacity: 1;
+    transform: translateY(100%);
+    transition-duration: var(--duration-drawer);
+    transition-timing-function: var(--ease-drawer);
   }
 
-  @keyframes driveModalUp {
-    from {
+  .drive-modal[open] {
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    .drive-modal[open] {
+      opacity: 1;
       transform: translateY(100%);
-    }
-    to {
-      transform: translateY(0);
     }
   }
 }
@@ -317,4 +370,24 @@
   text-align: center;
   color: var(--color-text-light);
   font-size: 0.9rem;
+}
+
+/* The dialog still fades in and out; it just doesn't travel. */
+@media (prefers-reduced-motion: reduce) {
+  .drive-modal {
+    opacity: 0;
+    transform: none;
+  }
+
+  .drive-modal[open] {
+    opacity: 1;
+    transform: none;
+  }
+
+  @starting-style {
+    .drive-modal[open] {
+      opacity: 0;
+      transform: none;
+    }
+  }
 }

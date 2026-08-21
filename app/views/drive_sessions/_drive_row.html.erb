@@ -1,5 +1,5 @@
 <% kind = session.kind %>
-<div class="drive-row" id="<%= dom_id(session) %>"
+<div class="<%= class_names("drive-row", "is-entering" => local_assigns[:entering]) %>" id="<%= dom_id(session) %>"
      data-controller="drive-session card-menu"
      data-action="click->drive-modal#open keydown->drive-modal#openOnKey"
      tabindex="0" aria-haspopup="dialog"

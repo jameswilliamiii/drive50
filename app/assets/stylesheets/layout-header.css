@@ -30,16 +30,31 @@ header {
   );
   color: var(--color-white);
   padding: var(--spacing-sm) var(--spacing-lg);
-  animation: inProgressBannerPulse 2.6s ease-in-out infinite;
+  position: relative;
+  isolation: isolate;
+}
+
+/* A composited overlay rather than filter: brightness() on the banner itself —
+   this runs for the whole length of a drive, so it must not repaint every frame. */
+.in-progress-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-white);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .in-progress-banner::before {
+    animation: inProgressBannerPulse 2.6s ease-in-out infinite;
+  }
 }
 
 @keyframes inProgressBannerPulse {
-  0%, 100% {
-    filter: brightness(1);
-  }
-  50% {
-    filter: brightness(1.16);
-  }
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.14; }
 }
 
 .in-progress-banner-content {
@@ -85,13 +100,15 @@ header {
   line-height: 1.4;
   box-shadow: none;
   cursor: pointer;
-  transition: var(--transition);
+  transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 
-.in-progress-banner .in-progress-banner-stop:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: var(--color-white);
-  color: var(--color-white);
+@media (hover: hover) {
+  .in-progress-banner .in-progress-banner-stop:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: var(--color-white);
+    color: var(--color-white);
+  }
 }
 
 .in-progress-banner-stop-icon {
@@ -150,16 +167,20 @@ header h1 {
   color: var(--color-primary);
 }
 
-a:hover .app-logo-drive {
-  color: var(--color-primary-dark);
+@media (hover: hover) {
+  a:hover .app-logo-drive {
+    color: var(--color-primary-dark);
+  }
 }
 
 .app-logo-50 {
   color: var(--color-text-secondary);
 }
 
-a:hover .app-logo-50 {
-  color: var(--color-text);
+@media (hover: hover) {
+  a:hover .app-logo-50 {
+    color: var(--color-text);
+  }
 }
 
 .header-nav {

@@ -788,6 +788,55 @@ class DriveSessionTest < ActiveSupport::TestCase
            "the rebuilt grid must carry the drive that triggered it"
   end
 
+  test "a newly completed drive is prepended, because the log is newest first" do
+    @user.update!(timezone: "America/Chicago")
+    @user.drive_sessions.destroy_all
+    stream = Turbo::StreamsChannel.send(:stream_name_from, @user)
+
+    payloads = capture_broadcasts(stream) do
+      @user.drive_sessions.create!(started_at: 2.hours.ago, ended_at: 1.hour.ago)
+    end
+
+    insert = payloads.map(&:to_s).find { |html| html.include?('target="sessions-list-all"') }
+    assert insert, "a completed drive should reach the open drive log"
+    assert_includes insert, 'action="prepend"',
+                    "appending puts the newest drive at the bottom of a newest-first list"
+  end
+
+  test "a day drive reaches the day and all lists but not the night one" do
+    @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
+    @user.drive_sessions.destroy_all
+    tz = ActiveSupport::TimeZone.new("America/Chicago")
+    stream = Turbo::StreamsChannel.send(:stream_name_from, @user)
+
+    payloads = capture_broadcasts(stream) do
+      @user.drive_sessions.create!(
+        started_at: tz.local(2024, 12, 15, 12, 0, 0),
+        ended_at: tz.local(2024, 12, 15, 13, 0, 0)
+      )
+    end
+
+    html = payloads.map(&:to_s)
+    assert html.any? { |p| p.include?('target="sessions-list-all"') }
+    assert html.any? { |p| p.include?('target="sessions-list-day"') }
+    assert_not html.any? { |p| p.include?('target="sessions-list-night"') },
+               "a drive with no night hours must not arrive in the night-filtered log"
+  end
+
+  test "a backdated drive broadcasts no row, since neither end of the list is its place" do
+    @user.update!(timezone: "America/Chicago")
+    @user.drive_sessions.destroy_all
+    @user.drive_sessions.create!(started_at: 2.hours.ago, ended_at: 1.hour.ago)
+    stream = Turbo::StreamsChannel.send(:stream_name_from, @user)
+
+    payloads = capture_broadcasts(stream) do
+      @user.drive_sessions.create!(started_at: 3.days.ago, ended_at: 3.days.ago + 1.hour)
+    end
+
+    assert_nil payloads.map(&:to_s).find { |html| html.include?('target="sessions-list-') },
+               "a drive that belongs mid-list must wait for the next load"
+  end
+
   test "activity_days spans exactly the 21 cells the grid renders" do
     @user.update!(timezone: "America/Chicago", latitude: 41.8781, longitude: -87.6298)
     tz = ActiveSupport::TimeZone.new("America/Chicago")

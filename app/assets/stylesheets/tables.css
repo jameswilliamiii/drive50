@@ -42,36 +42,6 @@ table td {
   vertical-align: middle;
 }
 
-table tbody tr {
-  transition: var(--transition);
-}
-
-table tbody tr:hover {
-  background-color: var(--color-background);
-}
-
-.drive-session-row {
-  animation: fadeIn 0.3s ease-in;
-  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.drive-session-row.fade-out {
-  opacity: 0 !important;
-  transform: translateY(-10px) !important;
-  pointer-events: none;
-}
-
 table td.actions {
   text-align: right;
   white-space: nowrap;
@@ -127,12 +97,14 @@ table td.notes-column {
   font-size: 0.875rem;
   font-weight: 700;
   text-decoration: none;
-  transition: var(--transition);
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 
-.load-more:hover {
-  color: var(--color-primary-dark);
-  background-color: var(--color-border-light);
+@media (hover: hover) {
+  .load-more:hover {
+    color: var(--color-primary-dark);
+    background-color: var(--color-border-light);
+  }
 }
 
 .load-more:focus-visible {
@@ -142,11 +114,13 @@ table td.notes-column {
 
 /* Signature nudge: the chevron dips on hover, hinting "more below". */
 .load-more-chevron {
-  transition: var(--transition-transform);
+  transition: transform var(--duration-fast) ease;
 }
 
-.load-more:hover .load-more-chevron {
-  transform: translateY(3px);
+@media (hover: hover) {
+  .load-more:hover .load-more-chevron {
+    transform: translateY(3px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

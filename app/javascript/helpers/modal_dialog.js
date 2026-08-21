@@ -26,7 +26,17 @@ export class ModalDialogController extends Controller {
 
     // removeAttribute rather than close(): close() fires its event asynchronously,
     // and a late handler would release a lock a subsequent open has already taken.
-    this.dialogTarget.removeAttribute("open")
+    // The class suppresses the exit transition for this one removal — the dialog
+    // was never really open, so animating it out would flash a ghost modal over
+    // the restored page.
+    const dialog = this.dialogTarget
+    dialog.classList.add("is-restoring")
+    dialog.removeAttribute("open")
+    // Forces the style flush that commits the removal above while the class is
+    // still applied. Without this read both changes land in one recalc, the
+    // transition is never suppressed, and the ghost fades in view.
+    getComputedStyle(dialog).opacity
+    dialog.classList.remove("is-restoring")
     unlockScroll(this)
   }
 

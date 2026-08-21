@@ -1,4 +1,4 @@
 <div id="progress-summary" class="dashboard-summary">
-  <%= render "drive_sessions/dashboard_hero", stats: stats %>
+  <%= render "drive_sessions/dashboard_hero", stats: stats, reveal: local_assigns[:reveal] %>
   <%= render "drive_sessions/activity_calendar", stats: stats, cells: activity_cells %>
 </div>

@@ -1,4 +1,4 @@
-<%= turbo_stream.append "sessions-list" do %>
+<%= turbo_stream.append "sessions-list-#{@kind_filter}" do %>
   <%= render partial: "drive_row", collection: @sessions, as: :session %>
 <% end %>
 

@@ -12,13 +12,15 @@
   align-items: center;
   justify-content: center;
   color: var(--color-primary);
-  transition: var(--transition);
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   border-radius: var(--border-radius-sm);
 }
 
-.menu-button:hover {
-  background-color: var(--color-background);
-  color: var(--color-primary-dark);
+@media (hover: hover) {
+  .menu-button:hover {
+    background-color: var(--color-background);
+    color: var(--color-primary-dark);
+  }
 }
 
 .menu-button-active {
@@ -38,16 +40,21 @@
   min-width: 200px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
-  transition: var(--transition);
+  transform: translateY(-6px) scale(0.96);
+  transform-origin: top right;
+  transition: opacity var(--duration-fast) ease, visibility var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
   z-index: 1000;
   padding: var(--spacing-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu { transform: none; }
 }
 
 .menu.menu-open {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 /* Scoped to `header .menu` so these win over the base `button[type="submit"]`
@@ -64,7 +71,7 @@ header .menu .menu-item {
   font-weight: 500;
   line-height: 1.4;
   border-radius: var(--border-radius-sm);
-  transition: var(--transition);
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   width: 100%;
   text-align: left;
   border: none;
@@ -81,22 +88,29 @@ header .menu .menu-item-icon {
   color: var(--color-text-secondary);
 }
 
-header .menu .menu-item:hover {
-  background-color: var(--color-background);
-  color: var(--color-primary);
-}
-
-header .menu .menu-item:hover .menu-item-icon,
 header .menu .menu-item-primary-link .menu-item-icon {
   color: inherit;
+}
+
+@media (hover: hover) {
+  header .menu .menu-item:hover {
+    background-color: var(--color-background);
+    color: var(--color-primary);
+  }
+
+  header .menu .menu-item:hover .menu-item-icon {
+    color: inherit;
+  }
 }
 
 header .menu button.menu-item-primary-link {
   color: var(--color-primary);
 }
 
-header .menu button.menu-item-primary-link:hover {
-  color: var(--color-primary-dark);
+@media (hover: hover) {
+  header .menu button.menu-item-primary-link:hover {
+    color: var(--color-primary-dark);
+  }
 }
 
 .menu-item-primary {
@@ -104,9 +118,11 @@ header .menu button.menu-item-primary-link:hover {
   color: #ffffff !important;
 }
 
-.menu-item-primary:hover {
-  background-color: var(--color-primary-dark);
-  color: #ffffff !important;
+@media (hover: hover) {
+  .menu-item-primary:hover {
+    background-color: var(--color-primary-dark);
+    color: #ffffff !important;
+  }
 }
 
 .menu-divider {

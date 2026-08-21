@@ -163,13 +163,20 @@ date math is done in the user's timezone (Sunday-aligned weeks).
 3. **Update targets** (must match DOM IDs in views):
    - `progress-summary` — totals, night hours, remaining, activity calendar
    - `recent-drives-table` — most recent completed drives
-   - `sessions-list` — appended/replaced per-row on the all-drives page
-     (rows are targeted by their `dom_id`)
+   - `sessions-list-{all,day,night}` — prepended per-row on the all-drives page,
+     which renders the list for its active filter only (and renders it even when
+     empty, so a drive completed elsewhere has somewhere to land). Replaces are
+     targeted by the row's `dom_id`
    - `in-progress-banner-container` and `fab-new-drive-wrapper` — reflect whether
      a drive is currently in progress
-4. **State transitions** — completing a drive (in-progress → completed) appends a
+4. **State transitions** — completing a drive (in-progress → completed) inserts a
    new row rather than replacing one; statistics are always recomputed after any
-   change.
+   change. The insert goes through `broadcast_drive_row`, which **prepends** —
+   the log is newest-first — and skips a drive that isn't the newest, since a
+   backdated one belongs mid-list where neither prepend nor append can put it.
+   A broadcast can't know which kind filter the page is on, so
+   `matching_kind_filters` addresses every list the drive belongs in and only the
+   one on the viewer's page finds a target.
 
 ### Background jobs & push notifications
 

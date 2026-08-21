@@ -1,10 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
+import { motionDuration } from "helpers/motion"
 
 // Connects to data-controller="drive-session"
 // Handles fade-out animation when deleting a drive session row
 export default class extends Controller {
-  static values = {
-    animationDuration: { type: Number, default: 300 }
+  // A filling animation outranks the .fade-out transition and would keep doing so
+  // forever, so the class comes off as soon as the entrance is done — which also
+  // keeps it out of the Turbo snapshot, where it would replay on every restore.
+  connect() {
+    if (!this.element.classList.contains("is-entering")) return
+
+    const clear = () => this.element.classList.remove("is-entering")
+    this.element.addEventListener("animationend", clear, { once: true })
+    // Reduced motion sets animation-name: none, so animationend never comes and
+    // the class would ride into the Turbo snapshot.
+    this.enteringTimer = setTimeout(clear, motionDuration("--duration-base", 200) + 50)
   }
 
   handleDelete(event) {
@@ -59,11 +69,12 @@ export default class extends Controller {
 
       // Submit form programmatically (confirmation already handled)
       form.requestSubmit()
-    }, this.animationDurationValue)
+    }, motionDuration("--duration-base", 200))
   }
 
   disconnect() {
     clearTimeout(this.deleteTimer)
+    clearTimeout(this.enteringTimer)
   }
 }
 

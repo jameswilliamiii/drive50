@@ -21,15 +21,22 @@
   border-radius: var(--border-radius-sm);
   color: var(--color-text);
   text-decoration: none;
-  transition: var(--transition);
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 
-.page-header-back:hover,
 .page-header-back:active {
   background-color: var(--color-border-light);
   color: var(--color-primary);
+  transition-duration: var(--duration-press);
+}
+
+@media (hover: hover) {
+  .page-header-back:hover {
+    background-color: var(--color-border-light);
+    color: var(--color-primary);
+  }
 }
 
 .page-header-icon {
