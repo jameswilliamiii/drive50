@@ -198,6 +198,15 @@
   .dash-hero-progress.is-revealing { clip-path: inset(0 100% 0 0); }
 }
 
+/* A click navigation renders twice — Turbo paints the cached snapshot first,
+   then the response — and each insertion is a new element, so @starting-style
+   replays the wipe halfway through the first one. Hold the preview at the start
+   position and the wipe runs once, on the render carrying the real figures. */
+[data-turbo-preview] .dash-hero-progress.is-revealing {
+  clip-path: inset(0 100% 0 0);
+  transition: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dash-hero-progress.is-revealing { transition: none; }
 }
