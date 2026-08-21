@@ -279,10 +279,11 @@
     border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
   }
 
-  /* Flush to the bottom edge now, so keep the last row clear of the home
-     indicator the way the FAB sheet does. */
+  /* Flush to the bottom edge, so the last row needs its own clearance from the
+     home indicator and the phone's rounded corners. env() reads 0 without
+     viewport-fit=cover on the viewport meta, so the fixed term carries it. */
   .drive-modal-body {
-    padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--spacing-3xl) + env(safe-area-inset-bottom));
   }
 
   /* The sheet travels its own height rather than fading, on the drawer curve. */
