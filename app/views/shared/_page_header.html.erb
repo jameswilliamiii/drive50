@@ -1,5 +1,6 @@
 <%
   back_path ||= nil
+  subtitle ||= nil
 %>
 <div class="page-header">
   <% if back_path %>
@@ -7,5 +8,10 @@
       <%= icon_arrow_left(size: 24, class: "page-header-icon") %>
     <% end %>
   <% end %>
-  <h1 class="page-header-title <%= 'padding-spacer' if back_path %>"><%= title %></h1>
+  <div class="page-header-text">
+    <h1 class="page-header-title"><%= title %></h1>
+    <% if subtitle %>
+      <p class="page-header-subtitle"><%= subtitle %></p>
+    <% end %>
+  </div>
 </div>

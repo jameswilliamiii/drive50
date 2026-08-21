@@ -1,12 +1,13 @@
 /* ============================================
-   Page Header - Native App Style
+   Page Header — matches the dashboard greeting's large-title style
+   (see .dashboard-greeting-title in cards.css) so every page reads
+   as one consistent app, back button or not.
    ============================================ */
 .page-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
 }
 
 .page-header-back {
@@ -16,6 +17,7 @@
   width: 44px;
   height: 44px;
   min-width: 44px;
+  margin-left: -10px;
   border-radius: var(--border-radius-sm);
   color: var(--color-text);
   text-decoration: none;
@@ -34,27 +36,14 @@
   display: block;
 }
 
-.page-header-title {
+.page-header-text {
   flex: 1;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0;
-  text-align: center;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
+
+/* .page-header-title and .page-header-subtitle share their typography with
+   .dashboard-greeting-title/-date via combined rules in cards.css, so the
+   dashboard and other page headers can't drift apart. */
 
 .page-header-no-margin {
   margin-bottom: 0;
-}
-
-.page-header .padding-spacer {
-  padding-right: 44px;
-}
-
-@media (min-width: 768px) {
-  .page-header-title {
-    font-size: 1.6rem;
-  }
 }

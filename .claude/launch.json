@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "drive50",
+      "runtimeExecutable": "bin/rails",
+      "runtimeArgs": ["server", "-p", "3050"],
+      "port": 3050
+    }
+  ]
+}

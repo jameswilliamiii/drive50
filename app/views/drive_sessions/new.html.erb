@@ -1,5 +1,7 @@
-<% content_for :title, "Start New Drive" %>
+<% content_for :title, "Add New Drive" %>
 
-<%= render "shared/page_header", title: "Start New Drive", back_path: "javascript:history.back()" %>
+<div class="drive-form-page">
+  <%= render "shared/page_header", title: "Add New Drive", back_path: "javascript:history.back()" %>
 
-<%= render "form", drive_session: @drive_session %>
+  <%= render "form", drive_session: @drive_session %>
+</div>

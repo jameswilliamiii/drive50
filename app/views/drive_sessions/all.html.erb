@@ -2,33 +2,29 @@
 
 <%= turbo_stream_from Current.user %>
 
-<div class="dashboard">
-  <div class="page-header">
-    <h1 class="page-header-title">Drive Log</h1>
-  </div>
+<%= render "shared/page_header", title: "Drive Log", subtitle: "Every drive you've logged, newest first." %>
 
-  <div class="drive-history">
-    <% if @sessions.any? %>
-      <div id="sessions-list" class="drive-list">
-        <%= render partial: "drive_row", collection: @sessions, as: :session %>
-      </div>
+<div class="drive-history">
+  <% if @sessions.any? %>
+    <div id="sessions-list" class="drive-list">
+      <%= render partial: "drive_row", collection: @sessions, as: :session %>
+    </div>
 
-      <turbo-frame id="sessions-pagination">
-        <div id="pagination-container" class="pagination-wrapper">
-          <% if @pagy.next %>
-            <%= link_to @pagy.page_url(:next),
-                        class: "load-more",
-                        data: {
-                          turbo_frame: "sessions-pagination",
-                          turbo_prefetch: false
-                        } do %>
-              Load more<%= icon(:chevron_down, size: 16, class: "load-more-chevron") %>
-            <% end %>
+    <turbo-frame id="sessions-pagination">
+      <div id="pagination-container" class="pagination-wrapper">
+        <% if @pagy.next %>
+          <%= link_to @pagy.page_url(:next),
+                      class: "load-more",
+                      data: {
+                        turbo_frame: "sessions-pagination",
+                        turbo_prefetch: false
+                      } do %>
+            Load more<%= icon(:chevron_down, size: 16, class: "load-more-chevron") %>
           <% end %>
-        </div>
-      </turbo-frame>
-    <% else %>
-      <p class="empty-state">No drives recorded yet. Start your first drive!</p>
-    <% end %>
-  </div>
+        <% end %>
+      </div>
+    </turbo-frame>
+  <% else %>
+    <p class="empty-state">No drives recorded yet. Start your first drive!</p>
+  <% end %>
 </div>
