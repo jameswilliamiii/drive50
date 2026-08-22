@@ -330,6 +330,14 @@
   color: var(--dusk-ink-soft);
 }
 
+.landing-dial-caption {
+  margin-top: 0.85rem;
+  font-size: 0.78rem;
+  color: var(--dusk-ink-soft);
+  opacity: 0.75;
+  text-align: center;
+}
+
 .landing-dot {
   width: 0.7rem;
   height: 0.7rem;

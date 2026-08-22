@@ -15,8 +15,7 @@ class TimezonesControllerTest < ActionDispatch::IntegrationTest
   test "should update timezone for authenticated user" do
     sign_in_as @user
 
-    # User has default timezone of UTC from migration
-    assert_equal "UTC", @user.timezone
+    assert_equal User::DEFAULT_TIMEZONE, @user.timezone
 
     post timezone_path, params: { timezone: "America/Los_Angeles" }, as: :json
 

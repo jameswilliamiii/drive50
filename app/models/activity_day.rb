@@ -14,7 +14,7 @@ class ActivityDay
 
   # The grid, oldest cell first. Days with no drives get an empty one rather than
   # being absent, because every cell is rendered either way.
-  def self.grid_for(drives_by_date, timezone: "UTC")
+  def self.grid_for(drives_by_date, timezone: User::DEFAULT_TIMEZONE)
     zone = DriveSession.resolved_zone(timezone)
     today = Time.current.in_time_zone(zone).to_date
     first = today - today.wday - (CELLS - 7)

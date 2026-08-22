@@ -2,7 +2,7 @@
 
 <%= turbo_stream_from Current.user %>
 
-<% greeting_tz = Current.user.timezone.presence || "UTC" %>
+<% greeting_tz = Current.user.timezone.presence || User::DEFAULT_TIMEZONE %>
 <div class="dashboard-greeting">
   <h1 class="dashboard-greeting-title"><%= dashboard_greeting(Current.user) %></h1>
   <p class="dashboard-greeting-date"><%= Time.current.in_time_zone(greeting_tz).strftime("%A, %B %-d") %></p>

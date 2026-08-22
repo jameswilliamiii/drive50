@@ -4,7 +4,6 @@ class DriveSession < ApplicationRecord
   include DriveSessionStatistics
 
   HOURS_NEEDED = 50
-  NIGHT_HOURS_NEEDED = 10
   REMINDER_DELAY = 45.minutes
   MAX_DRIVE_DURATION = 7.days
   KIND_FILTERS = %w[all day night].freeze
@@ -57,7 +56,7 @@ class DriveSession < ApplicationRecord
   # day-summary modal lists it, so both read one query rather than each computing
   # the same window. Bounded at both ends: an unbounded upper edge loaded rows the
   # grid then silently discarded.
-  def self.activity_days(timezone: "UTC")
+  def self.activity_days(timezone: User::DEFAULT_TIMEZONE)
     tz = resolved_zone(timezone)
     today = Time.current.in_time_zone(tz).to_date
     range_start = today - today.wday - 14
@@ -316,9 +315,9 @@ class DriveSession < ApplicationRecord
   def broadcast_progress_summary
     user.association(:drive_sessions).reset
     relation = user.drive_sessions
-    tz = user.timezone || "UTC"
+    tz = user.timezone || User::DEFAULT_TIMEZONE
 
-    statistics = DriveSession.statistics_for(relation, timezone: tz)
+    statistics = DriveSession.statistics_for(user, timezone: tz)
     activity_cells = ActivityDay.grid_for(relation.activity_days(timezone: tz), timezone: tz)
 
     broadcast_replace_to user,

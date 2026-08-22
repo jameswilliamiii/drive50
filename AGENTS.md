@@ -63,7 +63,10 @@ bin/rails console --sandbox  # Rolls back all changes on exit
 - **`User`** — `has_secure_password`; owns `sessions`, `drive_sessions`, and
   `push_subscriptions`. Stores `first_name`, `last_name`, `email_address`
   (normalized lowercase, unique), `timezone`, and optional `latitude`/`longitude`.
-  `full_name` is the displayed driver name.
+  `full_name` is the displayed driver name. `hours_goal`/`night_hours_goal`
+  default to 50/10 (the DB column defaults) but are per-user and editable at
+  signup and in Settings; `night_hours_goal` can't exceed `hours_goal`. These
+  are what `statistics_for` measures progress against — see Statistics below.
 - **`Session`** — authentication session with `ip_address` and `user_agent`.
 - **`DriveSession`** — one driving session. Columns: `started_at`, `ended_at`,
   `duration_minutes`, `night_minutes`, `notes`, `user_id`. State
@@ -75,7 +78,12 @@ bin/rails console --sandbox  # Rolls back all changes on exit
   `auth_key`, `user_agent`) belonging to a user.
 
 **Key constants** (`DriveSession`):
-- `HOURS_NEEDED = 50`, `NIGHT_HOURS_NEEDED = 10`
+- `HOURS_NEEDED = 50` — the default shown on the marketing page and the fallback
+  for `projected_finish` when called directly on a relation without a goal.
+  A signed-in user's actual goal is `User#hours_goal`/`night_hours_goal` (the
+  migration hardcodes the same 50/10 as the column defaults, deliberately not
+  referencing this constant — see its comment). `statistics_for` always passes the
+  user's own goal explicitly.
 - `REMINDER_DELAY = 45.minutes`, `MAX_DRIVE_DURATION = 7.days` (a validation ceiling —
   `night_seconds` walks one date per day spanned, so an unbounded span is unbounded CPU)
 
@@ -146,10 +154,12 @@ on the meridian matching their offset for exactly this reason.
 ### Statistics
 
 `DriveSessionStatistics` (concern on `DriveSession`) computes everything the
-dashboard shows via `statistics_for(relation, timezone:)`: total/day/night hours,
-hours remaining, this/last week hours, active-day count, current and best
-streaks, weekly pace, and a human-readable `projected_finish` label. All
-date math is done in the user's timezone (Sunday-aligned weeks).
+dashboard shows via `statistics_for(user, timezone:)`: total/day/night hours, hours
+remaining, this/last week hours, active-day count, current and best streaks, weekly
+pace, and a human-readable `projected_finish` label. `hours_needed` and
+`night_hours_needed` (and `projected_finish`) measure against the user's own
+`hours_goal`/`night_hours_goal`. All date math is done in the user's timezone
+(Sunday-aligned weeks).
 
 ### Real-time updates (Turbo Streams + Action Cable)
 

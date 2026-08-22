@@ -56,6 +56,58 @@ class UserTest < ActiveSupport::TestCase
     assert_includes user.errors[:password], "can't be blank"
   end
 
+  test "defaults hours_goal and night_hours_goal to 50/10" do
+    user = User.new
+    assert_equal 50, user.hours_goal
+    assert_equal 10, user.night_hours_goal
+  end
+
+  test "defaults timezone to the app's default zone" do
+    assert_equal User::DEFAULT_TIMEZONE, User.new.timezone
+  end
+
+  test "rejects a zero or negative hours_goal" do
+    user = User.new(hours_goal: 0)
+    assert_not user.valid?
+    assert_includes user.errors[:hours_goal], "must be greater than 0"
+  end
+
+  test "rejects an hours_goal over the upper bound" do
+    user = User.new(hours_goal: User::MAX_HOURS_GOAL + 1)
+    assert_not user.valid?
+    assert_includes user.errors[:hours_goal], "must be less than or equal to #{User::MAX_HOURS_GOAL}"
+  end
+
+  test "rejects a non-integer hours_goal" do
+    user = User.new(hours_goal: 40.5)
+    assert_not user.valid?
+    assert_includes user.errors[:hours_goal], "must be an integer"
+  end
+
+  test "rejects a negative night_hours_goal" do
+    user = User.new(night_hours_goal: -1)
+    assert_not user.valid?
+    assert_includes user.errors[:night_hours_goal], "must be greater than or equal to 0"
+  end
+
+  test "allows a night_hours_goal of 0" do
+    user = User.new(first_name: "T", last_name: "U", email_address: "zero-night@example.com",
+                     password: "password123", hours_goal: 40, night_hours_goal: 0)
+    assert user.valid?
+  end
+
+  test "rejects a night_hours_goal greater than hours_goal" do
+    user = User.new(hours_goal: 20, night_hours_goal: 21)
+    assert_not user.valid?
+    assert_includes user.errors[:night_hours_goal], "can't be more than the total hours goal"
+  end
+
+  test "allows night_hours_goal equal to hours_goal" do
+    user = User.new(first_name: "T", last_name: "U", email_address: "equal-goal@example.com",
+                     password: "password123", hours_goal: 10, night_hours_goal: 10)
+    assert user.valid?
+  end
+
   # Associations
   test "has many sessions" do
     assert_respond_to @user, :sessions

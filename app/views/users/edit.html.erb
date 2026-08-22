@@ -1,7 +1,7 @@
 <% content_for :title, "Settings" %>
 
 <div class="settings-page">
-  <%= render "shared/page_header", title: "Settings", subtitle: "Manage your location, notifications, and account." %>
+  <%= render "shared/page_header", title: "Settings", subtitle: "Manage your location, driving goals, notifications, and account." %>
 
   <div class="settings-container">
     <!-- Location section for night drive detection -->
@@ -48,6 +48,34 @@
       <% end %>
     </section>
 
+    <!-- Driving goals section -->
+    <section class="settings-section">
+      <h2 class="settings-section-title">Driving Goals</h2>
+      <p class="settings-section-description">
+        Every state sets its own requirement. Enter yours here, including how many hours must be at night.
+      </p>
+
+      <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
+        <%= render "shared/error_messages", object: @user, object_name: "driving goals", only: [ :hours_goal, :night_hours_goal ] %>
+
+        <div class="field-row">
+          <div class="field">
+            <%= f.label :hours_goal, "Total Hours Goal" %>
+            <%= f.number_field :hours_goal, min: 1, max: User::MAX_HOURS_GOAL, required: true %>
+          </div>
+
+          <div class="field">
+            <%= f.label :night_hours_goal, "Night Hours Goal" %>
+            <%= f.number_field :night_hours_goal, min: 0, max: User::MAX_HOURS_GOAL, required: true %>
+          </div>
+        </div>
+
+        <div class="actions no-margin">
+          <%= f.submit "Update Goals", class: "button-primary" %>
+        </div>
+      <% end %>
+    </section>
+
     <!-- Push Notifications section -->
     <section class="settings-section" data-controller="push-notifications">
       <h2 class="settings-section-title">Push Notifications</h2>
@@ -79,10 +107,11 @@
     </section>
 
     <!-- Account information section -->
-    <section class="settings-section settings-section-full">
+    <section class="settings-section">
       <h2 class="settings-section-title">Account</h2>
       <%= form_with model: @user, url: user_path, class: "drive-form" do |f| %>
-        <%= render "shared/error_messages", object: @user, object_name: "profile" %>
+        <%= render "shared/error_messages", object: @user, object_name: "profile",
+                   only: [ :first_name, :last_name, :email_address, :password, :password_confirmation ] %>
 
         <div class="field">
           <%= f.label :first_name, "Driver First Name" %>

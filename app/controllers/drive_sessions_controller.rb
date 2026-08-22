@@ -2,7 +2,7 @@ class DriveSessionsController < ApplicationController
   before_action :set_drive_session, only: [ :edit, :update, :destroy, :complete ]
 
   def index
-    tz = Current.user.timezone || "UTC"
+    tz = Current.user.timezone || User::DEFAULT_TIMEZONE
     user_sessions = Current.user.drive_sessions
 
     @recent_sessions = user_sessions.completed.ordered.with_user.limit(3)

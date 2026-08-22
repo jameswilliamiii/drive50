@@ -12,6 +12,31 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "the dashboard greeting falls back to the default zone for a blank timezone" do
+    @user.update!(timezone: nil)
+
+    get drive_sessions_url
+
+    assert_select ".dashboard-greeting-date",
+                  text: Time.current.in_time_zone(User::DEFAULT_TIMEZONE).strftime("%A, %B %-d")
+  end
+
+  test "the timezone detector's initial value is the signed-in user's own timezone" do
+    @user.update!(timezone: "America/Los_Angeles")
+
+    get drive_sessions_url
+
+    assert_select "body[data-timezone-detector-current-value=?]", "America/Los_Angeles"
+  end
+
+  test "the timezone detector falls back to the default zone with nothing else to go on" do
+    @user.update!(timezone: nil)
+
+    get drive_sessions_url
+
+    assert_select "body[data-timezone-detector-current-value=?]", User::DEFAULT_TIMEZONE
+  end
+
   test "should get all" do
     get all_drive_sessions_url
     assert_response :success
@@ -22,6 +47,15 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "a.dash-hero-chip.is-day[href=?]", all_drive_sessions_path(kind: "day")
     assert_select "a.dash-hero-chip.is-night[href=?]", all_drive_sessions_path(kind: "night")
+  end
+
+  test "the dashboard hero shows the user's own goal, not the app default" do
+    @user.update!(hours_goal: 40, night_hours_goal: 6)
+
+    get drive_sessions_url
+
+    assert_select ".dash-hero-caption", text: /of 40 hours/
+    assert_select ".dash-hero-chip.is-night .dash-hero-chip-value", text: /\/\s*6/
   end
 
   test "should get new" do

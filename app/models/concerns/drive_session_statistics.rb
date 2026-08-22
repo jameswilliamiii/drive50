@@ -3,15 +3,18 @@ module DriveSessionStatistics
 
   class_methods do
     # timezones#update persists whatever the browser posts, so a name that does not
-    # resolve must degrade to UTC rather than take the dashboard (and every Turbo
-    # broadcast that recomputes it) down with a NoMethodError on nil.
+    # resolve must degrade to the default rather than take the dashboard (and every
+    # Turbo broadcast that recomputes it) down with a NoMethodError on nil.
     def resolved_zone(timezone)
-      ActiveSupport::TimeZone[timezone.to_s] || ActiveSupport::TimeZone["UTC"]
+      ActiveSupport::TimeZone[timezone.to_s] || ActiveSupport::TimeZone[User::DEFAULT_TIMEZONE]
     end
 
-    # Calculate all statistics for a user's drive sessions
-    def statistics_for(user_or_relation, timezone: "UTC")
-      relation = user_or_relation.is_a?(ActiveRecord::Relation) ? user_or_relation : user_or_relation.drive_sessions
+    # Calculate all statistics for a user's drive sessions, measured against
+    # their own hours_goal/night_hours_goal.
+    def statistics_for(user, timezone: User::DEFAULT_TIMEZONE)
+      relation = user.drive_sessions
+      hours_goal = user.hours_goal
+      night_hours_goal = user.night_hours_goal
       completed = relation.completed
 
       total_minutes = completed.sum(:duration_minutes)
@@ -26,8 +29,10 @@ module DriveSessionStatistics
         total_hours: total_hours,
         night_hours: night_hours,
         day_hours: (total_minutes - night_minutes) / 60.0,
-        hours_needed: [ DriveSession::HOURS_NEEDED - total_hours, 0 ].max,
-        night_hours_needed: [ DriveSession::NIGHT_HOURS_NEEDED - night_hours, 0 ].max,
+        hours_goal: hours_goal,
+        night_hours_goal: night_hours_goal,
+        hours_needed: [ hours_goal - total_hours, 0 ].max,
+        night_hours_needed: [ night_hours_goal - night_hours, 0 ].max,
         drives_count: completed.count,
         in_progress: relation.in_progress.first,
         this_week_hours: relation.hours_in_week(0, timezone: timezone),
@@ -36,12 +41,12 @@ module DriveSessionStatistics
         current_streak: relation.current_streak(timezone: timezone, dates: dates),
         best_streak: relation.best_streak(timezone: timezone, dates: dates),
         weekly_pace: pace,
-        projected_finish: relation.projected_finish(timezone: timezone, pace: pace)
+        projected_finish: relation.projected_finish(timezone: timezone, pace: pace, hours_goal: hours_goal)
       }
     end
 
     # weeks_ago: 0 = current calendar week, 1 = previous, etc. Sunday-start, in the given tz.
-    def hours_in_week(weeks_ago, timezone: "UTC")
+    def hours_in_week(weeks_ago, timezone:)
       tz = resolved_zone(timezone)
       today = Time.current.in_time_zone(tz).to_date
       start_date = today - today.wday - (weeks_ago * 7)
@@ -51,12 +56,12 @@ module DriveSessionStatistics
     end
 
     # Distinct local dates (user tz) that have at least one completed drive, ascending.
-    def active_dates(timezone: "UTC")
+    def active_dates(timezone:)
       tz = resolved_zone(timezone)
       completed.pluck(:started_at).map { |t| t.in_time_zone(tz).to_date }.uniq.sort
     end
 
-    def active_day_count(days: 21, timezone: "UTC", dates: nil)
+    def active_day_count(days: 21, timezone:, dates: nil)
       dates ||= active_dates(timezone: timezone)
       tz = resolved_zone(timezone)
       today = Time.current.in_time_zone(tz).to_date
@@ -64,7 +69,7 @@ module DriveSessionStatistics
       dates.count { |d| d >= cutoff && d <= today }
     end
 
-    def current_streak(timezone: "UTC", dates: nil)
+    def current_streak(timezone:, dates: nil)
       tz = resolved_zone(timezone)
       today = Time.current.in_time_zone(tz).to_date
       set = (dates || active_dates(timezone: timezone)).to_set
@@ -81,7 +86,7 @@ module DriveSessionStatistics
       streak
     end
 
-    def best_streak(timezone: "UTC", dates: nil)
+    def best_streak(timezone:, dates: nil)
       best = 0
       run = 0
       prev = nil
@@ -93,7 +98,7 @@ module DriveSessionStatistics
       best
     end
 
-    def weekly_pace(timezone: "UTC")
+    def weekly_pace(timezone:)
       tz = resolved_zone(timezone)
       first = completed.minimum(:started_at)
       return 0.0 if first.nil?
@@ -106,8 +111,8 @@ module DriveSessionStatistics
     end
 
     # Human-readable label so the view stays dumb: "Early October", "Keep driving", or "Complete".
-    def projected_finish(timezone: "UTC", pace: nil)
-      remaining = [ DriveSession::HOURS_NEEDED - (completed.sum(:duration_minutes) / 60.0), 0 ].max
+    def projected_finish(timezone:, pace: nil, hours_goal: DriveSession::HOURS_NEEDED)
+      remaining = [ hours_goal - (completed.sum(:duration_minutes) / 60.0), 0 ].max
       return "Complete" if remaining <= 0
 
       pace ||= weekly_pace(timezone: timezone)

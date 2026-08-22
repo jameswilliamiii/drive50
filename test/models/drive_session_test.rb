@@ -145,15 +145,17 @@ class DriveSessionTest < ActiveSupport::TestCase
     assert_equal 60, fall.night_minutes
   end
 
-  test "a user with no timezone at all is judged in UTC" do
+  test "a user with no timezone at all is judged in the app's default zone" do
     @user.update!(timezone: nil, latitude: nil, longitude: nil)
 
+    # 16:00-16:40 CST Dec 15, straddling the documented 16:20 CST sunset above:
+    # a wrong fallback zone shifts the split, not just flips the whole drive.
     session = @user.drive_sessions.create!(
-      started_at: Time.utc(2026, 7, 1, 22, 0, 0),
-      ended_at: Time.utc(2026, 7, 1, 23, 0, 0)
+      started_at: Time.utc(2024, 12, 15, 22, 0, 0),
+      ended_at: Time.utc(2024, 12, 15, 22, 40, 0)
     )
 
-    assert_equal 60, session.night_minutes
+    assert_equal 20, session.night_minutes
   end
 
   test "an unresolvable timezone falls back instead of raising" do
@@ -163,12 +165,13 @@ class DriveSessionTest < ActiveSupport::TestCase
 
     session = nil
     assert_nothing_raised do
+      # Same 16:00-16:40 CST Dec 15 fixture as the fallback-timezone test above.
       session = @user.drive_sessions.create!(
-        started_at: Time.utc(2026, 7, 1, 22, 0, 0),
-        ended_at: Time.utc(2026, 7, 1, 23, 0, 0)
+        started_at: Time.utc(2024, 12, 15, 22, 0, 0),
+        ended_at: Time.utc(2024, 12, 15, 22, 40, 0)
       )
     end
-    assert_equal 60, session.night_minutes
+    assert_equal 20, session.night_minutes
   end
 
   test "day and night hours reconcile with duration when minutes divide unevenly" do
@@ -609,6 +612,18 @@ class DriveSessionTest < ActiveSupport::TestCase
     end
   end
 
+  test "statistics_for measures against the user's own goal, not the app default" do
+    @user.update!(hours_goal: 40, night_hours_goal: 6)
+    @user.drive_sessions.destroy_all
+    @user.drive_sessions.create!(started_at: 40.hours.ago, ended_at: Time.current)
+
+    stats = DriveSession.statistics_for(@user)
+    assert_equal 40, stats[:hours_goal]
+    assert_equal 6, stats[:night_hours_goal]
+    assert_equal 0, stats[:hours_needed], "40 hours meets a 40-hour goal"
+    assert_equal "Complete", stats[:projected_finish], "projected_finish must use the custom goal, not the 50-hour default"
+  end
+
   # Reminder Job
   test "schedules reminder job when in-progress session is created" do
     # User needs a push subscription for reminder to be scheduled
@@ -786,6 +801,32 @@ class DriveSessionTest < ActiveSupport::TestCase
                                .map { |node| JSON.parse(node["data-day-summary"]) }
     assert summaries.any? { |s| s["count"] == 1 && s["total"] == "1h" },
            "the rebuilt grid must carry the drive that triggered it"
+  end
+
+  test "the broadcast progress summary reflects the user's own goal, not the app default" do
+    @user.update!(hours_goal: 40, night_hours_goal: 6)
+    @user.drive_sessions.destroy_all
+    stream = Turbo::StreamsChannel.send(:stream_name_from, @user)
+
+    payloads = capture_broadcasts(stream) do
+      @user.drive_sessions.create!(started_at: 2.hours.ago, ended_at: 1.hour.ago)
+    end
+
+    summary = payloads.map(&:to_s).find { |html| html.include?('target="progress-summary"') }
+    assert summary, "completing a drive should rebroadcast the progress summary"
+    assert_includes summary, "of 40 hours",
+                    "the rebroadcast summary must use the custom goal, not the 50-hour default"
+  end
+
+  test "the broadcast progress summary does not raise for a user with no timezone" do
+    @user.update!(timezone: nil, latitude: nil, longitude: nil)
+    stream = Turbo::StreamsChannel.send(:stream_name_from, @user)
+
+    assert_nothing_raised do
+      capture_broadcasts(stream) do
+        @user.drive_sessions.create!(started_at: 2.hours.ago, ended_at: 1.hour.ago)
+      end
+    end
   end
 
   test "a newly completed drive is prepended, because the log is newest first" do

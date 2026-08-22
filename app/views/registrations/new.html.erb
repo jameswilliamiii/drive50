@@ -29,6 +29,19 @@
     <%= render "shared/password_field", form: form, field: :password_confirmation, label: "Confirm Password",
                autocomplete: "new-password" %>
 
+    <div class="field-row">
+      <div class="field">
+        <%= form.label :hours_goal, "Total Hours Goal" %>
+        <%= form.number_field :hours_goal, min: 1, max: User::MAX_HOURS_GOAL, required: true %>
+      </div>
+
+      <div class="field">
+        <%= form.label :night_hours_goal, "Night Hours Goal" %>
+        <%= form.number_field :night_hours_goal, min: 0, max: User::MAX_HOURS_GOAL, required: true %>
+      </div>
+    </div>
+    <p class="form-hint">Every state sets its own requirement. Change these if yours is different.</p>
+
     <div class="actions">
       <%= form.submit "Sign Up", class: "button-primary" %>
       <%= link_to "Sign In", new_session_path, class: "button" %>
