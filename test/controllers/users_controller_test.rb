@@ -119,4 +119,37 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_nil @user.latitude
     assert_nil @user.longitude
   end
+
+  test "should update hours goals" do
+    patch user_url, params: { user: { hours_goal: 40, night_hours_goal: 6 } }
+
+    assert_redirected_to edit_user_url
+    @user.reload
+    assert_equal 40, @user.hours_goal
+    assert_equal 6, @user.night_hours_goal
+  end
+
+  test "should not update to a night hours goal that exceeds the total" do
+    patch user_url, params: { user: { hours_goal: 20, night_hours_goal: 21 } }
+
+    assert_response :unprocessable_content
+    @user.reload
+    assert_equal 50, @user.hours_goal, "the rejected update must not have persisted"
+  end
+
+  test "an invalid hours goal submission shows its error only in the driving goals section" do
+    patch user_url, params: { user: { hours_goal: 20, night_hours_goal: 21 } }
+
+    assert_select ".error-messages", count: 1
+    assert_select ".error-messages", text: /Night hours goal can't be more than the total hours goal/
+    assert_select ".error-messages", text: /profile/, count: 0
+  end
+
+  test "an invalid account submission shows its error only in the account section" do
+    patch user_url, params: { user: { first_name: "", last_name: "", email_address: "" } }
+
+    assert_select ".error-messages", count: 1
+    assert_select ".error-messages", text: /First name can't be blank/
+    assert_select ".error-messages", text: /driving goals/, count: 0
+  end
 end
