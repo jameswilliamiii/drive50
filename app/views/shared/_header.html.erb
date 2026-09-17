@@ -38,6 +38,11 @@
             <%= link_to edit_user_path, class: "menu-item" do %>
               <%= icon(:settings, size: 20, class: "menu-item-icon") %>Settings
             <% end %>
+            <% if Current.user.admin? %>
+              <%= link_to admin_root_path, class: "menu-item" do %>
+                <%= icon(:settings, size: 20, class: "menu-item-icon") %>Admin
+              <% end %>
+            <% end %>
             <hr class="menu-divider">
             <%= link_to session_path, data: { turbo_method: :delete }, class: "menu-item" do %>
               <%= icon(:logout, size: 20, class: "menu-item-icon") %>Sign Out

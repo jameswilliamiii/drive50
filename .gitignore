@@ -39,5 +39,9 @@
 # Brainstorm visual companion
 .superpowers/
 
+# Local agent design specs and implementation plans (not for the repo)
+/docs/superpowers/specs/
+/docs/superpowers/plans/
+
 # Cursor local hook state
 /.cursor/hooks/state/

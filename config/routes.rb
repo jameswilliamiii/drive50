@@ -17,6 +17,15 @@ Rails.application.routes.draw do
 
   root "pages#home"
 
+  namespace :admin do
+    resources :users
+    resources :drive_sessions
+    resources :sessions
+    resources :push_subscriptions
+
+    root to: "users#index"
+  end
+
   resources :passwords, param: :token, only: [ :new, :create, :edit, :update ]
   resource :session, only: [ :new, :create, :destroy ]
   resources :registrations, only: [ :new, :create ]
