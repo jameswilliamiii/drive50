@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_17_023318) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_17_060213) do
   create_table "drive_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "duration_minutes"
@@ -187,6 +187,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_023318) do
     t.string "password_digest", null: false
     t.string "timezone", default: "America/Chicago"
     t.datetime "updated_at", null: false
+    t.boolean "weekly_motivation_enabled", default: true, null: false
+    t.date "weekly_motivation_sent_on"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 

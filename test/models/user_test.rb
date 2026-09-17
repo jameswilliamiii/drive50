@@ -35,6 +35,18 @@ class UserTest < ActiveSupport::TestCase
     assert_equal false, user.admin?
   end
 
+  test "weekly_motivation_enabled defaults to true" do
+    user = User.create!(
+      first_name: "Ada",
+      last_name: "Driver",
+      email_address: "ada-weekly-#{SecureRandom.hex(4)}@example.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
+    assert_equal true, user.weekly_motivation_enabled
+    assert_nil user.weekly_motivation_sent_on
+  end
+
   test "full_name joins first and last name" do
     user = User.new(first_name: "Sarah", last_name: "Mitchell")
     assert_equal "Sarah Mitchell", user.full_name

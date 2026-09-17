@@ -424,6 +424,28 @@
   margin: 0;
 }
 
+.settings-section .notification-weekly-form {
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+}
+
+.notification-weekly-wrap.is-hidden {
+  display: none;
+}
+
+.notification-weekly-form .settings-section-description {
+  margin: 0;
+}
+
+@media (min-width: 769px) {
+  .settings-page .actions .button,
+  .settings-page .actions .button-primary,
+  .settings-page .actions .button-danger,
+  .settings-page .actions input[type="submit"] {
+    min-width: 12rem;
+  }
+}
+
 .location-status {
   border-radius: var(--border-radius-sm);
 }

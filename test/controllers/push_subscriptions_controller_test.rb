@@ -36,6 +36,23 @@ class PushSubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal true, json["success"]
   end
 
+  test "create enables weekly motivation" do
+    @user.update!(weekly_motivation_enabled: false)
+
+    post push_subscription_url, params: {
+      subscription: {
+        endpoint: "https://fcm.googleapis.com/fcm/send/weekly-motivation",
+        keys: {
+          p256dh: "test_p256dh_key",
+          auth: "test_auth_key"
+        }
+      }
+    }, as: :json
+
+    assert_response :created
+    assert_predicate @user.reload, :weekly_motivation_enabled?
+  end
+
   test "create with invalid endpoint" do
     subscription_data = {
       subscription: {
@@ -127,6 +144,43 @@ class PushSubscriptionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :no_content
+  end
+
+  test "destroy clears weekly motivation when no subscriptions remain" do
+    @user.update!(weekly_motivation_enabled: true)
+    subscription = PushSubscription.create!(
+      user: @user,
+      endpoint: "https://fcm.googleapis.com/fcm/send/weekly-off",
+      p256dh_key: "key",
+      auth_key: "auth"
+    )
+
+    delete push_subscription_url, params: { endpoint: subscription.endpoint }, as: :json
+
+    assert_response :no_content
+    assert_not @user.reload.weekly_motivation_enabled?
+  end
+
+  test "destroy keeps weekly motivation when another subscription remains" do
+    @user.update!(weekly_motivation_enabled: true)
+    keep = PushSubscription.create!(
+      user: @user,
+      endpoint: "https://fcm.googleapis.com/fcm/send/keep",
+      p256dh_key: "key",
+      auth_key: "auth"
+    )
+    remove = PushSubscription.create!(
+      user: @user,
+      endpoint: "https://fcm.googleapis.com/fcm/send/remove",
+      p256dh_key: "key2",
+      auth_key: "auth2"
+    )
+
+    delete push_subscription_url, params: { endpoint: remove.endpoint }, as: :json
+
+    assert_response :no_content
+    assert_predicate keep.reload, :persisted?
+    assert_predicate @user.reload, :weekly_motivation_enabled?
   end
 
   test "destroy with invalid endpoint" do

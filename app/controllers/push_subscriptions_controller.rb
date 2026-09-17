@@ -30,6 +30,7 @@ class PushSubscriptionsController < ApplicationController
     )
 
     if @push_subscription.save
+      Current.user.update!(weekly_motivation_enabled: true)
       Rails.logger.info "Push subscription created for user #{Current.user.id} from #{request.remote_ip}"
       render json: { success: true }, status: :created
     else
@@ -46,6 +47,9 @@ class PushSubscriptionsController < ApplicationController
     subscription = Current.user.push_subscriptions.find_by(endpoint: endpoint)
 
     if subscription&.destroy
+      unless Current.user.push_subscriptions.exists?
+        Current.user.update!(weekly_motivation_enabled: false)
+      end
       Rails.logger.info "Push subscription deleted for user #{Current.user.id}"
       head :no_content
     else
