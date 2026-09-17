@@ -38,6 +38,23 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id], "Should create session cookie"
   end
 
+  test "registration ignores admin param" do
+    assert_difference("User.count") do
+      post registrations_url, params: {
+        user: {
+          first_name: "Hacker",
+          last_name: "McGee",
+          email_address: "hacker@example.com",
+          password: "password123",
+          password_confirmation: "password123",
+          admin: true
+        }
+      }
+    end
+
+    assert_equal false, User.find_by!(email_address: "hacker@example.com").admin?
+  end
+
   test "should not create user with invalid data" do
     assert_no_difference("User.count") do
       post registrations_url, params: {

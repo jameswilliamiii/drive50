@@ -23,6 +23,18 @@ class UserTest < ActiveSupport::TestCase
     assert_includes user.errors[:last_name], "can't be blank"
   end
 
+  test "admin defaults to false" do
+    user = User.new(
+      first_name: "Pat",
+      last_name: "Driver",
+      email_address: "pat@example.com",
+      password: "password123",
+      password_confirmation: "password123"
+    )
+    assert user.valid?
+    assert_equal false, user.admin?
+  end
+
   test "full_name joins first and last name" do
     user = User.new(first_name: "Sarah", last_name: "Mitchell")
     assert_equal "Sarah Mitchell", user.full_name

@@ -266,9 +266,38 @@ the signed-in user.
 Any collection whose rows read `user.full_name` (views, CSV export) should use the
 `.with_user` scope to avoid N+1 queries.
 
+### Code comments
+Prefer code that explains itself. Comments are the exception, not the default.
+
+**Leave or add a comment when:**
+- The next reader would likely change correct code without it (a gotcha, invariant, or
+  non-obvious constraint the code cannot express)
+- You are documenting a deliberate deviation from an obvious alternative
+
+**Do not leave comments that:**
+- Narrate what the next line does (`# require admin`, `# find the user`)
+- Restate the method or class name in prose
+- Come from generators or gem scaffolding unless they still describe a real gotcha
+  after you customize the file (strip Administrate/scaffold boilerplate when editing)
+
+When in doubt, delete the comment.
+
 ## Environment
 
 - Ruby: see `.ruby-version` (currently 3.4.7)
 - Rails: 8.1.x
 - Database: SQLite3 (with the Solid adapters for cache/queue/cable)
 - Deployment: Kamal (Docker-based), fronted by Thruster
+
+## Learned User Preferences
+
+- Commit on a working/feature branch, not directly on `main`
+- Do not commit design specs or implementation plans; keep them gitignored (under `docs/superpowers/`)
+- Prefer minimal code comments: no narration or generator boilerplate; only gotchas / invariants the code cannot express (see Important Patterns → Code comments)
+- When finishing a feature for review, prefer a squashed single-commit PR after a code review
+
+## Learned Workspace Facts
+
+- Admin UI is Administrate; `User#admin` gates access (`admin?` must be true); signed-in admins get an Admin link in the main nav
+- Administrate dashboards cover Users, Sessions, Drive Sessions, and Push Subscriptions
+- Local agent specs/plans live under `docs/superpowers/specs/` and `docs/superpowers/plans/` and are gitignored

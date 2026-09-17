@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_032315) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_17_023318) do
   create_table "drive_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "duration_minutes"
@@ -175,6 +175,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_032315) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
     t.string "email_address", null: false
     t.string "first_name"

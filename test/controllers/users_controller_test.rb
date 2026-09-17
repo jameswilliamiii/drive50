@@ -145,6 +145,20 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select ".error-messages", text: /profile/, count: 0
   end
 
+  test "settings update ignores admin param" do
+    patch user_url, params: {
+      user: {
+        first_name: @user.first_name,
+        last_name: @user.last_name,
+        email_address: @user.email_address,
+        admin: true
+      }
+    }
+
+    assert_redirected_to edit_user_url
+    assert_equal false, @user.reload.admin?
+  end
+
   test "an invalid account submission shows its error only in the account section" do
     patch user_url, params: { user: { first_name: "", last_name: "", email_address: "" } }
 
