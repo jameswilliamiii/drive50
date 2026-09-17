@@ -291,7 +291,7 @@ When in doubt, delete the comment.
 
 ## Learned User Preferences
 
-- Commit on a working/feature branch, not directly on `main`
+- Never commit or merge directly on `main` — always use a feature branch and land via PR
 - Do not commit design specs or implementation plans; keep them gitignored (under `docs/superpowers/`)
 - Prefer minimal code comments: no narration or generator boilerplate; only gotchas / invariants the code cannot express (see Important Patterns → Code comments)
 - When finishing a feature for review, prefer a squashed single-commit PR after a code review (force-push the branch so the PR stays one commit)
