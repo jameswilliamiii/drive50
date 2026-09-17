@@ -8,6 +8,8 @@
   <p class="dashboard-greeting-date"><%= Time.current.in_time_zone(greeting_tz).strftime("%A, %B %-d") %></p>
 </div>
 
+<%= render "shared/location_banner" %>
+
 <div class="dashboard">
   <%= render "progress_summary",
              stats: @stats,

@@ -294,10 +294,13 @@ When in doubt, delete the comment.
 - Commit on a working/feature branch, not directly on `main`
 - Do not commit design specs or implementation plans; keep them gitignored (under `docs/superpowers/`)
 - Prefer minimal code comments: no narration or generator boilerplate; only gotchas / invariants the code cannot express (see Important Patterns → Code comments)
-- When finishing a feature for review, prefer a squashed single-commit PR after a code review
+- When finishing a feature for review, prefer a squashed single-commit PR after a code review (force-push the branch so the PR stays one commit)
+- For Administrate datetime fields, prefer a shared options constant on stock `Field::DateTime` over a custom Field subclass so newly generated dashboards stay consistent
+- Administrate datetime display should use America/Chicago and show a timezone abbreviation
 
 ## Learned Workspace Facts
 
 - Admin UI is Administrate; `User#admin` gates access (`admin?` must be true); signed-in admins get an Admin link in the main nav
 - Administrate dashboards cover Users, Sessions, Drive Sessions, and Push Subscriptions
 - Local agent specs/plans live under `docs/superpowers/specs/` and `docs/superpowers/plans/` and are gitignored
+- Location/push onboarding: post-signup wizard (location then push); soft push prompt after sign-in when the current device lacks a subscription (sheet on mobile, modal on desktop); dismissals in `localStorage`; location step completeness inferred from user lat/lon (no `onboarding_completed_at`)

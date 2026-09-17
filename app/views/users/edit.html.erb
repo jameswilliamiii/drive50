@@ -101,9 +101,7 @@
         </span>
       </div>
 
-      <div class="ios-note" data-push-notifications-target="iosNote">
-        <strong>iOS Note:</strong> Push notifications only work when this app is installed to your home screen and opened from there (standalone mode).
-      </div>
+      <%= render "shared/push_ios_note", stimulus_controller: "push-notifications" %>
     </section>
 
     <!-- Account information section -->

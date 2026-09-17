@@ -45,3 +45,4 @@
 
 # Cursor local hook state
 /.cursor/hooks/state/
+.worktrees/

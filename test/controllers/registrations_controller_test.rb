@@ -34,7 +34,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to root_url
+    assert_redirected_to onboarding_location_url
+    assert session[:show_onboarding]
     assert cookies[:session_id], "Should create session cookie"
   end
 

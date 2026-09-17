@@ -1,0 +1,56 @@
+/* Scoped under .onboarding so wizard styles don't leak app-wide. */
+body.onboarding-focused main {
+  /* No bottom-nav padding; fill the viewport under the header. */
+  padding-bottom: var(--spacing-3xl);
+}
+
+.onboarding.authentication-form-container {
+  min-height: calc(100svh - 80px);
+}
+
+.onboarding-step {
+  width: 100%;
+  max-width: 480px;
+}
+
+.onboarding-step .drive-form {
+  margin-top: var(--spacing-xl);
+}
+
+.onboarding-step .actions {
+  flex-direction: column;
+  width: 100%;
+}
+
+.onboarding-step .actions form {
+  width: 100%;
+}
+
+.onboarding-step .actions .button,
+.onboarding-step .actions .button-primary {
+  width: 100%;
+  min-height: 52px;
+  text-align: center;
+}
+
+.onboarding-step .notification-status-text:empty {
+  display: none;
+}
+
+.onboarding-step .notification-status-text:not(:empty) {
+  margin-bottom: var(--spacing-lg);
+}
+
+.onboarding-finish-form {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .onboarding-step .drive-form {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-3xl);
+    box-shadow: var(--shadow-md);
+  }
+}

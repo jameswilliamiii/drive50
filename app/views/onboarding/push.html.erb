@@ -1,0 +1,31 @@
+<% content_for :title, push_reminders_title %>
+<% content_for :hide_app_chrome, "1" %>
+<% content_for :body_class, "onboarding-focused" %>
+
+<div class="onboarding authentication-form-container">
+  <div class="onboarding-step" data-controller="onboarding-push">
+    <%= render "shared/auth_header",
+               title: push_reminders_title,
+               subtitle: push_reminders_why %>
+
+    <div class="drive-form">
+      <p class="notification-status-text" data-onboarding-push-target="status"></p>
+
+      <%= render "shared/push_ios_note", stimulus_controller: "onboarding-push" %>
+
+      <div class="actions no-margin">
+        <button type="button"
+                class="button button-primary"
+                data-onboarding-push-target="enable"
+                data-action="click->onboarding-push#enable">
+          Enable notifications
+        </button>
+
+        <%= button_to "Not now", onboarding_finish_path, method: :post, class: "button" %>
+      </div>
+    </div>
+
+    <%= form_with url: onboarding_finish_path, method: :post, html: { class: "onboarding-finish-form", data: { onboarding_push_target: "finishForm" } } do %>
+    <% end %>
+  </div>
+</div>

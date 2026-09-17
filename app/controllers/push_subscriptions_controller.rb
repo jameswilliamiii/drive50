@@ -16,10 +16,13 @@ class PushSubscriptionsController < ApplicationController
 
     return render_invalid_endpoint unless valid_endpoint?(subscription_params[:endpoint])
 
-    @push_subscription = Current.user.push_subscriptions.find_or_initialize_by(
+    # Endpoints are unique per browser/device. find_or_initialize on the user
+    # association misses rows owned by another account on this same device, so
+    # look up globally and reassign to whoever is enabling push now.
+    @push_subscription = PushSubscription.find_or_initialize_by(
       endpoint: subscription_params[:endpoint]
     )
-
+    @push_subscription.user = Current.user
     @push_subscription.assign_attributes(
       p256dh_key: subscription_params.dig(:keys, :p256dh),
       auth_key: subscription_params.dig(:keys, :auth),

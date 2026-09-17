@@ -1,0 +1,25 @@
+<% content_for :title, "Location" %>
+<% content_for :hide_app_chrome, "1" %>
+<% content_for :body_class, "onboarding-focused" %>
+
+<div class="onboarding authentication-form-container">
+  <div class="onboarding-step" data-controller="location">
+    <%= render "shared/auth_header",
+               title: "Share your location",
+               subtitle: "Night hours use sunrise and sunset at your place. Without it, Drive50 approximates from your timezone, which can be wrong." %>
+
+    <%= form_with url: onboarding_location_path, scope: :user, method: :post, class: "drive-form", data: { location_target: "form" } do |f| %>
+      <%= f.hidden_field :latitude, data: { location_target: "latitude" } %>
+      <%= f.hidden_field :longitude, data: { location_target: "longitude" } %>
+
+      <div class="actions no-margin">
+        <button type="button"
+                class="button button-primary"
+                data-action="click->location#requestLocation">
+          Use my location
+        </button>
+        <%= link_to "Not now", onboarding_push_path, class: "button" %>
+      </div>
+    <% end %>
+  </div>
+</div>

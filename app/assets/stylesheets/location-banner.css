@@ -1,0 +1,85 @@
+/* Quiet dashboard tip when the account has no coordinates. */
+.location-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--color-info-soft);
+  border: 1px solid var(--color-info-soft-strong);
+  border-radius: var(--border-radius);
+  color: var(--color-info-strong);
+}
+
+.location-banner.hidden {
+  display: none;
+}
+
+.location-banner-text {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.location-banner-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.location-banner-link {
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.location-banner-dismiss {
+  flex: none;
+  margin: 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  min-height: 0;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .location-banner-dismiss:hover {
+    background: transparent;
+    border: none;
+    color: inherit;
+    opacity: 1;
+  }
+}
+
+.location-banner-dismiss:active {
+  background: transparent;
+  transform: none;
+  opacity: 1;
+}
+
+@media (max-width: 640px) {
+  .location-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+
+  .location-banner-actions {
+    justify-content: space-between;
+  }
+}

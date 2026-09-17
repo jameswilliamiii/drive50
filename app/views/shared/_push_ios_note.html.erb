@@ -1,0 +1,4 @@
+<%# locals: (stimulus_controller:) — kebab-case Stimulus id, e.g. "push-prompt" %>
+<%= tag.div class: "ios-note", data: { "#{stimulus_controller.tr("-", "_")}_target" => "iosNote" } do %>
+  <strong>iOS Note:</strong> <%= push_ios_install_note %>
+<% end %>
