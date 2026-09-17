@@ -31,6 +31,11 @@ Rails.application.routes.draw do
   resources :registrations, only: [ :new, :create ]
   resource :user, only: [ :edit, :update ]
 
+  get  "/onboarding/location", to: "onboarding#location", as: :onboarding_location
+  post "/onboarding/location", to: "onboarding#save_location"
+  get  "/onboarding/push",     to: "onboarding#push", as: :onboarding_push
+  post "/onboarding/finish",   to: "onboarding#finish", as: :onboarding_finish
+
   # Timezone detection endpoint
   post :timezone, to: "timezones#update"
 

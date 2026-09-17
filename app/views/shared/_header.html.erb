@@ -8,7 +8,7 @@
           </span>
         <% end %>
       </h1>
-      <% if authenticated? %>
+      <% if authenticated? && !content_for?(:hide_app_chrome) %>
         <div class="header-nav" data-controller="menu" data-action="click@window->menu#handleClickOutside">
           <button type="button" class="menu-button" data-menu-target="button" data-action="click->menu#toggle" aria-label="Toggle menu" aria-expanded="false">
             <%= icon_menu(size: 24, class: "menu-icon") %>

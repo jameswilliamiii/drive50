@@ -1,0 +1,17 @@
+<% if Current.user.latitude.blank? || Current.user.longitude.blank? %>
+  <div class="location-banner"
+       data-controller="location-banner"
+       role="status">
+    <p class="location-banner-text">
+      Location improves night-hour accuracy.
+    </p>
+    <div class="location-banner-actions">
+      <%= link_to "Set location", edit_user_path, class: "location-banner-link" %>
+      <button type="button"
+              class="location-banner-dismiss"
+              data-action="click->location-banner#dismiss">
+        Dismiss
+      </button>
+    </div>
+  </div>
+<% end %>

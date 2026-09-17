@@ -11,7 +11,8 @@ class RegistrationsController < ApplicationController
 
     if @user.save
       start_new_session_for @user
-      redirect_to root_path, notice: "Welcome! Your account has been created."
+      session[:show_onboarding] = true
+      redirect_to onboarding_location_path
     else
       render :new, status: :unprocessable_content
     end

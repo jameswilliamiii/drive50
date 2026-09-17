@@ -84,6 +84,36 @@ class PushSubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "new_auth", existing.auth_key
   end
 
+  test "create reassigns endpoint owned by another user" do
+    other = users(:two)
+    existing = PushSubscription.create!(
+      user: other,
+      endpoint: "https://web.push.apple.com/shared-device",
+      p256dh_key: "old_key",
+      auth_key: "old_auth"
+    )
+
+    subscription_data = {
+      subscription: {
+        endpoint: existing.endpoint,
+        keys: {
+          p256dh: "new_key",
+          auth: "new_auth"
+        }
+      }
+    }
+
+    assert_no_difference "PushSubscription.count" do
+      post push_subscription_url, params: subscription_data, as: :json
+    end
+
+    assert_response :created
+    existing.reload
+    assert_equal @user.id, existing.user_id
+    assert_equal "new_key", existing.p256dh_key
+    assert_equal "new_auth", existing.auth_key
+  end
+
   test "destroy removes subscription" do
     subscription = PushSubscription.create!(
       user: @user,

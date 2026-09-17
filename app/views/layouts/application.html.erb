@@ -35,9 +35,14 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= 'has-bottom-nav' if authenticated? %>"
+  <% hide_app_chrome = content_for?(:hide_app_chrome) %>
+  <body class="<%= [
+        content_for(:body_class),
+        ("has-bottom-nav" if authenticated? && !hide_app_chrome)
+      ].compact.join(" ") %>"
         data-controller="timezone-detector drive-modal day-modal"
-        data-timezone-detector-current-value="<%= Current.user&.timezone || session[:timezone] || User::DEFAULT_TIMEZONE %>">
+        data-timezone-detector-current-value="<%= Current.user&.timezone || session[:timezone] || User::DEFAULT_TIMEZONE %>"
+        <% if authenticated? %>data-offer-push-prompt="<%= offer_push_prompt? %>"<% end %>>
     <%= render "shared/header" %>
 
     <% if authenticated? %>
@@ -47,19 +52,22 @@
         <%= render "shared/in_progress_banner", in_progress: Current.user.drive_sessions.in_progress.first %>
       </div>
 
-      <%= render "shared/bottom_nav" %>
+      <% unless hide_app_chrome %>
+        <%= render "shared/bottom_nav" %>
 
-      <!-- Floating New/Complete Drive button (mobile only, state managed via turbo streams) -->
-      <div id="fab-new-drive-wrapper">
-        <%= render "shared/fab_new_drive" %>
-      </div>
+        <!-- Floating New/Complete Drive button (mobile only, state managed via turbo streams) -->
+        <div id="fab-new-drive-wrapper">
+          <%= render "shared/fab_new_drive" %>
+        </div>
+      <% end %>
     <% end %>
 
     <%= render "shared/toasts" %>
 
-    <% if authenticated? %>
+    <% if authenticated? && !hide_app_chrome %>
       <%= render "shared/drive_modal" %>
       <%= render "shared/day_summary_modal" %>
+      <%= render "shared/push_prompt" %>
     <% end %>
 
     <main>

@@ -1,0 +1,174 @@
+/* ============================================
+   Push prompt (post sign-in sheet / modal)
+   ============================================ */
+
+.push-prompt {
+  margin: auto;
+  width: min(28rem, calc(100vw - 2 * var(--spacing-xl)));
+  max-height: calc(100dvh - 2 * var(--spacing-2xl));
+  padding: 0;
+  border: none;
+  border-radius: var(--border-radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity var(--duration-base) ease-out,
+              transform var(--duration-base) ease-out;
+}
+
+@supports (overlay: auto) {
+  .push-prompt {
+    transition: opacity var(--duration-base) ease-out,
+                transform var(--duration-base) ease-out,
+                overlay var(--duration-base) ease-out allow-discrete,
+                display var(--duration-base) ease-out allow-discrete;
+  }
+}
+
+.push-prompt:not([open]),
+.push-prompt:not([open])::backdrop {
+  pointer-events: none;
+}
+
+.push-prompt[open] {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.push-prompt.is-restoring {
+  transition: none;
+}
+
+@starting-style {
+  .push-prompt[open] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.push-prompt::backdrop {
+  background: rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity var(--duration-base) ease-out;
+}
+
+@supports (overlay: auto) {
+  .push-prompt::backdrop {
+    transition: opacity var(--duration-base) ease-out,
+                overlay var(--duration-base) ease-out allow-discrete,
+                display var(--duration-base) ease-out allow-discrete;
+  }
+}
+
+.push-prompt[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .push-prompt[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.push-prompt.hidden {
+  display: none;
+}
+
+.push-prompt-card {
+  padding: var(--spacing-2xl);
+}
+
+.push-prompt-title {
+  margin: 0 0 var(--spacing-lg);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-text);
+}
+
+.push-prompt-body {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.push-prompt .ios-note {
+  margin-top: var(--spacing-xl);
+}
+
+.push-prompt-status {
+  margin-top: var(--spacing-lg);
+}
+
+.push-prompt-status.error {
+  color: var(--color-danger);
+}
+
+.push-prompt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-2xl);
+}
+
+.push-prompt-actions .button,
+.push-prompt-actions .button-primary {
+  width: 100%;
+}
+
+/* Mobile: dock near the bottom as a slightly inset sheet */
+@media (max-width: 640px) {
+  .push-prompt {
+    width: calc(100% - 2 * var(--spacing-md));
+    max-width: calc(100% - 2 * var(--spacing-md));
+    max-height: 85dvh;
+    margin: auto var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    opacity: 1;
+    transform: translateY(calc(100% + var(--spacing-lg)));
+    transition-duration: var(--duration-drawer);
+    transition-timing-function: var(--ease-drawer);
+  }
+
+  .push-prompt[open] {
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    .push-prompt[open] {
+      opacity: 1;
+      transform: translateY(calc(100% + var(--spacing-lg)));
+    }
+  }
+
+  .push-prompt-card {
+    padding: var(--spacing-xl) var(--spacing-xl)
+             calc(var(--spacing-2xl) + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .push-prompt {
+    opacity: 0;
+    transform: none;
+  }
+
+  .push-prompt[open] {
+    opacity: 1;
+    transform: none;
+  }
+
+  @starting-style {
+    .push-prompt[open] {
+      opacity: 0;
+      transform: none;
+    }
+  }
+}

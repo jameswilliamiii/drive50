@@ -30,4 +30,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
     assert_empty cookies[:session_id]
   end
+
+  test "sign in offers a one-shot push prompt flag" do
+    post session_url, params: { email_address: users(:one).email_address, password: "password" }
+    assert_redirected_to root_url
+    follow_redirect!
+    assert_select "[data-offer-push-prompt=true]"
+    assert_select ".push-prompt[data-controller=push-prompt]"
+    assert_select ".push-prompt", text: /Enable drive reminders/
+    assert_select ".push-prompt [data-action*=enable]", text: /Enable notifications/
+    assert_select ".push-prompt [data-action*=dismiss]", text: /Not now/
+    get root_url
+    assert_select "[data-offer-push-prompt=true]", count: 0
+  end
 end

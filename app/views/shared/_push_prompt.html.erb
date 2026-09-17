@@ -1,0 +1,29 @@
+<dialog class="push-prompt hidden"
+        data-controller="push-prompt"
+        data-action="click->push-prompt#backdropClick cancel->push-prompt#dismiss"
+        aria-labelledby="push-prompt-title">
+  <div class="push-prompt-card">
+    <h2 class="push-prompt-title" id="push-prompt-title"><%= push_reminders_title %></h2>
+    <p class="push-prompt-body">
+      <%= push_reminders_why %>
+    </p>
+
+    <%= render "shared/push_ios_note", stimulus_controller: "push-prompt" %>
+
+    <p class="notification-status-text push-prompt-status" data-push-prompt-target="status" hidden></p>
+
+    <div class="push-prompt-actions">
+      <button type="button"
+              class="button button-primary"
+              data-push-prompt-target="enable"
+              data-action="click->push-prompt#enable">
+        Enable notifications
+      </button>
+      <button type="button"
+              class="button"
+              data-action="click->push-prompt#dismiss">
+        Not now
+      </button>
+    </div>
+  </div>
+</dialog>

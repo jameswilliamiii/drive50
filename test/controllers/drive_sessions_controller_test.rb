@@ -12,6 +12,18 @@ class DriveSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "dashboard shows location banner when coordinates are missing" do
+    @user.update!(latitude: nil, longitude: nil)
+    get root_url
+    assert_select ".location-banner"
+  end
+
+  test "dashboard omits location banner when coordinates are present" do
+    @user.update!(latitude: 41.88, longitude: -87.63)
+    get root_url
+    assert_select ".location-banner", count: 0
+  end
+
   test "the dashboard greeting falls back to the default zone for a blank timezone" do
     @user.update!(timezone: nil)
 
