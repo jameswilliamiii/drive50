@@ -102,6 +102,25 @@
       </div>
 
       <%= render "shared/push_ios_note", stimulus_controller: "push-notifications" %>
+
+      <div class="notification-weekly-wrap<%= " is-hidden" unless @user.push_subscriptions.exists? %>"
+           data-push-notifications-target="weeklyWrap">
+        <%= form_with model: @user, url: user_path, class: "drive-form notification-weekly-form" do |f| %>
+          <div class="notification-toggle-container">
+            <label class="toggle-switch">
+              <%= f.check_box :weekly_motivation_enabled,
+                              aria: { label: "Weekly motivation" },
+                              data: { push_notifications_target: "weeklyToggle" } %>
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Weekly motivation</span>
+          </div>
+          <p class="settings-section-description">Monday morning tip with last week’s progress.</p>
+          <div class="actions no-margin">
+            <%= f.submit "Save", class: "button-primary" %>
+          </div>
+        <% end %>
+      </div>
     </section>
 
     <!-- Account information section -->

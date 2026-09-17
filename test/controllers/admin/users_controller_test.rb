@@ -135,4 +135,48 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_select "a[href=?]", admin_root_path, text: "Admin", count: 0
   end
+
+  test "admin can view weekly motivation fields on user show page" do
+    @user.update!(admin: true)
+    @other.update!(weekly_motivation_enabled: false, weekly_motivation_sent_on: Date.new(2026, 9, 14))
+    sign_in_as @user
+
+    get admin_user_url(@other)
+    assert_response :success
+    assert_includes response.body, "Weekly motivation enabled"
+    assert_includes response.body, "Weekly motivation sent on"
+  end
+
+  test "admin can edit weekly motivation fields" do
+    @user.update!(admin: true)
+    sign_in_as @user
+
+    get edit_admin_user_url(@other)
+    assert_response :success
+    assert_select "input[name='user[weekly_motivation_enabled]']"
+    assert_select "input[name='user[weekly_motivation_sent_on]']"
+  end
+
+  test "admin can update weekly motivation fields" do
+    @user.update!(admin: true)
+    sign_in_as @user
+
+    patch admin_user_url(@other), params: {
+      user: {
+        first_name: @other.first_name,
+        last_name: @other.last_name,
+        email_address: @other.email_address,
+        admin: @other.admin?,
+        hours_goal: @other.hours_goal,
+        night_hours_goal: @other.night_hours_goal,
+        weekly_motivation_enabled: false,
+        weekly_motivation_sent_on: "2026-09-14"
+      }
+    }
+
+    assert_redirected_to admin_user_url(@other)
+    @other.reload
+    assert_not @other.weekly_motivation_enabled?
+    assert_equal Date.new(2026, 9, 14), @other.weekly_motivation_sent_on
+  end
 end

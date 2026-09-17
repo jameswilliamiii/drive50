@@ -17,6 +17,8 @@ class UserDashboard < Administrate::BaseDashboard
     push_subscriptions: Field::HasMany,
     sessions: Field::HasMany,
     timezone: Field::String,
+    weekly_motivation_enabled: Field::Boolean,
+    weekly_motivation_sent_on: Field::Date,
     created_at: Field::DateTime,
     updated_at: Field::DateTime
   }.freeze
@@ -38,6 +40,8 @@ class UserDashboard < Administrate::BaseDashboard
     hours_goal
     night_hours_goal
     timezone
+    weekly_motivation_enabled
+    weekly_motivation_sent_on
     latitude
     longitude
     drive_sessions
@@ -59,6 +63,8 @@ class UserDashboard < Administrate::BaseDashboard
     timezone
     latitude
     longitude
+    weekly_motivation_enabled
+    weekly_motivation_sent_on
   ].freeze
 
   COLLECTION_FILTERS = {}.freeze

@@ -8,7 +8,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "should get edit" do
     get edit_user_url
+
     assert_response :success
+    assert_select "form.notification-weekly-form input[name='user[weekly_motivation_enabled]']"
+    assert_select ".notification-weekly-form", text: /Weekly motivation/
   end
 
   test "should update user name" do
@@ -127,6 +130,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     @user.reload
     assert_equal 40, @user.hours_goal
     assert_equal 6, @user.night_hours_goal
+  end
+
+  test "should disable weekly motivation" do
+    @user.update!(weekly_motivation_enabled: true)
+
+    patch user_url, params: { user: { weekly_motivation_enabled: false } }
+
+    assert_redirected_to edit_user_url
+    assert_not @user.reload.weekly_motivation_enabled?
   end
 
   test "should not update to a night hours goal that exceeds the total" do
