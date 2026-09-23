@@ -29,7 +29,6 @@ env:
     RAILS_ENV: production
     RAILS_SERVE_STATIC_FILES: true
     RAILS_LOG_LEVEL: info
-    SOLID_QUEUE_IN_PUMA: true
   secret:
     - RAILS_MASTER_KEY
     - SECRET_KEY_BASE
